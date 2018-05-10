@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% block title %}
+    Bot Detail
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            {% include 'oversight/fragments/messages.html' %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-8">
+            <h1>The "{{ object.name }}@{{ object.exchange }}" Bot</h1>
+            <div class="form-group">
+                <label for="base" class="control-label">Base Currency</label>
+                <input id="base" class="form-control" readonly value="{{ object.base }}" />
+            </div>
+            <div class="form-group">
+                <label for="quote" class="control-label">Quote Currency</label>
+                <input id="quote" class="form-control" type="text" readonly value="{{ object.quote }}" />
+            </div>
+            <div class="form-group">
+                <label for="track" class="control-label">Track Currency</label>
+                <input id="track" class="form-control" type="text" readonly value="{{ object.track }}" />
+            </div>
+            <div class="form-group">
+                <label for="peg" class="control-label">Peg Currency</label>
+                <input id="peg" class="form-control" type="text" readonly value="{{ object.peg }}" />
+            </div>
+            <div class="form-group">
+                <label for="tolerance" class="control-label">Tolerance</label>
+                <input id="tolerance" class="form-control" type="number" readonly value="{{ object.tolerance }}" />
+            </div>
+            <div class="form-group">
+                <label for="fee" class="control-label">Fee</label>
+                <input id="fee" class="form-control" type="number" readonly value="{{ object.fee }}" />
+            </div>
+            <div class="form-group">
+                <label for="order-amount" class="control-label">Order Amount</label>
+                <input id="order-amount" class="form-control" type="number" readonly value="{{ object.order_amount }}" />
+            </div>
+            <div class="form-group">
+                <label for="total-bid" class="control-label">Total Bid</label>
+                <input id="total-bid" class="form-control" type="number" readonly value="{{ object.total_bid }}" />
+            </div>
+            <div class="form-group">
+                <label for="total-ask" class="control-label">Total Ask</label>
+                <input id="total-ask" class="form-control" type="number" readonly value="{{ object.total_ask }}" />
+            </div>
+            <a href="{% url 'bot_update' pk=object.pk %}" role="button" class="btn btn-dark">Edit</a>
+            <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
+            <a href="{% url 'bot_delete' pk=object.pk %}" role="button" class="btn btn-outline-danger">Delete</a>
+        </div>
+    </div>
+{% endblock %}

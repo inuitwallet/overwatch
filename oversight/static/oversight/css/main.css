@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css?family=Cormorant+Unicase:500');
+
+#main-title {
+    font-family: 'Cormorant Unicase', serif;
+    font-size: 5.5rem;
+    color: #efefef;
+}
+
+#main-title a:visited {
+    color: #efefef;
+}
+
+#main-title a:hover {
+    color: #efefef;
+    text-decoration: none;
+}
+
+nav {
+    background-color: #090909
+}
+
+nav a {
+    color: #090909;
+    /*padding: 10px;*/
+}
+
+nav a:visited {
+    color: #090909;
+}
+
+nav a:hover {
+    color: #090909;
+    text-decoration: none;
+}
+
+.messages {
+    padding-bottom: 10px;
+}
+
+.content {
+    padding-top: 10px;
+}
+
+.bot-link {
+    color: #fff
+}
+
+.settings-icon {
+    position: relative;
+    top: -2px;
+    left: -2px
+}
+
+.bot-link:hover {
+    text-decoration: none;
+}
+
+.bot-link:visited {
+    color: #eee;
+}
+
+.control-label {
+    font-weight: 700;
+}
+
+.help-block {
+    opacity: 0.5;
+}

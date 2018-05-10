@@ -1,0 +1,5 @@
+*.sqlite3
+.idea/
+ve/
+client.py
+local_settings.py

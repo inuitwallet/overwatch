@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Configured Bots{% endblock %}
+
+{% block content %}
+    <div class="row messages">
+        <div class="col">
+            {% include 'oversight/fragments/messages.html' %}
+        </div>
+        <div class="col text-right new-button">
+            <a href="{% url 'bot_create' %}" class="btn btn-dark">New Bot</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table id="configured-bots" class="table table-striped table-hover table-bordered table-dark">
+                <caption>All Configured Bots</caption>
+                <thead class="thead-dark bg-dark">
+                    <tr>
+                        <td>Name</td>
+                        <td>Exchange</td>
+                        <!--<td>Base</td>-->
+                        <!--<td>Quote</td>-->
+                        <!--<td>Track</td>-->
+                        <!--<td>Peg</td>-->
+                        <td>Tolerance</td>
+                        <td>Fee</td>
+                        <td>Order Amount</td>
+                        <td>Total Bid</td>
+                        <td>Total Ask</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bot in object_list %}
+                        {% include 'oversight/fragments/bot.html' %}
+                    {% endfor %}
+                </tbody>
+           </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block endbodyjs %}
+    <script>
+        $(document).ready(function() {
+            $('#configured-bots').DataTable(
+                {
+                    "pagingType": "simple"
+                }
+            );
+        } );
+    </script>
+{% endblock %}

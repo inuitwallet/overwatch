@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% block title %}
+    Are you sure?
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <legend>Are you sure you want to delete the "{{ object.name }}@{{ object.exchange }}" Bot?</legend>
+        <button class="btn btn-dark" type="submit" value="Confirm">Confirm</button>
+        <a class="btn btn-secondary" role="button" href="{% url 'bot_detail' pk=object.pk %}">Back</a>
+    </form>
+{% endblock %}
