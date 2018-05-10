@@ -84,6 +84,14 @@ class Bot(models.Model):
 
         return True, 'authenticated'
 
+    @property
+    def latest_heartbeat(self):
+        latest_heartbeat = self.botheartbeat_set.first()
+        if latest_heartbeat:
+            return latest_heartbeat.time
+
+        return ''
+
 
 class BotHeartBeat(models.Model):
     bot = models.ForeignKey(
@@ -93,3 +101,9 @@ class BotHeartBeat(models.Model):
     time = models.DateTimeField(
         auto_now_add=True
     )
+
+    def __str__(self):
+        return '{}'.format(self.time)
+
+    class Meta:
+        ordering = ['-time']

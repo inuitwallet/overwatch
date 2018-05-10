@@ -2,4 +2,6 @@
 .idea/
 ve/
 client.py
+wrapper.py
 local_settings.py
+__pycache__/
