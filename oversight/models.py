@@ -31,7 +31,7 @@ class Bot(models.Model):
     api_secret = models.UUIDField(
         default=uuid.uuid4
     )
-    last_nonce = models.IntegerField(
+    last_nonce = models.BigIntegerField(
         default=0
     )
 
