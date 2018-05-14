@@ -7,23 +7,32 @@ from django.db import models
 class Bot(models.Model):
     name = models.CharField(
         max_length=255,
+        help_text='Name to identify this bot. Usually the name of the pair it operates on'
     )
     exchange = models.CharField(
-        max_length=255
+        max_length=255,
+        help_text='The exchange the bot operates on. '
+                  'Together with the name this forms a unique identifier for this bot'
     )
     base = models.CharField(
         max_length=255,
+        help_text='The base currency of the pair'
     )
     quote = models.CharField(
         max_length=255,
+        help_text='The quote currency of the pair'
     )
     track = models.CharField(
         max_length=255,
+        help_text='The currency to track. This determines if the pair is reversed or not'
     )
     peg = models.CharField(
         max_length=255,
+        help_text='The currency to peg to'
     )
-    tolerance = models.FloatField()
+    tolerance = models.FloatField(
+        help_text=''
+    )
     fee = models.FloatField()
     order_amount = models.FloatField()
     total_bid = models.FloatField()
@@ -87,8 +96,18 @@ class Bot(models.Model):
     @property
     def latest_heartbeat(self):
         latest_heartbeat = self.botheartbeat_set.first()
+
         if latest_heartbeat:
             return latest_heartbeat.time
+
+        return ''
+
+    @property
+    def last_error(self):
+        latest_error = self.boterror_set.first()
+
+        if latest_error:
+            return latest_error.time
 
         return ''
 
@@ -104,6 +123,26 @@ class BotHeartBeat(models.Model):
 
     def __str__(self):
         return '{}'.format(self.time)
+
+    class Meta:
+        ordering = ['-time']
+
+
+class BotError(models.Model):
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE
+    )
+    time = models.DateTimeField(
+        auto_now_add=True
+    )
+    title = models.CharField(
+        max_length=255
+    )
+    message = models.TextField()
+
+    def __str__(self):
+        return '{} - {}'.format(self.time, self.title)
 
     class Meta:
         ordering = ['-time']

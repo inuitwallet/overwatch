@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'oversight',
     'bootstrapform',
+    'widget_tweaks',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +133,8 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'dark',
     messages.ERROR: 'danger'
 }
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 # Load local_settings

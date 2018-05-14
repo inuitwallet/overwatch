@@ -33,5 +33,9 @@ urlpatterns = [
     path('bot/<int:pk>/edit', views.UpdateBotView.as_view(), name='bot_update'),
     path('bot/<int:pk>/delete', views.DeleteBotView.as_view(), name='bot_delete'),
 
+    # incoming data
     path('bot/config', views.BotConfigView.as_view(), name='bot_config'),
+    path('bot/report_error', views.BotErrorsView.as_view(), name='bot_report_error'),
+
+    path('bot/<int:pk>/error/datatables', views.BotErrorsDataTablesView.as_view(), name='bot_error_datatables')
 ]

@@ -66,3 +66,13 @@ nav a:hover {
 .help-block {
     opacity: 0.5;
 }
+
+.tab-content {
+    padding-top: 10px;
+}
+
+#bot-errors {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+

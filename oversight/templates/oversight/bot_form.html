@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load bootstrap %}
+{% load widget_tweaks %}
 
 {% block title %}
     {% if form.instance.pk is not None %}
@@ -20,7 +20,160 @@
             {% endif %}
         </legend>
         {% csrf_token %}
-        {{ form | bootstrap_horizontal }}
+        {{ form.non_field_errors }}
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Name</label>
+                    {% if form.name.errors %}
+                        {{ form.name|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.name|add_class:"form-control" }}
+                    {% endif %}
+                    <div class="invalid-feedback">
+                        The bot requires a name
+                    </div>
+                    {% if name.help_text %}
+                        <p class="form-text">{{ name.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.exchange.id_for_label }}">Exchange</label>
+                    {% if form.exchange.errors %}
+                        {{ form.exchange|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.exchange|add_class:"form-control" }}
+                    {% endif %}
+                    {% if exchange.help_text %}
+                        <p class="form-text">{{ exchange.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.base.id_for_label }}">Base Currency</label>
+                    {% if form.base.errors %}
+                        {{ form.base|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.base|add_class:"form-control" }}
+                    {% endif %}
+                    {% if base.help_text %}
+                        <p class="form-text">{{ base.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.quote.id_for_label }}">Quote Currency</label>
+                    {% if form.quote.errors %}
+                        {{ form.quote|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.quote|add_class:"form-control" }}
+                    {% endif %}
+                    {% if quote.help_text %}
+                        <p class="form-text">{{ quote.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.track.id_for_label }}">Track Currency</label>
+                    {% if form.track.errors %}
+                        {{ form.track|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.track|add_class:"form-control" }}
+                    {% endif %}
+                    {% if track.help_text %}
+                        <p class="form-text">{{ track.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.peg.id_for_label }}">Peg Currency</label>
+                    {% if form.peg.errors %}
+                        {{ form.peg|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.peg|add_class:"form-control" }}
+                    {% endif %}
+                    {% if peg.help_text %}
+                        <p class="form-text">{{ peg.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.tolerance.id_for_label }}">Tolerance</label>
+                    {% if form.tolerance.errors %}
+                        {{ form.tolerance|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.tolerance|add_class:"form-control" }}
+                    {% endif %}
+                    {% if tolerance.help_text %}
+                        <p class="form-text">{{ tolerance.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.fee.id_for_label }}">Fee</label>
+                    {% if form.fee.errors %}
+                        {{ form.fee|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.fee|add_class:"form-control" }}
+                    {% endif %}
+                    {% if fee.help_text %}
+                        <p class="form-text">{{ fee.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.fee.id_for_label }}">Order Amount</label>
+                    {% if form.order_amount.errors %}
+                        {{ form.order_amount|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.order_amount|add_class:"form-control" }}
+                    {% endif %}
+                    {% if fee.help_text %}
+                        <p class="form-text">{{ fee.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.total_bid.id_for_label }}">Total Bid</label>
+                    {% if form.total_bid.errors %}
+                        {{ form.total_bid|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.total_bid|add_class:"form-control" }}
+                    {% endif %}
+                    {% if total_bid.help_text %}
+                        <p class="form-text">{{ total_bid.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.total_ask.id_for_label }}">total Ask</label>
+                    {% if form.total_ask.errors %}
+                        {{ form.total_ask|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.total_ask|add_class:"form-control" }}
+                    {% endif %}
+                    {% if total_ask.help_text %}
+                        <p class="form-text">{{ total_ask.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
         <div class="form-group">
             <button type="submit" class="btn btn-dark">Save</button>
             <a href="{% url 'bot_detail' pk=object.pk %}" role="button" class="btn btn-secondary">Back</a>
