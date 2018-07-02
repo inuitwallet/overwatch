@@ -20,8 +20,8 @@
         {% endif %}
     </td>
     <td>
-        {% if bot.latest_error %}
-            {{ bot.latest_error|timesince }} ago
+        {% if bot.last_error %}
+            {{ bot.last_error|timesince }} ago
         {% else %}
             No errors
         {% endif %}
