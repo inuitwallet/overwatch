@@ -1,19 +1,20 @@
 import json
 from math import ceil
+from uuid import UUID
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse, HttpResponse, HttpResponseForbidden, Http404, HttpResponseNotFound
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponseNotFound
 from django.template import Template, Context
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
-from oversight.models import Bot, BotHeartBeat, BotError
+from oversight.models import Bot, BotHeartBeat, BotError, ApiProfile
 
 
 class ListBotView(LoginRequiredMixin, ListView):
@@ -28,7 +29,6 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         all_heartbeats = self.object.botheartbeat_set.all()
         paginator = Paginator(all_heartbeats, 30)
         context['heart_beats'] = paginator.get_page(1)
-        print(context)
         return context
 
 
@@ -79,6 +79,7 @@ class BotConfigView(View):
             )
 
         has_auth, reason = bot.auth(supplied_hash, name, exchange, nonce)
+
         if not has_auth:
             return HttpResponseForbidden(
                 json.dumps({'success': False, 'error': reason}),
@@ -95,14 +96,37 @@ class BotConfigView(View):
 class BotErrorsView(View):
     @staticmethod
     def post(request):
-        for key in ['name', 'exchange', 'n', 'h', 'title', 'message']:
+        for key in ['name', 'exchange', 'title', 'message', 'api_user', 'n', 'h']:
             if key not in request.POST:
                 return JsonResponse({'success': False, 'error': 'no {} present in POST data'.format(key)})
 
-        name = request.POST.get('name')
-        exchange = request.POST.get('exchange')
         nonce = request.POST.get('n')
         supplied_hash = request.POST.get('h')
+        api_user = request.POST.get('api_user')
+
+        try:
+            print(api_user)
+            print(UUID(api_user))
+            api_profile = ApiProfile.objects.get(api_user=UUID(api_user))
+            print(api_profile)
+        except User.DoesNotExist:
+            return HttpResponseNotFound(
+                json.dumps(
+                    {'success': False, 'error': '\'{}\' does not exist as an api user'.format(api_user)}
+                ),
+                content_type='application/json'
+            )
+
+        has_auth, reason = api_profile.auth(supplied_hash, nonce)
+
+        if not has_auth:
+            return HttpResponseForbidden(
+                json.dumps({'success': False, 'error': reason}),
+                content_type='application/json'
+            )
+
+        name = request.POST.get('name')
+        exchange = request.POST.get('exchange')
         title = request.POST.get('title')
         message = request.POST.get('message')
 
@@ -113,13 +137,6 @@ class BotErrorsView(View):
                 json.dumps(
                     {'success': False, 'error': '\'{}@{}\' does not exist as a bot'.format(name, exchange)}
                 ),
-                content_type='application/json'
-            )
-
-        has_auth, reason = bot.auth(supplied_hash, name, exchange, nonce)
-        if not has_auth:
-            return HttpResponseForbidden(
-                json.dumps({'success': False, 'error': reason}),
                 content_type='application/json'
             )
 

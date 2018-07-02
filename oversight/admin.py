@@ -1,7 +1,12 @@
 from django.contrib import admin
 
 # Register your models here.
-from oversight.models import Bot, BotHeartBeat, BotError
+from oversight.models import ApiProfile, Bot, BotHeartBeat, BotError
+
+
+@admin.register(ApiProfile)
+class ApiProfileAdmin(admin.ModelAdmin):
+    list_display = ['api_user', 'api_secret', 'last_nonce']
 
 
 @admin.register(Bot)

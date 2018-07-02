@@ -117,17 +117,21 @@
                     <h2>Heart Beats</h2>
                 </div>
             </div>
-            {% for heartbeat in heart_beats %}
-                <div class="row">
-                    <div class="col text-center">
-                        <div class="card">
-                            <div class="card-body">
-                                {{ heartbeat.time|timesince }} ago
+            <div class="row heart-beats">
+                <div class="col">
+                    {% for heartbeat in heart_beats %}
+                        <div class="row">
+                            <div class="col text-center">
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{ heartbeat.time|timesince }} ago
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -141,9 +145,9 @@
                     "serverSide": true,
                     "ajax": "{% url 'bot_error_datatables' pk=object.pk %}",
                     "columns": [
-                        { "name": "time" },
-                        { "name": "title" },
-                        { "name": "message" }
+                        { "name": "time", width: "20%" },
+                        { "name": "title", width: "30%" },
+                        { "name": "message", width: "50%" }
                     ]
                 }
             );

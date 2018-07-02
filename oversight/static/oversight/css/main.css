@@ -71,6 +71,11 @@ nav a:hover {
     padding-top: 10px;
 }
 
+.heart-beats {
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
 #bot-errors {
     max-width: 100%;
     word-wrap: break-word;
