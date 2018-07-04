@@ -91,6 +91,12 @@ class Bot(models.Model):
     last_nonce = models.BigIntegerField(
         default=0
     )
+    logs_group = models.CharField(
+        max_length=255,
+        help_text='AWS Cloudwatch logs group name',
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.name

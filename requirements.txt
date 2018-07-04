@@ -1,5 +1,6 @@
 boto3
+channels
 django
 django-bootstrap-form
-django-crispy-forms
 django-widget-tweaks
+service-identity

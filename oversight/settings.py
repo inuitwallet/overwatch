@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'oversight',
     'bootstrapform',
     'widget_tweaks',
-    'crispy_forms',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +74,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'oversight.wsgi.application'
+ASGI_APPLICATION = "oversight.routing.application"
 
 
 # Database
@@ -125,6 +126,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 LOGIN_REDIRECT_URL = 'index'
 LOGIN_URL = 'login'
 
@@ -133,8 +138,6 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'dark',
     messages.ERROR: 'danger'
 }
-
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 # Load local_settings
