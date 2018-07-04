@@ -166,7 +166,7 @@
     </script>
     <script>
         const webSocketBridge = new channels.WebSocketBridge();
-        webSocketBridge.connect('/logs/{{ object.exchange }}/{{ object.name }}/');
+        webSocketBridge.connect('/logs/{{ object.exchange }}/{{ object.name|escape }}/');
         webSocketBridge.listen(function(action, stream) {
             message_type = action['message_type'];
 
