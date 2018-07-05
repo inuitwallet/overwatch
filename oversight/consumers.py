@@ -17,8 +17,8 @@ class ChatConsumer(WebsocketConsumer):
     def connect(self):
         try:
             bot = Bot.objects.get(
-                name__iexact=self.scope['url_route']['kwargs']['name'],
-                exchange__iexact=self.scope['url_route']['kwargs']['exchange'])
+                pk=self.scope['url_route']['kwargs']['pk']
+            )
         except Bot.DoesNotExist:
             self.close()
             return

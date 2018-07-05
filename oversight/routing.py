@@ -9,7 +9,7 @@ application = ProtocolTypeRouter({
     # Empty for now (http->django views is added by default)
     'websocket': AuthMiddlewareStack(
         URLRouter([
-            url(r'^logs/(?P<exchange>[^/]+)/(?P<name>[^/]+)/$', consumers.ChatConsumer),
+            url(r'^logs/(?P<pk>[^/]+)/$', consumers.ChatConsumer),
         ])
     ),
 })
