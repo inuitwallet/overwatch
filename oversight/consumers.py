@@ -83,7 +83,7 @@ class ChatConsumer(WebsocketConsumer):
             )
 
             self.send_events(events)
-            time.sleep(1)
+            time.sleep(30)
 
         if not self.collect_logs:
             return
