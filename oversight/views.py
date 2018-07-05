@@ -105,10 +105,7 @@ class BotErrorsView(View):
         api_user = request.POST.get('api_user')
 
         try:
-            print(api_user)
-            print(UUID(api_user))
             api_profile = ApiProfile.objects.get(api_user=UUID(api_user))
-            print(api_profile)
         except User.DoesNotExist:
             return HttpResponseNotFound(
                 json.dumps(

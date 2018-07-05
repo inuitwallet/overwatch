@@ -44,8 +44,6 @@ class ApiProfile(models.Model):
         self.last_nonce = nonce
         self.save()
 
-        print(calculated_hash, supplied_hash)
-
         if calculated_hash != supplied_hash:
             return False, 'supplied hash does not match calculated hash'
 
