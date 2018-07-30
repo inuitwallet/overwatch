@@ -2,5 +2,7 @@ boto3
 channels
 django
 django-bootstrap-form
+django-storages
 django-widget-tweaks
+psycopg2-binary
 service-identity

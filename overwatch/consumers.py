@@ -7,7 +7,7 @@ import boto3
 from channels.generic.websocket import WebsocketConsumer
 from django.conf import settings
 
-from overoverwatch.models import Bot
+from overwatch.models import Bot
 
 
 class ChatConsumer(WebsocketConsumer):
