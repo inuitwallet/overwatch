@@ -6,3 +6,4 @@ wrapper.py
 local_settings.py
 __pycache__/
 */__pychache__/
+fixtures/

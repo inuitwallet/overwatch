@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% load static %}
+
+{% block title %}
+    Bot Detail
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            {% include 'overwatch/fragments/messages.html' %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-8">
+            <h1>The "{{ object.name }}@{{ object.exchange }}" Bot</h1>
+            <ul class="nav nav-tabs" id="botTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="false">Errors</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="botTabsContent">
+                <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                    <div class="row tab-content">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="base" class="control-label">Base Currency</label>
+                                <input id="base" class="form-control" readonly value="{{ object.base }}" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="quote" class="control-label">Quote Currency</label>
+                                <input id="quote" class="form-control" type="text" readonly value="{{ object.quote }}" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="track" class="control-label">Track Currency</label>
+                                <input id="track" class="form-control" type="text" readonly value="{{ object.track }}" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="peg" class="control-label">Peg Currency</label>
+                                <input id="peg" class="form-control" type="text" readonly value="{{ object.peg }}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="tolerance" class="control-label">Tolerance</label>
+                                <input id="tolerance" class="form-control" type="number" readonly value="{{ object.tolerance }}" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="fee" class="control-label">Fee</label>
+                                <input id="fee" class="form-control" type="number" readonly value="{{ object.fee }}" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="order-amount" class="control-label">Order Amount</label>
+                                <input id="order-amount" class="form-control" type="number" readonly value="{{ object.order_amount }}" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="total-bid" class="control-label">Total Bid</label>
+                                <input id="total-bid" class="form-control" type="number" readonly value="{{ object.total_bid }}" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="total-ask" class="control-label">Total Ask</label>
+                                <input id="total-ask" class="form-control" type="number" readonly value="{{ object.total_ask }}" />
+                            </div>
+                        </div>
+                </div>
+                    <div class="row">
+                        <div class="col">
+                            <a href="{% url 'bot_update' pk=object.pk %}" role="button" class="btn btn-dark">Edit</a>
+                            <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
+                            <a href="{% url 'bot_delete' pk=object.pk %}" role="button" class="btn btn-outline-danger">Delete</a>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row bot-logs">
+                        <p class="lead">CloudWatch Logs</p>
+                        <div class="container-fluid logs">
+                            <!-- Logs get streamed here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="errors" role="tabpanel" aria-labelledby="errors-tab">
+                    <div class="row">
+                        <div class="col tab-content">
+                            <table id="bot-errors" class="table table-striped table-hover table-bordered">
+                                <caption>{{ object.name}} Errors</caption>
+                                <thead>
+                                    <tr>
+                                        <td scope="col">Created</td>
+                                        <td scope="col">Title</td>
+                                        <td scope="col">Message</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row">
+                <div class="col text-center">
+                    <h2>Heart Beats</h2>
+                </div>
+            </div>
+            <div class="row heart-beats">
+                <div class="col">
+                    {% for heartbeat in heart_beats %}
+                        <div class="row">
+                            <div class="col text-center">
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{ heartbeat.time|timesince }} ago
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block endbodyjs %}
+    <script type="text/javascript" src="{% static '/channels/js/websocketbridge.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#bot-errors').DataTable(
+                {
+                    "pagingType": "full",
+                    "serverSide": true,
+                    "ajax": "{% url 'bot_error_datatables' pk=object.pk %}",
+                    "columns": [
+                        { "name": "time", width: "20%" },
+                        { "name": "title", width: "30%" },
+                        { "name": "message", width: "50%" }
+                    ],
+                    "order": [[ 0, 'desc' ]]
+                }
+            );
+        } );
+    </script>
+    <script>
+        const webSocketBridge = new channels.WebSocketBridge();
+        webSocketBridge.connect('/logs/{{ object.pk }}/');
+        webSocketBridge.listen(function(action, stream) {
+            message_type = action['message_type'];
+
+            if (message_type === "clear") {
+                $('.logs').empty();
+            }
+            if (message_type === "log_line") {
+                time = action['time'];
+                message = action['message'];
+                var log_line = '<div class="row"><div class="col-2 text-right">' + time + '</div><div class="col text-left">' + message + '</div></div>'
+                $('.logs').append(log_line);
+                var logsDiv = $('.logs')[0];
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+            }
+        });
+    </script>
+{% endblock %}
