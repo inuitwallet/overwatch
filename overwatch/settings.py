@@ -135,6 +135,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
 
+ACCOUNT_ACTIVATION_DAYS = 7
 
 # Load local_settings
 try:

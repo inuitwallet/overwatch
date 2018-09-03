@@ -39,8 +39,6 @@ class ChatConsumer(WebsocketConsumer):
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         )
 
-        print('waiters: {}'.format(logs_client.waiter_names))
-
         streams = logs_client.describe_log_streams(
             logGroupName=bot.logs_group,
             orderBy='LastEventTime',

@@ -90,3 +90,7 @@ nav a:hover {
     max-height: 200px;
     overflow-y: scroll;
 }
+
+#logout {
+    color: #fff;
+}

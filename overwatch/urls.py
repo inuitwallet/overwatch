@@ -21,21 +21,33 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('login/', auth_views.login, name='login'),
-    path('logout/', auth_views.logout, {'next_page': '/'}, name='logout'),
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
     path('', views.ListBotView.as_view(), name='index'),
 
     # Bot urls
-
     path('bot/<int:pk>', views.DetailBotView.as_view(), name='bot_detail'),
     path('bot/create', views.CreateBotView.as_view(), name='bot_create'),
     path('bot/<int:pk>/edit', views.UpdateBotView.as_view(), name='bot_update'),
     path('bot/<int:pk>/delete', views.DeleteBotView.as_view(), name='bot_delete'),
 
-    # incoming data
-    path('bot/config', views.BotConfigView.as_view(), name='bot_config'),
-    path('bot/report_error', views.BotErrorsView.as_view(), name='bot_report_error'),
+    path('bot/config', views.BotApiConfigView.as_view(), name='bot_config'),
 
-    path('bot/<int:pk>/error/datatables', views.BotErrorsDataTablesView.as_view(), name='bot_error_datatables')
+    # incoming data
+    path('bot/report_error', views.BotUserApiErrorsView.as_view(), name='bot_report_error'),
+
+    path('bot/placed_order', views.BotApiPlacedOrderView.as_view(), name='bot_placed_order'),
+    #path('bot/cancelled_order', views.BotCancelledOrderView.as_view(), name='bot_cancelled_order'),
+
+   # path('bot/prices', views.BotPricesView.as_view(), name='bot_prices'),
+   # path('bot/balance', views.BotBalancesView.as_view(), name='bot_balance'),
+
+    # Display DataTables
+    path('bot/<int:pk>/error/datatables', views.BotErrorsDataTablesView.as_view(), name='bot_error_datatables'),
+    path(
+        'bot/<int:pk>/placed_orders/datatables',
+        views.BotPlacedOrdersDataTablesView.as_view(),
+        name='bot_placed_orders_datatables'
+    )
 ]

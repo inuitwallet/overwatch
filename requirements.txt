@@ -1,7 +1,9 @@
 boto3
+bpython
 channels
 django
 django-bootstrap-form
+django-registration
 django-storages
 django-widget-tweaks
 psycopg2-binary
