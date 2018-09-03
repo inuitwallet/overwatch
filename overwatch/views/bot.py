@@ -96,31 +96,52 @@ def generic_data_tables_view(request, object, bot_pk):
         ceil(index / length)
     )
 
-    return JsonResponse(
-        {
-            'draw': draw,
-            'recordsTotal': results_total,
-            'recordsFiltered': query_set.count(),
-            'data': [
-                [
-                    Template(
-                        '{{ error.time }}'
-                    ).render(
-                        Context({'error': error})
-                    ),
-                    error.title,
-                    error.message
-                ] for error in page
-            ]
-        }
-    )
+    return {
+        'draw': draw,
+        'recordsTotal': results_total,
+        'recordsFiltered': query_set.count(),
+        'data': page
+    }
 
 
 class BotErrorsDataTablesView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        return generic_data_tables_view(request, BotError, pk)
+        data = generic_data_tables_view(request, BotError, pk)
+        return JsonResponse(
+            {
+                'draw': data['draw'],
+                'recordsTotal': data['recordsTotal'],
+                'recordsFiltered': data['recordsFiltered'],
+                'data': [
+                    [
+                        Template(
+                            '{{ error.time }}'
+                        ).render(
+                            Context({'error': error})
+                        ),
+                        error.title,
+                        error.message
+                    ] for error in data['data']
+                ]
+            }
+        )
 
 
 class BotPlacedOrdersDataTablesView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        return generic_data_tables_view(request, BotPlacedOrder, pk)
+        data = generic_data_tables_view(request, BotPlacedOrder, pk)
+        return JsonResponse(
+            {
+                'draw': data['draw'],
+                'recordsTotal': data['recordsTotal'],
+                'recordsFiltered': data['recordsFiltered'],
+                'data': [
+                    [
+                        placed_order.time,
+                        placed_order.order_type,
+                        placed_order.price,
+                        placed_order.amount
+                    ] for placed_order in data['data']
+                ]
+            }
+        )
