@@ -24,7 +24,7 @@ def handle_bot_api_auth(request_data, additional_keys=None):
 
     for key in keys:
         if key not in request_data:
-            return False, JsonResponse({'success': False, 'error': 'no {} present in GET data'.format(key)})
+            return False, JsonResponse({'success': False, 'error': 'no {} present in data'.format(key)})
 
     name = request_data.get('name')
     exchange = request_data.get('exchange')
