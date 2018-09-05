@@ -5,7 +5,8 @@ from .bot import (
     CreateBotView,
     DeleteBotView,
     BotErrorsDataTablesView,
-    BotPlacedOrdersDataTablesView
+    BotPlacedOrdersDataTablesView,
+    BotPlacedOrdersChartView
 )
 from .bot_api import (
     BotApiConfigView,
@@ -26,6 +27,7 @@ __all__ = [
     'BotApiConfigView',
     'BotApiPlacedOrderView',
     'BotUserApiErrorsView',
+    'BotPlacedOrdersChartView'
 ]
 
 

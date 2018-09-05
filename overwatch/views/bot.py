@@ -1,5 +1,7 @@
+import datetime
 from math import ceil
 
+from chartjs.views.lines import BaseLineChartView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
@@ -7,6 +9,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.template import Template, Context
 from django.urls import reverse_lazy
+from django.utils.timezone import now
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
@@ -145,3 +148,53 @@ class BotPlacedOrdersDataTablesView(LoginRequiredMixin, View):
                 ]
             }
         )
+
+
+class BotPlacedOrdersChartView(LoginRequiredMixin, BaseLineChartView):
+    placed_orders = None
+    labels = []
+    buy_prices = []
+    sell_prices = []
+
+    def get_placed_orders(self):
+        if self.placed_orders is None:
+            self.placed_orders = BotPlacedOrder.objects.filter(
+                bot__pk=self.kwargs['pk'],
+                time__gte=now() - datetime.timedelta(hours=12)
+            ).order_by(
+                'time'
+            )
+
+            buy_price = 0
+            sell_price = 0
+
+            for order in self.placed_orders:
+                self.labels.append(order.time.strftime('%Y-%m-%d %H:%M:%S'))
+
+                if order.order_type == 'sell':
+                    sell_price = order.price
+
+                if order.order_type == 'buy':
+                    buy_price = order.price
+
+                self.sell_prices.append(sell_price)
+                self.buy_prices.append(buy_price)
+
+
+    def get_labels(self):
+        """
+        get the timestamps for the x axis
+        :return:
+        """
+        self.get_placed_orders()
+        return self.labels
+
+    def get_providers(self):
+        """Return names of datasets."""
+        self.get_placed_orders()
+        return ['Sell', 'Buy']
+
+    def get_data(self):
+        """Return 3 datasets to plot."""
+        self.get_placed_orders()
+        return [self.sell_prices, self.buy_prices]

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'bootstrapform',
     'widget_tweaks',
     'channels',
+    'chartjs',
 ]
 
 MIDDLEWARE = [

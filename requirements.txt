@@ -3,6 +3,7 @@ bpython
 channels
 django
 django-bootstrap-form
+django-chartjs
 django-registration
 django-storages
 django-widget-tweaks
