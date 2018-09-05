@@ -66,7 +66,7 @@ def handle_bot_user_api_auth(request, additional_keys=None):
     return True, bot
 
 
-class BotUserApiErrorsView(LoginRequiredMixin, View):
+class BotUserApiErrorsView(View):
     @staticmethod
     def post(request):
         success, bot = handle_bot_user_api_auth(request, ['title', 'message'])
