@@ -124,8 +124,6 @@
                 <div class="tab-pane fade" id="placed-orders" role="tabpanel" aria-labelledby="placed-orders-tab">
                     <div class="row">
                         <canvas id="placed-orders-chart" width="500" height="400"></canvas>
-                        <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
-                        <script type="text/javascript" src="{% static 'js/Chart.min.js' %}"></script>
                         <script type="text/javascript">
                             $.get('{% url "bot_placed_orders_chart" pk=object.pk %}', function(data) {
                                 var ctx = $("#placed-orders-chart").get(0).getContext("2d");
