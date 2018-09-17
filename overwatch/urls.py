@@ -40,7 +40,7 @@ urlpatterns = [
     path('bot/placed_order', views.BotApiPlacedOrderView.as_view(), name='bot_placed_order'),
     #path('bot/cancelled_order', views.BotCancelledOrderView.as_view(), name='bot_cancelled_order'),
 
-   # path('bot/prices', views.BotPricesView.as_view(), name='bot_prices'),
+    path('bot/prices', views.BotApiPricesView.as_view(), name='bot_prices'),
    # path('bot/balance', views.BotBalancesView.as_view(), name='bot_balance'),
 
     # Display DataTables
