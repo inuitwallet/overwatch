@@ -96,6 +96,38 @@
                         </div>
                     </div>
                     <hr />
+                    <div class="row bot-prices">
+                        <p class="lead">Active Prices</p>
+                        <div class="container-fluid prices">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h2>Bid Price</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_bid_price.price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h2>Ask Price</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_ask_price.price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
                     <div class="row bot-logs">
                         <p class="lead">CloudWatch Logs</p>
                         <div class="container-fluid logs">

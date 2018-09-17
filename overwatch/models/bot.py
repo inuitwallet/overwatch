@@ -187,7 +187,8 @@ class BotPrice(models.Model):
     time = models.DateTimeField(
         auto_now_add=True
     )
-    price = models.FloatField()
+    price = models.FloatField(null=True, blank=True)
+    price_usd = models.FloatField(null=True, blank=True)
     unit = models.CharField(
         max_length=255,
     )
