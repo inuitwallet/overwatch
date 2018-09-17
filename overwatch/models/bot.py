@@ -174,3 +174,26 @@ class BotPlacedOrder(models.Model):
     )
     price = models.FloatField()
     amount = models.FloatField()
+
+    class Meta:
+        ordering = ['-time']
+
+
+class BotPrice(models.Model):
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE
+    )
+    time = models.DateTimeField(
+        auto_now_add=True
+    )
+    price = models.FloatField()
+    unit = models.CharField(
+        max_length=255,
+    )
+    side = models.CharField(
+        max_length=255,
+    )
+
+    class Meta:
+        ordering = ['-time']

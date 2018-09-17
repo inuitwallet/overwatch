@@ -101,7 +101,7 @@ class ChatConsumer(WebsocketConsumer):
                     'time': datetime.datetime.utcfromtimestamp(
                         int(event.get('timestamp') / 1000)
                     ).strftime('%Y-%m-%d %H:%M:%S'),
-                    'message': message
+                    'message': str(message)
                 })
             )
 

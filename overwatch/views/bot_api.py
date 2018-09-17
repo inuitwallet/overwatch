@@ -5,7 +5,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from overwatch.models import BotHeartBeat, Bot
-from overwatch.models.bot import BotPlacedOrder
+from overwatch.models.bot import BotPlacedOrder, BotPrice
 
 """
 These classes represent API views that use direct bot authentication. 
@@ -53,6 +53,10 @@ def handle_bot_api_auth(request_data, additional_keys=None):
 
 
 class BotApiConfigView(View):
+    """
+    Endpoint to allow a bot to request it's  config as a json object.
+    Hitting this endpoint also registers a Bot Heartbeat
+    """
     @staticmethod
     def get(request):
         success, bot = handle_bot_api_auth(request.GET)
@@ -68,6 +72,9 @@ class BotApiConfigView(View):
 
 
 class BotApiPlacedOrderView(View):
+    """
+    Endpoint to allow bots to register a placed order
+    """
     @staticmethod
     def post(request):
         success, bot = handle_bot_api_auth(request.POST, ['base', 'quote', 'order_type', 'price', 'amount'])
@@ -83,6 +90,32 @@ class BotApiPlacedOrderView(View):
             order_type=request.POST.get('order_type'),
             price=request.POST.get('price'),
             amount=request.POST.get('amount')
+        )
+
+        return JsonResponse({'success': True})
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+class BotApiPricesView(View):
+    """
+    Endpoint to allow bots to register their operational prices
+    """
+    @staticmethod
+    def post(request):
+        success, bot = handle_bot_api_auth(request.POST, ['price', 'unit', 'side'])
+
+        if not success:
+            # if the function returns False, then bot is set to a Response instance
+            return bot
+
+        BotPrice.objects.create(
+            bot=bot,
+            price=request.POST.get('price'),
+            unit=request.POST.get('unit'),
+            side=request.POST.get('side')
         )
 
         return JsonResponse({'success': True})

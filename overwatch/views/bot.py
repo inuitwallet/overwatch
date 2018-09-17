@@ -158,9 +158,14 @@ class BotPlacedOrdersChartView(LoginRequiredMixin, BaseLineChartView):
 
     def get_placed_orders(self):
         if self.placed_orders is None:
+            # reset the buy and sell prices lists
+            self.buy_prices = []
+            self.sell_prices = []
+            self.labels = []
+
             self.placed_orders = BotPlacedOrder.objects.filter(
                 bot__pk=self.kwargs['pk'],
-                time__gte=now() - datetime.timedelta(hours=12)
+                time__gte=now() - datetime.timedelta(hours=48)
             ).order_by(
                 'time'
             )
@@ -179,7 +184,6 @@ class BotPlacedOrdersChartView(LoginRequiredMixin, BaseLineChartView):
 
                 self.sell_prices.append(sell_price)
                 self.buy_prices.append(buy_price)
-
 
     def get_labels(self):
         """
