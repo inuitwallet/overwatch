@@ -29,7 +29,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
 
         placed_orders = BotPlacedOrder.objects.filter(
             bot__pk=self.kwargs['pk'],
-            # time__gte=now() - datetime.timedelta(hours=48)
+            time__gte=now() - datetime.timedelta(hours=48)
         ).order_by(
             'time'
         )
