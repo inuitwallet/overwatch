@@ -95,6 +95,11 @@ nav a:hover {
     color: #fff;
 }
 
+#bot-placed-orders {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
 #placed-orders-chart {
     height: 100%;
     width: 100%;

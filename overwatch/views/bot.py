@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.template import Template, Context
 from django.urls import reverse_lazy
 from django.utils.timezone import now
-from pygal.style import CleanStyle
+from pygal.style import LightColorizedStyle
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
@@ -53,9 +53,11 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             x_label_rotation=35,
             truncate_label=-1,
             x_value_formatter=lambda dt: dt.strftime('%d, %b %Y at %I:%M:%S %p'),
+            fill=True,
+            style=LightColorizedStyle,
         )
-        datetimeline.add("Buy", bid_points)
-        datetimeline.add("Sell", ask_points)
+        datetimeline.add("Buy", bid_points, dots_size=2)
+        datetimeline.add("Sell", ask_points, dots_size=2)
         return datetimeline.render_data_uri()
 
     def get_context_data(self, **kwargs):
