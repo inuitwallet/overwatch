@@ -1,3 +1,4 @@
+import datetime
 from math import ceil
 
 import pygal
@@ -8,6 +9,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.template import Template, Context
 from django.urls import reverse_lazy
+from django.utils.timezone import now
 from pygal.style import CleanStyle
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
