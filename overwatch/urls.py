@@ -51,11 +51,4 @@ urlpatterns = [
         name='bot_placed_orders_datatables'
     ),
 
-    # charts data
-    path(
-        'bot/<int:pk>/placed_orders/chart',
-        views.BotPlacedOrdersChartView.as_view(),
-        name='bot_placed_orders_chart'
-    )
-
 ]

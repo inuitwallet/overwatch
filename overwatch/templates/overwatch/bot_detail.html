@@ -155,15 +155,8 @@
                 </div>
                 <div class="tab-pane fade" id="placed-orders" role="tabpanel" aria-labelledby="placed-orders-tab">
                     <div class="row">
-                        <canvas id="placed-orders-chart" width="500" height="400"></canvas>
-                        <script type="text/javascript">
-                            $.get('{% url "bot_placed_orders_chart" pk=object.pk %}', function(data) {
-                                var ctx = $("#placed-orders-chart").get(0).getContext("2d");
-                                new Chart(ctx, {
-                                    type: 'line', data: data
-                                });
-                            });
-                        </script>
+                        <!-- Placed Orders Chart -->
+                        <embed type="image/svg+xml" src="{{ placed_orders_chart|safe }}" id="placed-orders-chart"/>
                     </div>
                     <div class="row">
                         <div class="col tab-content">

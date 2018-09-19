@@ -6,7 +6,6 @@ from .bot import (
     DeleteBotView,
     BotErrorsDataTablesView,
     BotPlacedOrdersDataTablesView,
-    BotPlacedOrdersChartView
 )
 from .bot_api import (
     BotApiConfigView,
@@ -29,7 +28,6 @@ __all__ = [
     'BotApiPlacedOrderView',
     'BotApiPricesView',
     'BotUserApiErrorsView',
-    'BotPlacedOrdersChartView'
 ]
 
 

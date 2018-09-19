@@ -1,7 +1,6 @@
-import datetime
 from math import ceil
 
-from chartjs.views.lines import BaseLineChartView
+import pygal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
@@ -9,7 +8,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.template import Template, Context
 from django.urls import reverse_lazy
-from django.utils.timezone import now
+from pygal.style import CleanStyle
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
@@ -23,6 +22,39 @@ class ListBotView(LoginRequiredMixin, ListView):
 
 class DetailBotView(LoginRequiredMixin, DetailView):
     model = Bot
+
+    def get_placed_orders_chart(self):
+        bid_points = []
+        ask_points = []
+
+        placed_orders = BotPlacedOrder.objects.filter(
+            bot__pk=self.kwargs['pk'],
+            # time__gte=now() - datetime.timedelta(hours=48)
+        ).order_by(
+            'time'
+        )
+
+        buy_price = 0
+        sell_price = 0
+
+        for order in placed_orders:
+            if order.order_type == 'sell':
+                sell_price = order.price
+
+            if order.order_type == 'buy':
+                buy_price = order.price
+
+            bid_points.append((order.time, buy_price))
+            ask_points.append((order.time, sell_price))
+
+        datetimeline = pygal.DateTimeLine(
+            x_label_rotation=35,
+            truncate_label=-1,
+            x_value_formatter=lambda dt: dt.strftime('%d, %b %Y at %I:%M:%S %p'),
+        )
+        datetimeline.add("Buy", bid_points)
+        datetimeline.add("Sell", ask_points)
+        return datetimeline.render_data_uri()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -39,6 +71,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         ).exclude(
             price_usd__isnull=True
         ).first()
+        context['placed_orders_chart'] = self.get_placed_orders_chart()
         return context
 
 
@@ -158,57 +191,3 @@ class BotPlacedOrdersDataTablesView(LoginRequiredMixin, View):
                 ]
             }
         )
-
-
-class BotPlacedOrdersChartView(LoginRequiredMixin, BaseLineChartView):
-    placed_orders = None
-    labels = []
-    buy_prices = []
-    sell_prices = []
-
-    def get_placed_orders(self):
-        if self.placed_orders is None:
-            # reset the buy and sell prices lists
-            self.buy_prices = []
-            self.sell_prices = []
-            self.labels = []
-
-            self.placed_orders = BotPlacedOrder.objects.filter(
-                bot__pk=self.kwargs['pk'],
-                time__gte=now() - datetime.timedelta(hours=48)
-            ).order_by(
-                'time'
-            )
-
-            buy_price = 0
-            sell_price = 0
-
-            for order in self.placed_orders:
-                self.labels.append(order.time.strftime('%Y-%m-%d %H:%M:%S'))
-
-                if order.order_type == 'sell':
-                    sell_price = order.price
-
-                if order.order_type == 'buy':
-                    buy_price = order.price
-
-                self.sell_prices.append(sell_price)
-                self.buy_prices.append(buy_price)
-
-    def get_labels(self):
-        """
-        get the timestamps for the x axis
-        :return:
-        """
-        self.get_placed_orders()
-        return self.labels
-
-    def get_providers(self):
-        """Return names of datasets."""
-        self.get_placed_orders()
-        return ['Sell', 'Buy']
-
-    def get_data(self):
-        """Return 3 datasets to plot."""
-        self.get_placed_orders()
-        return [self.sell_prices, self.buy_prices]
