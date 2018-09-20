@@ -108,7 +108,24 @@
                                     </div>
                                     <div class="row">
                                         <div class="col text-center">
-                                            {{ last_bid_price.price_usd|floatformat:6 }} USD
+                                            {{ last_price.bid_price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h6>({{ last_price.bid_difference|floatformat:2 }}%)</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h2>Price</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_price.price_usd|floatformat:6 }} USD
                                         </div>
                                     </div>
                                 </div>
@@ -120,7 +137,12 @@
                                     </div>
                                     <div class="row">
                                         <div class="col text-center">
-                                            {{ last_ask_price.price_usd|floatformat:6 }} USD
+                                            {{ last_price.ask_price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h6>({{ last_price.ask_difference|floatformat:2 }}%)</h6>
                                         </div>
                                     </div>
                                 </div>

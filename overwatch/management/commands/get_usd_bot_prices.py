@@ -39,5 +39,13 @@ class Command(BaseCommand):
                 # catch the not sound unit from above without the need for a second request
                 continue
 
-            bot_price.price_usd = bot_price.price * float(self.usd_prices[bot_price.unit])
+            if bot_price.price:
+                bot_price.price_usd = bot_price.price * float(self.usd_prices[bot_price.unit])
+
+            if bot_price.bid_price:
+                bot_price.bid_price_usd = bot_price.bid_price * float(self.usd_prices[bot_price.unit])
+
+            if bot_price.ask_price:
+                bot_price.ask_price_usd = bot_price.ask_price * float(self.usd_prices[bot_price.unit])
+
             bot_price.save()

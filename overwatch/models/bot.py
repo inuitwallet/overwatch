@@ -189,10 +189,11 @@ class BotPrice(models.Model):
     )
     price = models.FloatField(null=True, blank=True)
     price_usd = models.FloatField(null=True, blank=True)
+    bid_price = models.FloatField(null=True, blank=True)
+    bid_price_usd = models.FloatField(null=True, blank=True)
+    ask_price = models.FloatField(null=True, blank=True)
+    ask_price_usd = models.FloatField(null=True, blank=True)
     unit = models.CharField(
-        max_length=255,
-    )
-    side = models.CharField(
         max_length=255,
     )
 

@@ -1,9 +1,11 @@
-from .bot import Bot, BotError, BotHeartBeat
+from .bot import Bot, BotError, BotHeartBeat, BotPlacedOrder, BotPrice
 from .user import ApiProfile
 
 __all__ = [
     'ApiProfile',
     'Bot',
     'BotHeartBeat',
-    'BotError'
+    'BotError',
+    'BotPlacedOrder',
+    'BotPrice'
 ]

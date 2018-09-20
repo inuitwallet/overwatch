@@ -65,14 +65,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         all_heartbeats = self.object.botheartbeat_set.all()
         paginator = Paginator(all_heartbeats, 30)
         context['heart_beats'] = paginator.get_page(1)
-        context['last_bid_price'] = self.object.botprice_set.filter(
-            side__iexact='bid'
-        ).exclude(
-            price_usd__isnull=True
-        ).first()
-        context['last_ask_price'] = self.object.botprice_set.filter(
-            side__iexact='ask'
-        ).exclude(
+        context['last_price'] = self.object.botprice_set.exclude(
             price_usd__isnull=True
         ).first()
         context['placed_orders_chart'] = self.get_placed_orders_chart()
