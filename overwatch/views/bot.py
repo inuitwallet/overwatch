@@ -65,10 +65,15 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         all_heartbeats = self.object.botheartbeat_set.all()
         paginator = Paginator(all_heartbeats, 30)
         context['heart_beats'] = paginator.get_page(1)
-        context['last_price'] = self.object.botprice_set.exclude(
+
+        last_price = self.object.botprice_set.exclude(
             price_usd__isnull=True
         ).first()
+        context['last_price'] = last_price
+        context['ask_diff'] = ((last_price.ask_price - last_price.price) / last_price.price) * 100
+        context['bid_diff'] = ((last_price.price - last_price.bid_price) / last_price.price) * 100
         context['placed_orders_chart'] = self.get_placed_orders_chart()
+
         return context
 
 
