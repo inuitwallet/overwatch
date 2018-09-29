@@ -140,13 +140,19 @@ class BotApiBalancesView(View):
             # if the function returns False, then bot is set to a Response instance
             return bot
 
+        # Bittrex still lists USNBT as NBT
+        unit = request.POST.get('unit')
+
+        if unit.upper() == 'NBT':
+            unit = 'USNBT'
+
         BotBalance.objects.create(
             bot=bot,
             bid_available=request.POST.get('bid_available'),
             ask_available=request.POST.get('ask_available'),
             bid_on_order=request.POST.get('bid_on_order'),
             ask_on_order=request.POST.get('ask_on_order'),
-            unit=request.POST.get('unit')
+            unit=unit
         )
 
         return JsonResponse({'success': True})
