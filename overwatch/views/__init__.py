@@ -10,7 +10,8 @@ from .bot import (
 from .bot_api import (
     BotApiConfigView,
     BotApiPlacedOrderView,
-    BotApiPricesView
+    BotApiPricesView,
+    BotApiBalancesView
 )
 from .bot_user_api import (
     BotUserApiErrorsView
@@ -27,6 +28,7 @@ __all__ = [
     'BotApiConfigView',
     'BotApiPlacedOrderView',
     'BotApiPricesView',
+    'BotApiBalancesView',
     'BotUserApiErrorsView',
 ]
 

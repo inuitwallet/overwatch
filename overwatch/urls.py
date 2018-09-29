@@ -41,7 +41,7 @@ urlpatterns = [
     #path('bot/cancelled_order', views.BotCancelledOrderView.as_view(), name='bot_cancelled_order'),
 
     path('bot/prices', views.BotApiPricesView.as_view(), name='bot_prices'),
-   # path('bot/balance', views.BotBalancesView.as_view(), name='bot_balance'),
+    path('bot/balance', views.BotApiBalancesView.as_view(), name='bot_balance'),
 
     # Display DataTables
     path('bot/<int:pk>/error/datatables', views.BotErrorsDataTablesView.as_view(), name='bot_error_datatables'),

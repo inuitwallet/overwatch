@@ -22,6 +22,9 @@
                     <a class="nav-link active" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="true">Details</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="true">Config</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" id="errors-tab" data-toggle="tab" href="#errors" role="tab" aria-controls="errors" aria-selected="false">Errors</a>
                 </li>
                 <li class="nav-item">
@@ -30,6 +33,100 @@
             </ul>
             <div class="tab-content" id="botTabsContent">
                 <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                    <div class="row bot-prices">
+                        <p class="lead">Active Prices</p>
+                        <div class="container-fluid prices">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h2>Bid Price</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_price.bid_price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h6>({{ bid_diff|floatformat:2 }}%)</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h2>Price</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_price.price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h2>Ask Price</h2>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_price.ask_price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h6>({{ ask_diff|floatformat:2 }}%)</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row bot-balances">
+                        <p class="lead">Balances</p>
+                        <div class="container-fluid balances">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h3>Bid</h3>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_balance.bid_on_order|floatformat:6 }} / {{ last_balance.bid_available|floatformat:6 }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <h4>Ask</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            {{ last_balance.ask_on_order|floatformat:6 }} / {{ last_balance.ask_available|floatformat:6 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row bot-logs">
+                        <p class="lead">CloudWatch Logs</p>
+                        <div class="container-fluid logs">
+                            <!-- Logs get streamed here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="config" role="tabpanel" aria-labelledby="config-tab">
                     <div class="row tab-content">
                         <div class="col">
                             <div class="form-group">
@@ -87,73 +184,12 @@
                                 <input id="total-ask" class="form-control" type="number" readonly value="{{ object.total_ask }}" />
                             </div>
                         </div>
-                </div>
+                    </div>
                     <div class="row">
                         <div class="col">
                             <a href="{% url 'bot_update' pk=object.pk %}" role="button" class="btn btn-dark">Edit</a>
                             <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
                             <a href="{% url 'bot_delete' pk=object.pk %}" role="button" class="btn btn-outline-danger">Delete</a>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row bot-prices">
-                        <p class="lead">Active Prices</p>
-                        <div class="container-fluid prices">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <h2>Bid Price</h2>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            {{ last_price.bid_price_usd|floatformat:6 }} USD
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <h6>({{ bid_diff|floatformat:2 }}%)</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <h2>Price</h2>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            {{ last_price.price_usd|floatformat:6 }} USD
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <h2>Ask Price</h2>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            {{ last_price.ask_price_usd|floatformat:6 }} USD
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <h6>({{ ask_diff|floatformat:2 }}%)</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row bot-logs">
-                        <p class="lead">CloudWatch Logs</p>
-                        <div class="container-fluid logs">
-                            <!-- Logs get streamed here -->
                         </div>
                     </div>
                 </div>

@@ -199,3 +199,27 @@ class BotPrice(models.Model):
 
     class Meta:
         ordering = ['-time']
+
+
+class BotBalance(models.Model):
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE
+    )
+    time = models.DateTimeField(
+        auto_now_add=True
+    )
+    bid_available = models.FloatField()
+    ask_available = models.FloatField()
+    bid_on_order = models.FloatField()
+    ask_on_order = models.FloatField()
+    bid_available_usd = models.FloatField(null=True, blank=True)
+    ask_available_usd = models.FloatField(null=True, blank=True)
+    bid_on_order_usd = models.FloatField(null=True, blank=True)
+    ask_on_order_usd = models.FloatField(null=True, blank=True)
+    unit = models.CharField(
+        max_length=255,
+    )
+
+    class Meta:
+        ordering = ['-time']

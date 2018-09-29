@@ -5,7 +5,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from overwatch.models import BotHeartBeat, Bot
-from overwatch.models.bot import BotPlacedOrder, BotPrice
+from overwatch.models.bot import BotPlacedOrder, BotPrice, BotBalance
 
 """
 These classes represent API views that use direct bot authentication. 
@@ -117,6 +117,36 @@ class BotApiPricesView(View):
             unit=request.POST.get('unit'),
             ask_price=request.POST.get('ask_price'),
             bid_price=request.POST.get('bid_price')
+        )
+
+        return JsonResponse({'success': True})
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+class BotApiBalancesView(View):
+    """
+    Endpoint to allow bots to register their available balances
+    """
+    @staticmethod
+    def post(request):
+        success, bot = handle_bot_api_auth(
+            request.POST, ['bid_available', 'ask_available', 'bid_on_order', 'ask_on_order', 'unit']
+        )
+
+        if not success:
+            # if the function returns False, then bot is set to a Response instance
+            return bot
+
+        BotBalance.objects.create(
+            bot=bot,
+            bid_available=request.POST.get('bid_available'),
+            ask_available=request.POST.get('ask_available'),
+            bid_on_order=request.POST.get('bid_on_order'),
+            ask_on_order=request.POST.get('ask_on_order'),
+            unit=request.POST.get('unit')
         )
 
         return JsonResponse({'success': True})

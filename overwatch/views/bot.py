@@ -74,6 +74,8 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         context['bid_diff'] = ((last_price.bid_price - last_price.price) / last_price.price) * 100
         context['placed_orders_chart'] = self.get_placed_orders_chart()
 
+        context['last_balance'] = self.object.botbalance_set.first()
+
         return context
 
 
