@@ -89,9 +89,9 @@ class Bot(models.Model):
             'track': self.track,
             'peg': self.peg,
             'tolerance': self.tolerance,
-            'fee': self.fee,
-            'bid_spread': self.bid_spread,
-            'ask_spread': self.ask_spread,
+            'fee': self.fee / 100,
+            'bid_spread': self.bid_spread / 100,
+            'ask_spread': self.ask_spread / 100,
             'order_amount': self.order_amount,
             'total_bid': self.total_bid,
             'total_ask': self.total_ask
