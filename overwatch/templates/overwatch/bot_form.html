@@ -34,8 +34,8 @@
                     <div class="invalid-feedback">
                         The bot requires a name
                     </div>
-                    {% if name.help_text %}
-                        <p class="form-text">{{ name.help_text|safe }}</p>
+                    {% if form.name.help_text %}
+                        <small class="form-text">{{ form.name.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -47,8 +47,8 @@
                     {% else %}
                         {{ form.exchange|add_class:"form-control" }}
                     {% endif %}
-                    {% if exchange.help_text %}
-                        <p class="form-text">{{ exchange.help_text|safe }}</p>
+                    {% if form.exchange.help_text %}
+                        <small class="form-text">{{ form.exchange.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -62,8 +62,8 @@
                     {% else %}
                         {{ form.base|add_class:"form-control" }}
                     {% endif %}
-                    {% if base.help_text %}
-                        <p class="form-text">{{ base.help_text|safe }}</p>
+                    {% if form.base.help_text %}
+                        <small class="form-text">{{ form.base.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -75,8 +75,8 @@
                     {% else %}
                         {{ form.quote|add_class:"form-control" }}
                     {% endif %}
-                    {% if quote.help_text %}
-                        <p class="form-text">{{ quote.help_text|safe }}</p>
+                    {% if form.quote.help_text %}
+                        <small class="form-text">{{ form.quote.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -88,8 +88,8 @@
                     {% else %}
                         {{ form.track|add_class:"form-control" }}
                     {% endif %}
-                    {% if track.help_text %}
-                        <p class="form-text">{{ track.help_text|safe }}</p>
+                    {% if form.track.help_text %}
+                        <small class="form-text">{{ form.track.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -101,26 +101,13 @@
                     {% else %}
                         {{ form.peg|add_class:"form-control" }}
                     {% endif %}
-                    {% if peg.help_text %}
-                        <p class="form-text">{{ peg.help_text|safe }}</p>
+                    {% if form.peg.help_text %}
+                        <small class="form-text">{{ form.peg.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.tolerance.id_for_label }}">Tolerance</label>
-                    {% if form.tolerance.errors %}
-                        {{ form.tolerance|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.tolerance|add_class:"form-control" }}
-                    {% endif %}
-                    {% if tolerance.help_text %}
-                        <p class="form-text">{{ tolerance.help_text|safe }}</p>
-                    {% endif %}
-                </div>
-            </div>
             <div class="col">
                 <div class="form-group">
                     <label for="{{ form.fee.id_for_label }}">Fee</label>
@@ -129,21 +116,49 @@
                     {% else %}
                         {{ form.fee|add_class:"form-control" }}
                     {% endif %}
-                    {% if fee.help_text %}
-                        <p class="form-text">{{ fee.help_text|safe }}</p>
+                    {% if form.fee.help_text %}
+                        <small class="form-text">{{ form.fee.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label for="{{ form.fee.id_for_label }}">Order Amount</label>
+                    <label for="{{ form.bid_spread.id_for_label }}">Bid Spread</label>
+                    {% if form.bid_spread.errors %}
+                        {{ form.bid_spread|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.bid_spread|add_class:"form-control" }}
+                    {% endif %}
+                    {% if form.bid_spread.help_text %}
+                        <small class="form-text">{{ form.bid_spread.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.ask_spread.id_for_label }}">Ask Spread</label>
+                    {% if form.ask_spread.errors %}
+                        {{ form.ask_spread|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.ask_spread|add_class:"form-control" }}
+                    {% endif %}
+                    {% if form.ask_spread.help_text %}
+                        <small class="form-text">{{ form.ask_spread.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.order_amount.id_for_label }}">Order Amount</label>
                     {% if form.order_amount.errors %}
                         {{ form.order_amount|add_class:"form-control"|add_class:"is-invalid" }}
                     {% else %}
                         {{ form.order_amount|add_class:"form-control" }}
                     {% endif %}
-                    {% if fee.help_text %}
-                        <p class="form-text">{{ fee.help_text|safe }}</p>
+                    {% if form.order_amount.help_text %}
+                        <small class="form-text">{{ form.order_amount.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -155,21 +170,34 @@
                     {% else %}
                         {{ form.total_bid|add_class:"form-control" }}
                     {% endif %}
-                    {% if total_bid.help_text %}
-                        <p class="form-text">{{ total_bid.help_text|safe }}</p>
+                    {% if form.total_bid.help_text %}
+                        <small class="form-text">{{ form.total_bid.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
-                    <label for="{{ form.total_ask.id_for_label }}">total Ask</label>
+                    <label for="{{ form.total_ask.id_for_label }}">Total Ask</label>
                     {% if form.total_ask.errors %}
                         {{ form.total_ask|add_class:"form-control"|add_class:"is-invalid" }}
                     {% else %}
                         {{ form.total_ask|add_class:"form-control" }}
                     {% endif %}
-                    {% if total_ask.help_text %}
-                        <p class="form-text">{{ total_ask.help_text|safe }}</p>
+                    {% if form.total_ask.help_text %}
+                        <small class="form-text">{{ form.total_ask.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.tolerance.id_for_label }}">Tolerance</label>
+                    {% if form.tolerance.errors %}
+                        {{ form.tolerance|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.tolerance|add_class:"form-control" }}
+                    {% endif %}
+                    {% if form.tolerance.help_text %}
+                        <small class="form-text">{{ form.tolerance.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -184,7 +212,33 @@
                         {{ form.logs_group|add_class:"form-control" }}
                     {% endif %}
                     {% if logs_group.help_text %}
-                        <p class="form-text">{{ logs_group.help_text|safe }}</p>
+                        <small class="form-text">{{ logs_group.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.aws_access_key.id_for_label }}">AWS Access Key</label>
+                    {% if form.aws_access_key.errors %}
+                        {{ form.aws_access_key|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.aws_access_key|add_class:"form-control" }}
+                    {% endif %}
+                    {% if aws_access_key.help_text %}
+                        <small class="form-text">{{ aws_access_key.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.aws_secret_key.id_for_label }}">AWS Secret Key</label>
+                    {% if form.aws_secret_key.errors %}
+                        {{ form.aws_secret_key|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.aws_secret_key|add_class:"form-control" }}
+                    {% endif %}
+                    {% if aws_secret_key.help_text %}
+                        <small class="form-text">{{ aws_secret_key.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>

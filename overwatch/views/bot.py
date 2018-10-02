@@ -82,7 +82,8 @@ class DetailBotView(LoginRequiredMixin, DetailView):
 class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     model = Bot
     fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
-              'tolerance', 'fee', 'order_amount', 'total_bid', 'total_ask', 'logs_group']
+              'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
+              'logs_group', 'aws_access_key', 'aws_secret_key']
     success_message = '%(name)s@%(exchange)s has been updated'
 
     def get_success_url(self):
@@ -92,7 +93,8 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
 class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
     model = Bot
     fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
-              'tolerance', 'fee', 'order_amount', 'total_bid', 'total_ask', 'logs_group']
+              'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
+              'logs_group', 'aws_access_key', 'aws_secret_key']
     success_message = '%(name)s@%(exchange)s has been created'
     success_url = reverse_lazy('index')
 

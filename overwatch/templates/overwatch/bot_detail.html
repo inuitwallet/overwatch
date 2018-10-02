@@ -2,6 +2,8 @@
 
 {% load bootstrap %}
 
+{% load model_field %}
+
 {% load static %}
 
 {% block title %}
@@ -132,56 +134,81 @@
                             <div class="form-group">
                                 <label for="base" class="control-label">Base Currency</label>
                                 <input id="base" class="form-control" readonly value="{{ object.base }}" />
+                                <small>{% model_field_help_text from object.base %}</small>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label for="quote" class="control-label">Quote Currency</label>
                                 <input id="quote" class="form-control" type="text" readonly value="{{ object.quote }}" />
+                                <small>{% model_field_help_text from object.quote %}</small>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label for="track" class="control-label">Track Currency</label>
                                 <input id="track" class="form-control" type="text" readonly value="{{ object.track }}" />
+                                <small>{% model_field_help_text from object.track %}</small>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label for="peg" class="control-label">Peg Currency</label>
                                 <input id="peg" class="form-control" type="text" readonly value="{{ object.peg }}" />
+                                <small>{% model_field_help_text from object.peg %}</small>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label for="tolerance" class="control-label">Tolerance</label>
-                                <input id="tolerance" class="form-control" type="number" readonly value="{{ object.tolerance }}" />
+                                <label for="fee" class="control-label">Fee</label>
+                                <input id="fee" class="form-control" type="number" readonly value="{{ object.fee }}" />
+                                <small>{% model_field_help_text from object.fee %}</small>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
-                                <label for="fee" class="control-label">Fee</label>
-                                <input id="fee" class="form-control" type="number" readonly value="{{ object.fee }}" />
+                                <label for="bid-spread" class="control-label">Bid Spread</label>
+                                <input id="bid-spread" class="form-control" type="number" readonly value="{{ object.bid_spread }}" />
+                                <small>{% model_field_help_text from object.bid_spread %}</small>
                             </div>
                         </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="ask-spread" class="control-label">Bid Spread</label>
+                                <input id="ask-spread" class="form-control" type="number" readonly value="{{ object.ask_spread }}" />
+                                <small>{% model_field_help_text from object.ask_spread %}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col">
                             <div class="form-group">
                                 <label for="order-amount" class="control-label">Order Amount</label>
                                 <input id="order-amount" class="form-control" type="number" readonly value="{{ object.order_amount }}" />
+                                <small>{% model_field_help_text from object.order_amount %}</small>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label for="total-bid" class="control-label">Total Bid</label>
                                 <input id="total-bid" class="form-control" type="number" readonly value="{{ object.total_bid }}" />
+                                <small>{% model_field_help_text from object.total_bid %}</small>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label for="total-ask" class="control-label">Total Ask</label>
                                 <input id="total-ask" class="form-control" type="number" readonly value="{{ object.total_ask }}" />
+                                <small>{% model_field_help_text from object.total_ask %}</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="tolerance" class="control-label">Tolerance</label>
+                                <input id="tolerance" class="form-control" type="number" readonly value="{{ object.tolerance }}" />
+                                <small>{% model_field_help_text from object.tolerance %}</small>
                             </div>
                         </div>
                     </div>
