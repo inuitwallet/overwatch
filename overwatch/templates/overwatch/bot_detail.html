@@ -52,7 +52,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col text-center">
-                                            <h6>({{ bid_diff|floatformat:2 }}%)</h6>
+                                            <small>({{ bid_diff|floatformat:2 }}%)</small>
                                         </div>
                                     </div>
                                 </div>
@@ -65,6 +65,11 @@
                                     <div class="row">
                                         <div class="col text-center">
                                             {{ last_price.price_usd|floatformat:6 }} USD
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col text-center">
+                                            <small>Total Spread - Fees = {{ spread|floatformat:2 }}%</small>
                                         </div>
                                     </div>
                                 </div>
@@ -81,7 +86,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col text-center">
-                                            <h6>({{ ask_diff|floatformat:2 }}%)</h6>
+                                            <small>({{ ask_diff|floatformat:2 }}%)</small>
                                         </div>
                                     </div>
                                 </div>
