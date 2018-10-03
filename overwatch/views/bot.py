@@ -53,7 +53,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             x_label_rotation=35,
             truncate_label=-1,
             value_formatter=lambda x: '{:.8f}'.format(x),
-            x_value_formatter=lambda dt: dt.strftime('%d, %b %Y at %I:%M:%S %p'),
+            x_value_formatter=lambda dt: dt.strftime('%Y-%m-%d %H:%M:%S'),
             fill=True,
             style=LightColorizedStyle,
         )
