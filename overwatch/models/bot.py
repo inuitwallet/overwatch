@@ -88,7 +88,7 @@ class Bot(models.Model):
             'quote': self.quote,
             'track': self.track,
             'peg': self.peg,
-            'tolerance': self.tolerance,
+            'tolerance': self.tolerance / 100,
             'fee': self.fee / 100,
             'bid_spread': self.bid_spread / 100,
             'ask_spread': self.ask_spread / 100,
