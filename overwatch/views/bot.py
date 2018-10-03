@@ -52,7 +52,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         datetimeline = pygal.DateTimeLine(
             x_label_rotation=35,
             truncate_label=-1,
-            y_value_formatter=lambda x: '{:.4f}'.format(x),
+            value_formatter=lambda x: '{:.4f}'.format(x),
             x_value_formatter=lambda dt: dt.strftime('%d, %b %Y at %I:%M:%S %p'),
             fill=True,
             style=LightColorizedStyle,
