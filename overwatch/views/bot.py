@@ -36,18 +36,14 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             'time'
         )
 
-        buy_price = 0
-        sell_price = 0
-
         for order in placed_orders:
             if order.order_type == 'sell':
-                sell_price = order.price
+                bid_points.append((order.time, None))
+                ask_points.append((order.time, order.price))
 
             if order.order_type == 'buy':
-                buy_price = order.price
-
-            bid_points.append((order.time, buy_price))
-            ask_points.append((order.time, sell_price))
+                bid_points.append((order.time, order.price))
+                ask_points.append((order.time, None))
 
         datetimeline = pygal.DateTimeLine(
             x_label_rotation=35,
