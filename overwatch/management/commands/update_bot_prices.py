@@ -78,25 +78,18 @@ class Command(BaseCommand):
                     # catch the not found unit from above without the need for a second request
                     continue
 
+                if reverse:
+                    peg_price = self.usd_prices[track] / self.usd_prices[peg]
+                else:
+                    peg_price = self.usd_prices[track] * self.usd_prices[peg]
+
                 if bot_price.price:
-                    bot_price.price_peg = self.apply_price(
-                        bot_price.price,
-                        self.usd_prices[track] / self.usd_prices[peg],
-                        reverse
-                    )
+                    bot_price.price_peg = self.apply_price(bot_price.price, peg_price, reverse)
 
                 if bot_price.bid_price:
-                    bot_price.bid_price_peg = self.apply_price(
-                        bot_price.bid_price,
-                        self.usd_prices[track] / self.usd_prices[peg],
-                        reverse
-                    )
+                    bot_price.bid_price_peg = self.apply_price(bot_price.bid_price, peg_price, reverse)
 
                 if bot_price.ask_price:
-                    bot_price.ask_price_peg = self.apply_price(
-                        bot_price.ask_price,
-                        self.usd_prices[track] / self.usd_prices[peg],
-                        reverse
-                    )
+                    bot_price.ask_price_peg = self.apply_price(bot_price.ask_price, peg_price, reverse)
 
             bot_price.save()
