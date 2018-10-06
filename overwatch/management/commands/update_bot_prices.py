@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 continue
 
             # If the peg currency is USD, we're golden as the price is already in USD
-            if peg == 'USD':
+            if peg == 'USD' or peg == 'USNBT':
                 if bot_price.price:
                     bot_price.price_peg = self.apply_price(bot_price.price, self.usd_prices[track], reverse)
 
