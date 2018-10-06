@@ -83,6 +83,17 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         context['placed_orders_chart'] = self.get_placed_orders_chart()
         context['last_balance'] = self.object.botbalance_set.first()
 
+        context['peg'] = self.object.peg
+
+        if self.object.peg.upper() == 'USNBT':
+            context['peg'] = 'USD'
+
+        if self.object.peg.upper() == 'CNNBT':
+            context['peg'] = 'CNY'
+
+        if self.object.peg.upper() == 'EUNBT':
+            context['peg'] = 'EUR'
+
         return context
 
 
