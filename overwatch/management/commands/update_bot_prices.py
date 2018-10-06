@@ -79,15 +79,24 @@ class Command(BaseCommand):
                     continue
 
                 if bot_price.price:
-                    price_peg = self.apply_price(bot_price.price, self.usd_prices[track], reverse)
-                    bot_price.price_peg = price_peg * self.usd_prices[peg]
+                    bot_price.price_peg = self.apply_price(
+                        bot_price.price,
+                        self.usd_prices[track] * self.usd_prices[peg],
+                        reverse
+                    )
 
                 if bot_price.bid_price:
-                    bid_price_peg = self.apply_price(bot_price.bid_price, self.usd_prices[track], reverse)
-                    bot_price.bid_price_peg = bid_price_peg * self.usd_prices[peg]
+                    bot_price.bid_price_peg = self.apply_price(
+                        bot_price.bid_price,
+                        self.usd_prices[track] * self.usd_prices[peg],
+                        reverse
+                    )
 
                 if bot_price.ask_price:
-                    ask_price_peg = self.apply_price(bot_price.ask_price, self.usd_prices[track], reverse)
-                    bot_price.ask_price_peg = ask_price_peg * self.usd_prices[peg]
+                    ask_price_peg = self.apply_price(
+                        bot_price.ask_price,
+                        self.usd_prices[track] * self.usd_prices[peg],
+                        reverse
+                    )
 
             bot_price.save()
