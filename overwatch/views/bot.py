@@ -54,7 +54,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             style=LightColorizedStyle,
         )
         datetimeline.add("Buy {}".format(self.object.base), bid_points, dots_size=2)
-        datetimeline.add("Sell {}".format(self.object.quote), ask_points, dots_size=2)
+        datetimeline.add("Sell {}".format(self.object.base), ask_points, dots_size=2)
         return datetimeline.render_data_uri()
 
     def get_context_data(self, **kwargs):
