@@ -66,12 +66,13 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         last_price = self.object.botprice_set.exclude(
             price_usd__isnull=True
         ).first()
-        context['last_price'] = last_price
-        context['ask_diff'] = ((last_price.ask_price - last_price.price) / last_price.price) * 100
-        context['bid_diff'] = ((last_price.bid_price - last_price.price) / last_price.price) * 100
-        context['spread'] = (context['ask_diff'] - context['bid_diff']) - (self.object.fee * 2)
-        context['placed_orders_chart'] = self.get_placed_orders_chart()
+        if last_price:
+            context['last_price'] = last_price
+            context['ask_diff'] = ((last_price.ask_price - last_price.price) / last_price.price) * 100
+            context['bid_diff'] = ((last_price.bid_price - last_price.price) / last_price.price) * 100
+            context['spread'] = (context['ask_diff'] - context['bid_diff']) - (self.object.fee * 2)
 
+        context['placed_orders_chart'] = self.get_placed_orders_chart()
         context['last_balance'] = self.object.botbalance_set.first()
 
         return context
