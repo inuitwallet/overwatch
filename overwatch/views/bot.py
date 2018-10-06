@@ -70,7 +70,15 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             context['last_price'] = last_price
             context['ask_diff'] = ((last_price.ask_price_peg - last_price.price_peg) / last_price.price_peg) * 100
             context['bid_diff'] = ((last_price.bid_price_peg - last_price.price_peg) / last_price.price_peg) * 100
-            context['spread'] = (context['ask_diff'] - context['bid_diff']) - (self.object.fee * 2)
+            context['spread'] = (
+                max(
+                    context['ask_diff'],
+                    context['bid_diff']
+                ) - min(
+                    context['ask_diff'],
+                    context['bid_diff']
+                ) - (self.object.fee * 2)
+            )
 
         context['placed_orders_chart'] = self.get_placed_orders_chart()
         context['last_balance'] = self.object.botbalance_set.first()
