@@ -64,7 +64,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         context['heart_beats'] = paginator.get_page(1)
 
         last_price = self.object.botprice_set.exclude(
-            price_usd__isnull=True
+            price_peg__isnull=True
         ).first()
         if last_price:
             context['last_price'] = last_price

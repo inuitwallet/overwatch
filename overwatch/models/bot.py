@@ -216,13 +216,15 @@ class BotPrice(models.Model):
         auto_now_add=True
     )
     price = models.FloatField(null=True, blank=True)
-    price_usd = models.FloatField(null=True, blank=True)
+    price_peg = models.FloatField(null=True, blank=True)
     bid_price = models.FloatField(null=True, blank=True)
-    bid_price_usd = models.FloatField(null=True, blank=True)
+    bid_price_peg = models.FloatField(null=True, blank=True)
     ask_price = models.FloatField(null=True, blank=True)
-    ask_price_usd = models.FloatField(null=True, blank=True)
+    ask_price_peg = models.FloatField(null=True, blank=True)
     unit = models.CharField(
         max_length=255,
+        null=True,
+        blank=True
     )
 
     class Meta:

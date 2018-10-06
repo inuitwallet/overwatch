@@ -105,7 +105,7 @@ class BotApiPricesView(View):
     """
     @staticmethod
     def post(request):
-        success, bot = handle_bot_api_auth(request.POST, ['price', 'unit', 'bid_price', 'ask_price'])
+        success, bot = handle_bot_api_auth(request.POST, ['price', 'bid_price', 'ask_price'])
 
         if not success:
             # if the function returns False, then bot is set to a Response instance
@@ -114,7 +114,6 @@ class BotApiPricesView(View):
         BotPrice.objects.create(
             bot=bot,
             price=request.POST.get('price'),
-            unit=request.POST.get('unit'),
             ask_price=request.POST.get('ask_price'),
             bid_price=request.POST.get('bid_price')
         )
