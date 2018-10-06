@@ -81,21 +81,21 @@ class Command(BaseCommand):
                 if bot_price.price:
                     bot_price.price_peg = self.apply_price(
                         bot_price.price,
-                        self.usd_prices[track] * self.usd_prices[peg],
+                        self.usd_prices[track] / self.usd_prices[peg],
                         reverse
                     )
 
                 if bot_price.bid_price:
                     bot_price.bid_price_peg = self.apply_price(
                         bot_price.bid_price,
-                        self.usd_prices[track] * self.usd_prices[peg],
+                        self.usd_prices[track] / self.usd_prices[peg],
                         reverse
                     )
 
                 if bot_price.ask_price:
                     bot_price.ask_price_peg = self.apply_price(
                         bot_price.ask_price,
-                        self.usd_prices[track] * self.usd_prices[peg],
+                        self.usd_prices[track] / self.usd_prices[peg],
                         reverse
                     )
 
