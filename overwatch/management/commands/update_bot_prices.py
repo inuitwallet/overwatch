@@ -93,7 +93,7 @@ class Command(BaseCommand):
                     )
 
                 if bot_price.ask_price:
-                    ask_price_peg = self.apply_price(
+                    bot_price.ask_price_peg = self.apply_price(
                         bot_price.ask_price,
                         self.usd_prices[track] * self.usd_prices[peg],
                         reverse
