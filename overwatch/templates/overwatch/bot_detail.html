@@ -280,8 +280,8 @@
                                 <caption>{{ object.name}} Trades</caption>
                                 <thead>
                                     <tr>
-                                        <td scope="col">Trade ID</td>
                                         <td scope="col">Time</td>
+                                        <td scope="col">Trade ID</td>
                                         <td scope="col">Trade Type</td>
                                         <td scope="col">Target Price (USD)</td>
                                         <td scope="col">Trade Price (USD)</td>
@@ -367,8 +367,8 @@
                     "serverSide": true,
                     "ajax": "{% url 'bot_trades_datatables' pk=object.pk %}",
                     "columns": [
-                        { "name": "trade_id", width: "20%" },
                         { "name": "time", width: "20%" },
+                        { "name": "trade_id", width: "20%" },
                         { "name": "order_type", width: "20%" },
                         { "name": "target_price_usd", width: "20%" },
                         { "name": "trade_price_usd", width: "20%" },

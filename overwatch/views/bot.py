@@ -295,8 +295,8 @@ class BotTradesDataTablesView(LoginRequiredMixin, View):
                 'recordsFiltered': data['recordsFiltered'],
                 'data': [
                     [
-                        trade.trade_id,
                         trade.time,
+                        trade.trade_id,
                         trade.trade_type.title(),
                         round(trade.target_price_usd, 8),
                         round(trade.trade_price_usd, 8),
