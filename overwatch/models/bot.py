@@ -3,6 +3,7 @@ import hmac
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 
 class Bot(models.Model):
@@ -250,6 +251,36 @@ class BotBalance(models.Model):
     unit = models.CharField(
         max_length=255,
     )
+
+    class Meta:
+        ordering = ['-time']
+
+
+class BotTrade(models.Model):
+    bot = models.ForeignKey(
+        Bot,
+        on_delete=models.CASCADE
+    )
+    time = models.DateTimeField(
+        default=timezone.now  # there is some historical data so need to be able to set this field
+    )
+    trade_id = models.CharField(
+        max_length=255
+    )
+    trade_type = models.CharField(
+        max_length=255,
+    )
+    price = models.FloatField()
+    amount = models.FloatField()
+    total = models.FloatField()
+    age = models.DurationField(null=True, blank=True)
+    target_price_usd = models.FloatField(null=True, blank=True)
+    trade_price_usd = models.FloatField(null=True, blank=True)
+    difference_usd = models.FloatField(null=True, blank=True)
+    profit_usd = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return '{}@{}={:.2f} USD'.format(self.trade_id, self.bot, self.profit_usd)
 
     class Meta:
         ordering = ['-time']

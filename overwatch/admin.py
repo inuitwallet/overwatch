@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from overwatch.models import ApiProfile, Bot, BotHeartBeat, BotError
-from overwatch.models.bot import BotPlacedOrder, BotPrice, BotBalance
+from overwatch.models.bot import BotPlacedOrder, BotPrice, BotBalance, BotTrade
 
 
 @admin.register(ApiProfile)
@@ -41,4 +41,11 @@ class BotPriceAdmin(admin.ModelAdmin):
 @admin.register(BotBalance)
 class BotBalanceAdmin(admin.ModelAdmin):
     list_display = ['bot', 'time', 'bid_available', 'ask_available', 'bid_on_order', 'ask_on_order']
+    raw_id_fields = ['bot']
+
+
+@admin.register(BotTrade)
+class BotTradeAdmin(admin.ModelAdmin):
+    list_display = ['bot', 'time', 'trade_id', 'price', 'amount', 'total', 'target_price_usd', 'trade_price_usd',
+                    'profit_usd']
     raw_id_fields = ['bot']

@@ -159,3 +159,9 @@ class BotApiBalancesView(View):
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
+
+
+class BotApiTradeView(View):
+    """
+    Endpoint to allow for reporting of trades. Typically this is handled by a second lambda function
+    """
