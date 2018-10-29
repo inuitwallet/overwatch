@@ -66,7 +66,8 @@ class DetailBotView(LoginRequiredMixin, DetailView):
 
         line_chart = pygal.StackedBar(
             x_title='Days',
-            y_title='Value in USD'
+            y_title='Value in USD',
+            logarithmic=True
         )
         line_chart.title = 'Aggregated profits over time'
         line_chart.x_labels = [60, 30, 14, 7, 3, 2, 1]
