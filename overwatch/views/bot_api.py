@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden
@@ -5,7 +6,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from overwatch.models import BotHeartBeat, Bot
-from overwatch.models.bot import BotPlacedOrder, BotPrice, BotBalance
+from overwatch.models.bot import BotPlacedOrder, BotPrice, BotBalance, BotTrade
 
 """
 These classes represent API views that use direct bot authentication. 
@@ -164,4 +165,26 @@ class BotApiBalancesView(View):
 class BotApiTradeView(View):
     """
     Endpoint to allow for reporting of trades. Typically this is handled by a second lambda function
+    and not the bot itself
     """
+
+    @staticmethod
+    def post(request):
+        success, bot = handle_bot_api_auth(
+            request.POST, ['trade_time', 'trade_id', 'trade_type', 'price', 'amount', 'total', 'age']
+        )
+
+        if not success:
+            # if the function returns False, then bot is set to a Response instance
+            return bot
+
+        BotTrade.objects.create(
+            bot=bot,
+            time=request.POST.get('trade_time'),
+            trade_id=request.POST.get('trade_id'),
+            trade_type=request.POST.get('trade_type'),
+            price=request.POST.get('price'),
+            amount=request.POST.get('amount'),
+            total=request.POST.get('total'),
+            age=datetime.timedelta(seconds=request.POST.get('age')),
+        )

@@ -32,6 +32,9 @@
                 <li class="nav-item">
                     <a class="nav-link" id="placed-orders-tab" data-toggle="tab" href="#placed-orders" role="tab" aria-controls="placed-orders" aria-selected="false">Placed Orders</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="trades-tab" data-toggle="tab" href="#trades" role="tab" aria-controls="trades" aria-selected="false">Trades</a>
+                </li>
             </ul>
             <div class="tab-content" id="botTabsContent">
                 <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
@@ -266,6 +269,32 @@
                         </div>
                     </div>
                 </div>
+                <div class="tab-pane fade" id="trades" role="tabpanel" aria-labelledby="trades-tab">
+                    <div class="row">
+                        <!-- Trades Chart -->
+                        <embed type="image/svg+xml" src="{{ trades_chart|safe }}" id="trades-chart"/>
+                    </div>
+                    <div class="row">
+                        <div class="col tab-content">
+                            <table id="bot-trades" class="table table-striped table-hover table-bordered" style="width: 100%;">
+                                <caption>{{ object.name}} Trades</caption>
+                                <thead>
+                                    <tr>
+                                        <td scope="col">Trade ID</td>
+                                        <td scope="col">Time</td>
+                                        <td scope="col">Trade Type</td>
+                                        <td scope="col">Target Price (USD)</td>
+                                        <td scope="col">Trade Price (USD)</td>
+                                        <td scope="col">Amount</td>
+                                        <td scope="col">Profit (USD)</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-2">
@@ -324,6 +353,27 @@
                         { "name": "order_type", width: "20%" },
                         { "name": "price", width: "30%" },
                         { "name": "amount", width: "30%" }
+                    ],
+                    "order": [[ 0, 'desc' ]]
+                }
+            );
+        } );
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#bot-trades').DataTable(
+                {
+                    "pagingType": "full",
+                    "serverSide": true,
+                    "ajax": "{% url 'bot_trades_datatables' pk=object.pk %}",
+                    "columns": [
+                        { "name": "trade_id", width: "20%" },
+                        { "name": "time", width: "20%" },
+                        { "name": "order_type", width: "20%" },
+                        { "name": "target_price_usd", width: "20%" },
+                        { "name": "trade_price_usd", width: "20%" },
+                        { "name": "amount", width: "20%" },
+                        { "name": "profit", width: "20%" }
                     ],
                     "order": [[ 0, 'desc' ]]
                 }

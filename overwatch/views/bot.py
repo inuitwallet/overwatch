@@ -5,7 +5,7 @@ import pygal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http import JsonResponse
 from django.template import Template, Context
 from django.urls import reverse_lazy
@@ -15,7 +15,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
 from overwatch.models import Bot, BotError
-from overwatch.models.bot import BotPlacedOrder
+from overwatch.models.bot import BotPlacedOrder, BotTrade
 
 
 class ListBotView(LoginRequiredMixin, ListView):
@@ -57,6 +57,70 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         datetimeline.add("Sell", ask_points, dots_size=2)
         return datetimeline.render_data_uri()
 
+    def get_trades_chart(self):
+        trades = BotTrade.objects.filter(
+            bot__pk=self.kwargs['pk'],
+            time__gte=now() - datetime.timedelta(days=60),
+            profit_usd__isnull=False
+        )
+
+        line_chart = pygal.StackedBar()
+        line_chart.title = 'Aggregated profits over time'
+        line_chart.x_labels = [60, 30, 14, 7, 3, 2, 1]
+        line_chart.add(
+            'Buy',
+            [
+                trades.filter(
+                    trade_type='buy'
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='buy', time__gte=now() - datetime.timedelta(days=30)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='buy', time__gte=now() - datetime.timedelta(days=14)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='buy', time__gte=now() - datetime.timedelta(days=7)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='buy', time__gte=now() - datetime.timedelta(days=3)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='buy', time__gte=now() - datetime.timedelta(days=2)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='buy', time__gte=now() - datetime.timedelta(days=1)
+                ).aggregate(profit=Sum('profit_usd'))['profit']
+            ]
+        )
+        line_chart.add(
+            'Sell',
+            [
+                trades.filter(
+                    trade_type='sell'
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='sell', time__gte=now() - datetime.timedelta(days=30)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='sell', time__gte=now() - datetime.timedelta(days=14)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='sell', time__gte=now() - datetime.timedelta(days=7)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='sell', time__gte=now() - datetime.timedelta(days=3)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='sell', time__gte=now() - datetime.timedelta(days=2)
+                ).aggregate(profit=Sum('profit_usd'))['profit'],
+                trades.filter(
+                    trade_type='sell', time__gte=now() - datetime.timedelta(days=1)
+                ).aggregate(profit=Sum('profit_usd'))['profit']
+            ]
+        )
+        return line_chart.render_data_uri()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         all_heartbeats = self.object.botheartbeat_set.all()
@@ -81,6 +145,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             )
 
         context['placed_orders_chart'] = self.get_placed_orders_chart()
+        context['trades_chart'] = self.get_trades_chart()
         context['last_balance'] = self.object.botbalance_set.first()
 
         context['peg'] = self.object.peg
@@ -212,6 +277,29 @@ class BotPlacedOrdersDataTablesView(LoginRequiredMixin, View):
                         placed_order.price,
                         placed_order.amount
                     ] for placed_order in data['data']
+                ]
+            }
+        )
+
+
+class BotTradesDataTablesView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        data = generic_data_tables_view(request, BotTrade, pk)
+        return JsonResponse(
+            {
+                'draw': data['draw'],
+                'recordsTotal': data['recordsTotal'],
+                'recordsFiltered': data['recordsFiltered'],
+                'data': [
+                    [
+                        trade.trade_id,
+                        trade.time,
+                        trade.trade_type.title(),
+                        round(trade.target_price_usd, 8),
+                        round(trade.trade_price_usd, 8),
+                        trade.amount,
+                        round(trade.profit_usd, 2)
+                    ] for trade in data['data']
                 ]
             }
         )

@@ -6,12 +6,14 @@ from .bot import (
     DeleteBotView,
     BotErrorsDataTablesView,
     BotPlacedOrdersDataTablesView,
+    BotTradesDataTablesView
 )
 from .bot_api import (
     BotApiConfigView,
     BotApiPlacedOrderView,
     BotApiPricesView,
-    BotApiBalancesView
+    BotApiBalancesView,
+    BotApiTradeView
 )
 from .bot_user_api import (
     BotUserApiErrorsView
@@ -25,10 +27,12 @@ __all__ = [
     'DeleteBotView',
     'BotErrorsDataTablesView',
     'BotPlacedOrdersDataTablesView',
+    'BotTradesDataTablesView',
     'BotApiConfigView',
     'BotApiPlacedOrderView',
     'BotApiPricesView',
     'BotApiBalancesView',
+    'BotApiTradeView',
     'BotUserApiErrorsView',
 ]
 
