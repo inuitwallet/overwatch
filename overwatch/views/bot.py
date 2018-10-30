@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.template import Template, Context
 from django.urls import reverse_lazy
 from django.utils.timezone import now
-from pygal.style import LightColorizedStyle, CleanStyle, DarkGreenBlueStyle
+from pygal.style import CleanStyle
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
@@ -77,7 +77,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         )
         line_chart.value_formatter = lambda x: "$%.2f USD" % x
         line_chart.title = 'Aggregated profits over time'
-        days = [60, 30, 14, 7, 3, 2, 1]
+        days = [30, 14, 7, 3, 2, 1]
         line_chart.x_labels = days
         profits = {'buy': [], 'sell': []}
 
