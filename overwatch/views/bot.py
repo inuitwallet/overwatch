@@ -47,7 +47,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
 
         datetimeline = pygal.DateTimeLine(
             x_label_rotation=35,
-            x_titla='Date',
+            x_title='Date',
             y_title='Price',
             truncate_label=-1,
             legend_at_bottom=True,
