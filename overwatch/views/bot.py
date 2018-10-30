@@ -47,7 +47,10 @@ class DetailBotView(LoginRequiredMixin, DetailView):
 
         datetimeline = pygal.DateTimeLine(
             x_label_rotation=35,
+            x_titla='Date',
+            y_title='Price',
             truncate_label=-1,
+            legend_at_bottom=True,
             value_formatter=lambda x: '{:.8f}'.format(x),
             x_value_formatter=lambda dt: dt.strftime('%Y-%m-%d %H:%M:%S'),
             fill=True,
@@ -69,6 +72,7 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         line_chart = pygal.Bar(
             x_title='Days',
             y_title='Value in USD',
+            legend_at_bottom=True,
             style=CleanStyle(
                 font_family='googlefont:Raleway',
                 value_font_size=10
