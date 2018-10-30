@@ -66,70 +66,36 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             profit_usd__isnull=False
         )
 
-        line_chart = pygal.StackedBar(
+        line_chart = pygal.Bar(
             x_title='Days',
             y_title='Value in USD',
             style=CleanStyle(
                 font_family='googlefont:Raleway',
                 value_font_size=10
             ),
-            print_values=True,
-            print_values_position='top',
+            dynamic_print_values=True,
         )
         line_chart.value_formatter = lambda x: "$%.2f USD" % x
         line_chart.title = 'Aggregated profits over time'
-        line_chart.x_labels = [60, 30, 14, 7, 3, 2, 1]
+        days = [60, 30, 14, 7, 3, 2, 1]
+        line_chart.x_labels = days
+        profits = {'buy': [], 'sell': []}
+
+        for day in days:
+            for side in ['buy', 'sell']:
+                profits[side].append(
+                    trades.filter(
+                        trade_type=side, time__gte=now() - datetime.timedelta(days=day)
+                    ).aggregate(
+                        profit=Sum('profit_usd')
+                    )['profit']
+                )
+
+        line_chart.add('Buy', profits['buy'])
+        line_chart.add('Sell', profits['sell'])
         line_chart.add(
-            'Buy',
-            [
-                trades.filter(
-                    trade_type='buy'
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='buy', time__gte=now() - datetime.timedelta(days=30)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='buy', time__gte=now() - datetime.timedelta(days=14)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='buy', time__gte=now() - datetime.timedelta(days=7)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='buy', time__gte=now() - datetime.timedelta(days=3)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='buy', time__gte=now() - datetime.timedelta(days=2)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='buy', time__gte=now() - datetime.timedelta(days=1)
-                ).aggregate(profit=Sum('profit_usd'))['profit']
-            ]
-        )
-        line_chart.add(
-            'Sell',
-            [
-                trades.filter(
-                    trade_type='sell'
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='sell', time__gte=now() - datetime.timedelta(days=30)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='sell', time__gte=now() - datetime.timedelta(days=14)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='sell', time__gte=now() - datetime.timedelta(days=7)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='sell', time__gte=now() - datetime.timedelta(days=3)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='sell', time__gte=now() - datetime.timedelta(days=2)
-                ).aggregate(profit=Sum('profit_usd'))['profit'],
-                trades.filter(
-                    trade_type='sell', time__gte=now() - datetime.timedelta(days=1)
-                ).aggregate(profit=Sum('profit_usd'))['profit']
-            ]
+            'Total',
+            [float(buy or 0) + float(sell or 0) for buy, sell in zip(profits['buy'], profits['sell'])]
         )
         return line_chart.render_data_uri()
 
