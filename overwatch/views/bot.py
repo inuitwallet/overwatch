@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.template import Template, Context
 from django.urls import reverse_lazy
 from django.utils.timezone import now
-from pygal.style import LightColorizedStyle
+from pygal.style import LightColorizedStyle, CleanStyle, DarkGreenBlueStyle
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
@@ -51,7 +51,9 @@ class DetailBotView(LoginRequiredMixin, DetailView):
             value_formatter=lambda x: '{:.8f}'.format(x),
             x_value_formatter=lambda dt: dt.strftime('%Y-%m-%d %H:%M:%S'),
             fill=True,
-            style=LightColorizedStyle,
+            style=CleanStyle(
+                font_family='googlefont:Raleway',
+            ),
         )
         datetimeline.add("Buy", bid_points, dots_size=2)
         datetimeline.add("Sell", ask_points, dots_size=2)
@@ -66,8 +68,15 @@ class DetailBotView(LoginRequiredMixin, DetailView):
 
         line_chart = pygal.StackedBar(
             x_title='Days',
-            y_title='Value in USD'
+            y_title='Value in USD',
+            style=CleanStyle(
+                font_family='googlefont:Raleway',
+                value_font_size=10
+            ),
+            print_values=True,
+            print_values_position='top',
         )
+        line_chart.value_formatter = lambda x: "$%.2f USD" % x
         line_chart.title = 'Aggregated profits over time'
         line_chart.x_labels = [60, 30, 14, 7, 3, 2, 1]
         line_chart.add(
