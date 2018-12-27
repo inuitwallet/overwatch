@@ -284,3 +284,4 @@ class BotTrade(models.Model):
 
     class Meta:
         ordering = ['-time']
+        unique_together = ('bot', 'trade_id')
