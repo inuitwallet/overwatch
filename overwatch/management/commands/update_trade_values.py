@@ -18,7 +18,7 @@ class Command(BaseCommand):
             print('No Json: {}'.format(r.text))
             return None
 
-        agg_price = response.get('aggregated_usd_price')
+        agg_price = response.get('moving_averages', {}).get('30_minute')
 
         if agg_price is None:
             print('No agg_price?: {}'.format(response))

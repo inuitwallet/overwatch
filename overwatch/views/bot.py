@@ -14,8 +14,7 @@ from pygal.style import CleanStyle
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
-from overwatch.models import Bot, BotError
-from overwatch.models.bot import BotPlacedOrder, BotTrade
+from overwatch.models import Bot, BotError, BotPlacedOrder, BotTrade
 
 
 class ListBotView(LoginRequiredMixin, ListView):

@@ -10,7 +10,8 @@ from overwatch.models.bot import BotTrade, Bot
 
 
 class Command(BaseCommand):
-    def get_price(self, cur, dt):
+    @staticmethod
+    def get_price(cur, dt):
         r = requests.get('https://price-aggregator.crypto-daio.co.uk/price/{}/{}'.format(cur, dt))
 
         if r.status_code != requests.codes.ok:
@@ -23,7 +24,7 @@ class Command(BaseCommand):
             print('No Json: {}'.format(r.text))
             return None
 
-        agg_price = response.get('aggregated_usd_price')
+        agg_price = response.get('moving_averages', {}).get('30_minute')
 
         if agg_price is None:
             print('No agg_price?: {}'.format(response))
