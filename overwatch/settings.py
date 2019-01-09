@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'bootstrapform',
     'widget_tweaks',
     'channels',
-    'beatserver',
     'etc',
 ]
 

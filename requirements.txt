@@ -1,4 +1,3 @@
-beatserver
 boto3
 bpython
 channels
