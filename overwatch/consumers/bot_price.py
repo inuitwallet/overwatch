@@ -53,13 +53,13 @@ class BotPriceConsumer(SyncConsumer):
         print('updated bot_price')
 
         # we should scan any other prices that happen to be missing usd prices
-        for bad_bot_price in BotPrice.objects.filter(updated=False):
-            async_to_sync(self.channel_layer.send)(
-                'bot-price',
-                {
-                    "type": "calculate.usd.values",
-                    "bot_price": bad_bot_price.pk,
-                },
-            )
+        # for bad_bot_price in BotPrice.objects.filter(updated=False):
+        #     async_to_sync(self.channel_layer.send)(
+        #         'bot-price',
+        #         {
+        #             "type": "calculate.usd.values",
+        #             "bot_price": bad_bot_price.pk,
+        #         },
+        #     )
 
 
