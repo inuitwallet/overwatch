@@ -419,7 +419,7 @@
         botWebSocketBridge.listen(function(action, stream) {
             message_type = action['message_type'];
 
-            if (message_type === "clear") {
+            if (message_type === "bot_clear") {
                 <!--Prices-->
                 $('.bid-price-peg').empty();
                 $('.bid-price').empty();

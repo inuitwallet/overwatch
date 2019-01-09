@@ -1,13 +1,6 @@
-import datetime
 import json
-
-import boto3
 from asgiref.sync import async_to_sync
-from channels.consumer import SyncConsumer
 from channels.generic.websocket import WebsocketConsumer
-from channels.layers import get_channel_layer
-
-from overwatch.models import Bot
 
 
 class CloudWatchConsumer(WebsocketConsumer):

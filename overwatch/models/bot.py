@@ -176,9 +176,9 @@ class Bot(models.Model):
             self.last_price.ask_price
         )
 
-    def rendered_price(self, peg=True):
-        if peg:
-            dp = str(self.peg_decimal_places)
+    def rendered_price(self, usd=True):
+        if usd:
+            dp = str(4)
             template = '{{ last_price.price_usd|floatformat:' + dp + ' }} {{ currency }}'
         else:
             dp = str(self.base_decimal_places)
@@ -190,14 +190,14 @@ class Bot(models.Model):
             Context(
                 {
                     'last_price': self.last_price,
-                    'currency': self.peg if peg else self.base
+                    'currency': 'USD' if usd else self.base
                 }
             )
         )
 
-    def rendered_bid_price(self, peg=True):
-        if peg:
-            dp = str(self.peg_decimal_places)
+    def rendered_bid_price(self, usd=True):
+        if usd:
+            dp = str(4)
             template = '{{ last_price.bid_price_usd|floatformat:' + dp + ' }} {{ currency }}'
         else:
             dp = str(self.base_decimal_places)
@@ -209,14 +209,14 @@ class Bot(models.Model):
             Context(
                 {
                     'last_price': self.last_price,
-                    'currency': self.peg if peg else self.base
+                    'currency': 'USD' if usd else self.base
                 }
             )
         )
 
-    def rendered_ask_price(self, peg=True):
-        if peg:
-            dp = str(self.peg_decimal_places)
+    def rendered_ask_price(self, usd=True):
+        if usd:
+            dp = str(4)
             template = '{{ last_price.ask_price_usd|floatformat:' + dp + ' }} {{ currency }}'
         else:
             dp = str(self.base_decimal_places)
@@ -228,26 +228,26 @@ class Bot(models.Model):
             Context(
                 {
                     'last_price': self.last_price,
-                    'currency': self.peg if peg else self.base
+                    'currency': 'USD' if usd else self.base
                 }
             )
         )
 
-    def rendered_bid_balance(self, on_order=True, peg=True):
-        if peg:
-            dp = str(self.peg_decimal_places)
-            currency = self.peg
+    def rendered_bid_balance(self, on_order=True, usd=True):
+        if usd:
+            dp = str(4)
+            currency = 'USD'
         else:
             dp = str(self.quote_decimal_places) if self.reversed else str(self.base_decimal_places)
             currency = self.base if self.reversed else self.quote
 
         if on_order:
-            if peg:
+            if usd:
                 template = '{{ last_balance.bid_on_order_usd|floatformat:' + dp + ' }} {{ currency }}'
             else:
                 template = '{{ last_balance.bid_on_order|floatformat:' + dp + ' }} {{ currency }}'
         else:
-            if peg:
+            if usd:
                 template = '{{ last_balance.bid_available_usd|floatformat:' + dp + ' }} {{ currency }}'
             else:
                 template = '{{ last_balance.bid_available|floatformat:' + dp + ' }} {{ currency }}'
@@ -263,21 +263,21 @@ class Bot(models.Model):
             )
         )
 
-    def rendered_ask_balance(self, on_order=True, peg=True):
-        if peg:
-            dp = str(self.peg_decimal_places)
-            currency = self.peg
+    def rendered_ask_balance(self, on_order=True, usd=True):
+        if usd:
+            dp = str(4)
+            currency = 'USD'
         else:
             dp = str(self.base_decimal_places) if self.reversed else str(self.quote_decimal_places)
             currency = self.base if self.reversed else self.quote
 
         if on_order:
-            if peg:
+            if usd:
                 template = '{{ last_balance.ask_on_order_usd|floatformat:' + dp + ' }} {{ currency }}'
             else:
                 template = '{{ last_balance.ask_on_order|floatformat:' + dp + ' }} {{ currency }}'
         else:
-            if peg:
+            if usd:
                 template = '{{ last_balance.ask_available_usd|floatformat:' + dp + ' }} {{ currency }}'
             else:
                 template = '{{ last_balance.ask_available|floatformat:' + dp + ' }} {{ currency }}'

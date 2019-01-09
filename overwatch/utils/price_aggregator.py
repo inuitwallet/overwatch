@@ -9,6 +9,9 @@ def get_price_data(currency, dt=None):
     If time_stamp is None, the latest price is retrieved.
     Otherwise the price closest to the tie stamp is retrieved.
     """
+    if currency.lower() == 'usd':
+        return 1
+
     url = 'https://price-aggregator.crypto-daio.co.uk/price/{}'.format(currency)
 
     if dt is not None:
