@@ -24,8 +24,8 @@ class BotConsumer(JsonWebsocketConsumer):
 
         self.clear({})
 
-        self.get_price_info()
-        self.get_balance_info()
+        self.get_price_info({})
+        self.get_balance_info({})
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)('bot_{}'.format(self.bot.pk), self.channel_name)
@@ -40,7 +40,7 @@ class BotConsumer(JsonWebsocketConsumer):
             )
         )
 
-    def get_price_info(self):
+    def get_price_info(self, event):
         self.send(
             json.dumps(
                 {
@@ -55,7 +55,7 @@ class BotConsumer(JsonWebsocketConsumer):
             )
         )
 
-    def get_balance_info(self):
+    def get_balance_info(self, event):
         self.send(
             json.dumps(
                 {
