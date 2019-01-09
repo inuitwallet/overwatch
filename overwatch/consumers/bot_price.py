@@ -37,13 +37,22 @@ class BotPriceConsumer(SyncConsumer):
             return
 
         if bot_price.price:
-            bot_price.price_usd = bot_price.price * price_30_ma
+            if bot_price.bot.reversed:
+                bot_price.price_usd = bot_price.price / price_30_ma
+            else:
+                bot_price.price_usd = bot_price.price * price_30_ma
 
         if bot_price.bid_price:
-            bot_price.bid_price_usd = bot_price.bid_price * price_30_ma
+            if bot_price.bot.reversed:
+                bot_price.bid_price_usd = bot_price.bid_price / price_30_ma
+            else:
+                bot_price.bid_price_usd = bot_price.bid_price * price_30_ma
 
         if bot_price.ask_price:
-            bot_price.ask_price_usd = bot_price.ask_price * price_30_ma
+            if bot_price.bot.reversed:
+                bot_price.ask_price_usd = bot_price.ask_price / price_30_ma
+            else:
+                bot_price.ask_price_usd = bot_price.ask_price * price_30_ma
 
         bot_price.unit = currency
         bot_price.updated = True
