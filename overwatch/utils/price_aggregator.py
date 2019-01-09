@@ -10,7 +10,18 @@ def get_price_data(currency, dt=None):
     Otherwise the price closest to the tie stamp is retrieved.
     """
     if currency.lower() == 'usd':
-        return 1
+        return {
+            "aggregated_usd_price": 1,
+            "currency": "USD",
+            "currency_name": "US-Dollar",
+            "moving_averages": {
+                "12_hour": 1,
+                "1_hour": 1,
+                "24_hour": 1,
+                "30_minute": 1,
+                "6_hour": 1
+            }
+        }
 
     url = 'https://price-aggregator.crypto-daio.co.uk/price/{}'.format(currency)
 
