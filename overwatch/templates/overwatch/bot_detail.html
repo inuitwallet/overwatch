@@ -435,19 +435,19 @@
                 $('.ask-balance').empty();
             }
             if (message_type === "price_info") {
-                $('.bid-price-peg').append(action['bid_price_peg']);
-                $('.bid-price').append(action['bid_price']);
-                $('.price-peg').append(action['price_peg']);
-                $('.price').append(action['price']);
-                $('.ask-price-peg').append(action['ask_price_peg']);
-                $('.ask-price').append(action['ask_price']);
+                $('.bid-price-peg').html(action['bid_price_peg']);
+                $('.bid-price').html(action['bid_price']);
+                $('.price-peg').html(action['price_peg']);
+                $('.price').html(action['price']);
+                $('.ask-price-peg').html(action['ask_price_peg']);
+                $('.ask-price').html(action['ask_price']);
             }
             if (message_type === "balance_info") {
                 console.log(action);
-                $('.bid-balance-peg').append(action['bid_balance_peg']);
-                $('.bid-balance').append(action['bid_balance']);
-                $('.ask-balance-peg').append(action['ask_balance_peg']);
-                $('.ask-balance').append(action['ask_balance']);
+                $('.bid-balance-peg').html(action['bid_balance_peg']);
+                $('.bid-balance').html(action['bid_balance']);
+                $('.ask-balance-peg').html(action['ask_balance_peg']);
+                $('.ask-balance').html(action['ask_balance']);
             }
         });
     </script>

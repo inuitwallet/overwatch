@@ -1,4 +1,3 @@
-from asgiref.sync import async_to_sync
 from channels.consumer import SyncConsumer
 
 from overwatch.models import BotPrice
