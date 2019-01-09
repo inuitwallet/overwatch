@@ -164,7 +164,7 @@ class Bot(models.Model):
 
     @property
     def reversed(self):
-        return self.base == self.peg
+        return self.quote == self.track
 
     @property
     def spread(self):
