@@ -269,7 +269,7 @@ class Bot(models.Model):
             currency = 'USD'
         else:
             dp = str(self.base_decimal_places) if self.reversed else str(self.quote_decimal_places)
-            currency = self.quote if self.reversed else self.base
+            currency = self.base if self.reversed else self.quote
 
         if on_order:
             if usd:
