@@ -1,6 +1,8 @@
 import datetime
 import json
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -116,6 +118,13 @@ class BotApiPricesView(View):
             price=request.POST.get('price'),
             ask_price=request.POST.get('ask_price'),
             bid_price=request.POST.get('bid_price')
+        )
+
+        async_to_sync(get_channel_layer().group_send)(
+            'bot_{}'.format(bot.pk),
+            {
+                'type': 'get.price.info',
+            }
         )
 
         return JsonResponse({'success': True})
