@@ -190,7 +190,7 @@ class Bot(models.Model):
             Context(
                 {
                     'last_price': self.last_price,
-                    'currency': 'USD' if usd else self.base
+                    'currency': 'USD' if usd else self.quote if self.reversed else self.base
                 }
             )
         )
@@ -209,7 +209,7 @@ class Bot(models.Model):
             Context(
                 {
                     'last_price': self.last_price,
-                    'currency': 'USD' if usd else self.base
+                    'currency': 'USD' if usd else self.quote if self.reversed else self.base
                 }
             )
         )
@@ -228,7 +228,7 @@ class Bot(models.Model):
             Context(
                 {
                     'last_price': self.last_price,
-                    'currency': 'USD' if usd else self.base
+                    'currency': 'USD' if usd else self.quote if self.reversed else self.base
                 }
             )
         )
@@ -239,7 +239,7 @@ class Bot(models.Model):
             currency = 'USD'
         else:
             dp = str(self.quote_decimal_places) if self.reversed else str(self.base_decimal_places)
-            currency = self.base if self.reversed else self.quote
+            currency = self.quote if self.reversed else self.base
 
         if on_order:
             if usd:
@@ -269,7 +269,7 @@ class Bot(models.Model):
             currency = 'USD'
         else:
             dp = str(self.base_decimal_places) if self.reversed else str(self.quote_decimal_places)
-            currency = self.base if self.reversed else self.quote
+            currency = self.quote if self.reversed else self.base
 
         if on_order:
             if usd:
