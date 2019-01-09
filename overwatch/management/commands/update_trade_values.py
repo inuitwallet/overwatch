@@ -1,7 +1,7 @@
 import requests
 from django.core.management import BaseCommand
 
-from overwatch.models.bot import BotTrade
+from overwatch.models import BotTrade
 
 
 class Command(BaseCommand):
@@ -27,7 +27,7 @@ class Command(BaseCommand):
         return agg_price
 
     def handle(self, *args, **options):
-        trades = BotTrade.objects.filter(profit_usd__isnull=True)
+        trades = BotTrade.objects.filter(profit_peg__isnull=True)
 
         print('Updating trade prices for {} trades'.format(trades.count()))
 
@@ -47,17 +47,17 @@ class Command(BaseCommand):
 
             prices[trade.bot.quote] = quote_price
 
-            trade_price_usd = trade.price * base_price
+            trade_price_peg = trade.price * base_price
 
             if trade.trade_type == 'buy':
-                trade_diff_usd = quote_price - trade_price_usd
+                trade_diff_peg = quote_price - trade_price_peg
             else:
-                trade_diff_usd = trade_price_usd - quote_price
+                trade_diff_peg = trade_price_peg - quote_price
 
-            trade.target_price_usd = quote_price,
-            trade.trade_price_usd = trade_price_usd,
-            trade.difference_usd = trade_diff_usd,
-            trade.profit_usd = trade_diff_usd * trade.amount
+            trade.target_price_peg = quote_price,
+            trade.trade_price_peg = trade_price_peg,
+            trade.difference_peg = trade_diff_peg,
+            trade.profit_peg = trade_diff_peg * trade.amount
 
             trade.save()
             print('Updated {}'.format(trade))

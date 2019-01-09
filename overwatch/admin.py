@@ -1,8 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from overwatch.models import ApiProfile, Bot, BotHeartBeat, BotError
-from overwatch.models.bot import BotPlacedOrder, BotPrice, BotBalance, BotTrade
+from overwatch.models import ApiProfile, Bot, BotHeartBeat, BotError, BotPlacedOrder, BotPrice, BotBalance, BotTrade
 
 
 @admin.register(ApiProfile)

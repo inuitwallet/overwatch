@@ -10,6 +10,10 @@
     Bot Detail
 {% endblock %}
 
+{% block headjs %}
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.384.0.min.js"></script>
+{% endblock %}
+
 {% block content %}
     <div class="row">
         <div class="col">
@@ -49,13 +53,13 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col text-center">
-                                            {{ last_price.bid_price_peg|floatformat:6 }} {{ peg }}
+                                        <div class="col text-center bid-price-peg">
+                                            <!--Bid Price in Peg will be populated here-->
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col text-center">
-                                            <small>({{ bid_diff|floatformat:2 }}%)</small>
+                                            <small class="bid-price"><!--Bid price will be populated here--></small>
                                         </div>
                                     </div>
                                 </div>
@@ -66,13 +70,13 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col text-center">
-                                            {{ last_price.price_peg|floatformat:6 }} {{ peg }}
+                                        <div class="col text-center price-peg">
+                                            <!--Price in Peg is populated here-->
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col text-center">
-                                            <small>Total Spread - Fees = {{ spread|floatformat:2 }}%</small>
+                                            <small class="price"><!--Price is populated here--></small>
                                         </div>
                                     </div>
                                 </div>
@@ -83,13 +87,13 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col text-center">
-                                            {{ last_price.ask_price_peg|floatformat:6 }} {{ peg }}
+                                        <div class="col text-center ask-price-peg">
+                                            <!--Ask Price in Peg will be populated here-->
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col text-center">
-                                            <small>({{ ask_diff|floatformat:2 }}%)</small>
+                                            <small class="ask-price"><!--Ask price will be populated here--></small>
                                         </div>
                                     </div>
                                 </div>
@@ -108,8 +112,13 @@
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col text-center bid-balance-peg">
+                                            <!--Bid Balance in Peg populated here-->
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col text-center">
-                                            {{ last_balance.bid_on_order|floatformat:6 }} / {{ last_balance.bid_available|floatformat:6 }}
+                                            <small class="bid-balance"><!--Bid balance populated here--></small>
                                         </div>
                                     </div>
                                 </div>
@@ -120,8 +129,13 @@
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col text-center ask-balance-peg">
+                                            <!--Ask Balance Peg Populated here-->
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col text-center">
-                                            {{ last_balance.ask_on_order|floatformat:6 }} / {{ last_balance.ask_available|floatformat:6 }}
+                                            <small class="ask-balance"><!--Ask Balance populated here--></small>
                                         </div>
                                     </div>
                                 </div>
@@ -381,21 +395,59 @@
         } );
     </script>
     <script>
-        const webSocketBridge = new channels.WebSocketBridge();
-        webSocketBridge.connect('/logs/{{ object.pk }}/');
-        webSocketBridge.listen(function(action, stream) {
+        const logWebSocketBridge = new channels.WebSocketBridge();
+        logWebSocketBridge.connect('/logs/{{ object.pk }}/');
+        logWebSocketBridge.listen(function(action, stream) {
             message_type = action['message_type'];
 
-            if (message_type === "clear") {
+            if (message_type === "cloudwatch_logs_clear") {
                 $('.logs').empty();
             }
-            if (message_type === "log_line") {
+            if (message_type === "cloudwatch_logs_add_line") {
                 time = action['time'];
                 message = action['message'];
                 var log_line = '<div class="row"><div class="col-2 text-right">' + time + '</div><div class="col text-left">' + message + '</div></div>'
                 $('.logs').append(log_line);
                 var logsDiv = $('.logs')[0];
                 logsDiv.scrollTop = logsDiv.scrollHeight;
+            }
+        });
+    </script>
+    <script>
+        const botWebSocketBridge = new channels.WebSocketBridge();
+        botWebSocketBridge.connect('/bot/{{ object.pk }}/');
+        botWebSocketBridge.listen(function(action, stream) {
+            message_type = action['message_type'];
+
+            if (message_type === "clear") {
+                <!--Prices-->
+                $('.bid-price-peg').empty();
+                $('.bid-price').empty();
+                $('.price-peg').empty();
+                $('.price').empty();
+                $('.ask-price-peg').empty();
+                $('.ask-price').empty();
+
+                <!--Balances-->
+                $('.bid-balance-peg').empty();
+                $('.bid-balance').empty();
+                $('.ask-balance-peg').empty();
+                $('.ask-balance').empty();
+            }
+            if (message_type === "price_info") {
+                $('.bid-price-peg').append(action['bid_price_peg']);
+                $('.bid-price').append(action['bid_price']);
+                $('.price-peg').append(action['price_peg']);
+                $('.price').append(action['price']);
+                $('.ask-price-peg').append(action['ask_price_peg']);
+                $('.ask-price').append(action['ask_price']);
+            }
+            if (message_type === "balance_info") {
+                console.log(action);
+                $('.bid-balance-peg').append(action['bid_balance_peg']);
+                $('.bid-balance').append(action['bid_balance']);
+                $('.ask-balance-peg').append(action['ask_balance_peg']);
+                $('.ask-balance').append(action['ask_balance']);
             }
         });
     </script>

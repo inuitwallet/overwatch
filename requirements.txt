@@ -1,6 +1,8 @@
+beatserver
 boto3
 bpython
 channels
+channels_redis
 django
 django-bootstrap-form
 django-etc

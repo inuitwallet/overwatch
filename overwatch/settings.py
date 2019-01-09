@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'bootstrapform',
     'widget_tweaks',
     'channels',
-    'chartjs',
+    'beatserver',
     'etc',
 ]
 
@@ -138,6 +138,16 @@ MESSAGE_TAGS = {
 }
 
 ACCOUNT_ACTIVATION_DAYS = 7
+
+# Channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # Load local_settings
 try:

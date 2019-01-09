@@ -5,8 +5,7 @@ from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidde
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from overwatch.models import BotHeartBeat, Bot
-from overwatch.models.bot import BotPlacedOrder, BotPrice, BotBalance, BotTrade
+from overwatch.models import BotHeartBeat, Bot, BotPlacedOrder, BotPrice, BotBalance, BotTrade
 
 """
 These classes represent API views that use direct bot authentication. 

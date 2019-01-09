@@ -3,7 +3,7 @@ import hmac
 import uuid
 
 from django.db import models
-from django.utils import timezone
+from django.template import Template, Context
 
 
 class Bot(models.Model):
@@ -77,6 +77,13 @@ class Bot(models.Model):
         blank=True,
         null=True
     )
+    aws_region = models.CharField(
+        max_length=255,
+        default='eu-west-1'
+    )
+    peg_decimal_places = models.IntegerField(default=6)
+    base_decimal_places = models.IntegerField(default=6)
+    quote_decimal_places = models.IntegerField(default=6)
 
     def __str__(self):
         return self.name
@@ -147,141 +154,141 @@ class Bot(models.Model):
 
         return ''
 
+    @property
+    def last_price(self):
+        return self.botprice_set.exclude(price_usd__isnull=True).first()
 
-class BotHeartBeat(models.Model):
-    bot = models.ForeignKey(
-        Bot,
-        on_delete=models.CASCADE
-    )
-    time = models.DateTimeField(
-        auto_now_add=True
-    )
+    @property
+    def last_balance(self):
+        return self.botbalance_set.first()
 
-    def __str__(self):
-        return '{}'.format(self.time)
+    @property
+    def reversed(self):
+        return self.quote == self.peg
 
-    class Meta:
-        ordering = ['-time']
+    @property
+    def spread(self):
+        return max(
+            self.last_price.bid_price,
+            self.last_price.ask_price
+        ) - min(
+            self.last_price.bid_price,
+            self.last_price.ask_price
+        )
 
+    def rendered_price(self, peg=True):
+        if peg:
+            dp = str(self.peg_decimal_places)
+            template = '{{ last_price.price_usd|floatformat:' + dp + ' }} {{ currency }}'
+        else:
+            dp = str(self.base_decimal_places)
+            template = '{{ last_price.price|floatformat:' + dp + ' }} {{ currency }}'
 
-class BotError(models.Model):
-    bot = models.ForeignKey(
-        Bot,
-        on_delete=models.CASCADE
-    )
-    time = models.DateTimeField(
-        auto_now_add=True
-    )
-    title = models.CharField(
-        max_length=255
-    )
-    message = models.TextField()
+        return Template(
+            template
+        ).render(
+            Context(
+                {
+                    'last_price': self.last_price,
+                    'currency': self.peg if peg else self.base
+                }
+            )
+        )
 
-    def __str__(self):
-        return '{} - {}'.format(self.time, self.title)
+    def rendered_bid_price(self, peg=True):
+        if peg:
+            dp = str(self.peg_decimal_places)
+            template = '{{ last_price.bid_price_usd|floatformat:' + dp + ' }} {{ currency }}'
+        else:
+            dp = str(self.base_decimal_places)
+            template = '{{ last_price.bid_price|floatformat:' + dp + ' }} {{ currency }}'
 
-    class Meta:
-        ordering = ['-time']
+        return Template(
+            template
+        ).render(
+            Context(
+                {
+                    'last_price': self.last_price,
+                    'currency': self.peg if peg else self.base
+                }
+            )
+        )
 
+    def rendered_ask_price(self, peg=True):
+        if peg:
+            dp = str(self.peg_decimal_places)
+            template = '{{ last_price.ask_price_usd|floatformat:' + dp + ' }} {{ currency }}'
+        else:
+            dp = str(self.base_decimal_places)
+            template = '{{ last_price.ask_price|floatformat:' + dp + ' }} {{ currency }}'
 
-class BotPlacedOrder(models.Model):
-    bot = models.ForeignKey(
-        Bot,
-        on_delete=models.CASCADE
-    )
-    time = models.DateTimeField(
-        auto_now_add=True
-    )
-    base = models.CharField(
-        max_length=255,
-    )
-    quote = models.CharField(
-        max_length=255,
-    )
-    order_type = models.CharField(
-        max_length=255,
-    )
-    price = models.FloatField()
-    amount = models.FloatField()
+        return Template(
+            template
+        ).render(
+            Context(
+                {
+                    'last_price': self.last_price,
+                    'currency': self.peg if peg else self.base
+                }
+            )
+        )
 
-    class Meta:
-        ordering = ['-time']
+    def rendered_bid_balance(self, on_order=True, peg=True):
+        if peg:
+            dp = str(self.peg_decimal_places)
+            currency = self.peg
+        else:
+            dp = str(self.quote_decimal_places) if self.reversed else str(self.base_decimal_places)
+            currency = self.base if self.reversed else self.quote
 
+        if on_order:
+            if peg:
+                template = '{{ last_balance.bid_on_order_usd|floatformat:' + dp + ' }} {{ currency }}'
+            else:
+                template = '{{ last_balance.bid_on_order|floatformat:' + dp + ' }} {{ currency }}'
+        else:
+            if peg:
+                template = '{{ last_balance.bid_available_usd|floatformat:' + dp + ' }} {{ currency }}'
+            else:
+                template = '{{ last_balance.bid_available|floatformat:' + dp + ' }} {{ currency }}'
 
-class BotPrice(models.Model):
-    bot = models.ForeignKey(
-        Bot,
-        on_delete=models.CASCADE
-    )
-    time = models.DateTimeField(
-        auto_now_add=True
-    )
-    price = models.FloatField(null=True, blank=True)
-    price_peg = models.FloatField(null=True, blank=True)
-    bid_price = models.FloatField(null=True, blank=True)
-    bid_price_peg = models.FloatField(null=True, blank=True)
-    ask_price = models.FloatField(null=True, blank=True)
-    ask_price_peg = models.FloatField(null=True, blank=True)
-    unit = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+        return Template(
+            template
+        ).render(
+            Context(
+                {
+                    'last_balance': self.last_balance,
+                    'currency': currency
+                }
+            )
+        )
 
-    class Meta:
-        ordering = ['-time']
+    def rendered_ask_balance(self, on_order=True, peg=True):
+        if peg:
+            dp = str(self.peg_decimal_places)
+            currency = self.peg
+        else:
+            dp = str(self.base_decimal_places) if self.reversed else str(self.quote_decimal_places)
+            currency = self.base if self.reversed else self.quote
 
+        if on_order:
+            if peg:
+                template = '{{ last_balance.ask_on_order_usd|floatformat:' + dp + ' }} {{ currency }}'
+            else:
+                template = '{{ last_balance.ask_on_order|floatformat:' + dp + ' }} {{ currency }}'
+        else:
+            if peg:
+                template = '{{ last_balance.ask_available_usd|floatformat:' + dp + ' }} {{ currency }}'
+            else:
+                template = '{{ last_balance.ask_available|floatformat:' + dp + ' }} {{ currency }}'
 
-class BotBalance(models.Model):
-    bot = models.ForeignKey(
-        Bot,
-        on_delete=models.CASCADE
-    )
-    time = models.DateTimeField(
-        auto_now_add=True
-    )
-    bid_available = models.FloatField()
-    ask_available = models.FloatField()
-    bid_on_order = models.FloatField()
-    ask_on_order = models.FloatField()
-    bid_available_usd = models.FloatField(null=True, blank=True)
-    ask_available_usd = models.FloatField(null=True, blank=True)
-    bid_on_order_usd = models.FloatField(null=True, blank=True)
-    ask_on_order_usd = models.FloatField(null=True, blank=True)
-    unit = models.CharField(
-        max_length=255,
-    )
-
-    class Meta:
-        ordering = ['-time']
-
-
-class BotTrade(models.Model):
-    bot = models.ForeignKey(
-        Bot,
-        on_delete=models.CASCADE
-    )
-    time = models.DateTimeField(
-        default=timezone.now  # there is some historical data so need to be able to set this field
-    )
-    trade_id = models.CharField(
-        max_length=255
-    )
-    trade_type = models.CharField(
-        max_length=255,
-    )
-    price = models.FloatField()
-    amount = models.FloatField()
-    total = models.FloatField()
-    age = models.DurationField(null=True, blank=True)
-    target_price_usd = models.FloatField(null=True, blank=True)
-    trade_price_usd = models.FloatField(null=True, blank=True)
-    difference_usd = models.FloatField(null=True, blank=True)
-    profit_usd = models.FloatField(null=True, blank=True)
-
-    def __str__(self):
-        return '{}@{}={:.2f} USD'.format(self.trade_id, self.bot, self.profit_usd)
-
-    class Meta:
-        ordering = ['-time']
-        unique_together = ('bot', 'trade_id')
+        return Template(
+            template
+        ).render(
+            Context(
+                {
+                    'last_balance': self.last_balance,
+                    'currency': currency
+                }
+            )
+        )

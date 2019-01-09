@@ -108,23 +108,6 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         paginator = Paginator(all_heartbeats, 30)
         context['heart_beats'] = paginator.get_page(1)
 
-        last_price = self.object.botprice_set.exclude(
-            price_peg__isnull=True
-        ).first()
-        if last_price:
-            context['last_price'] = last_price
-            context['ask_diff'] = ((last_price.ask_price_peg - last_price.price_peg) / last_price.price_peg) * 100
-            context['bid_diff'] = ((last_price.bid_price_peg - last_price.price_peg) / last_price.price_peg) * 100
-            context['spread'] = (
-                max(
-                    context['ask_diff'],
-                    context['bid_diff']
-                ) - min(
-                    context['ask_diff'],
-                    context['bid_diff']
-                ) - (self.object.fee * 2)
-            )
-
         context['placed_orders_chart'] = self.get_placed_orders_chart()
         context['trades_chart'] = self.get_trades_chart()
         context['last_balance'] = self.object.botbalance_set.first()
