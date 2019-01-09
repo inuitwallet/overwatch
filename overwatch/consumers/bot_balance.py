@@ -37,16 +37,28 @@ class BotBalanceConsumer(SyncConsumer):
             return
 
         if bot_balance.bid_available:
-            bot_balance.bid_available_usd = bot_balance.bid_available * price_30_ma
+            if bot_balance.bot.reversed:
+                bot_balance.bid_available_usd = bot_balance.bid_available / price_30_ma
+            else:
+                bot_balance.bid_available_usd = bot_balance.bid_available * price_30_ma
 
         if bot_balance.bid_on_order:
-            bot_balance.bid_on_order_usd = bot_balance.bid_on_order * price_30_ma
+            if bot_balance.bot.reversed:
+                bot_balance.bid_on_order_usd = bot_balance.bid_on_order / price_30_ma
+            else:
+                bot_balance.bid_on_order_usd = bot_balance.bid_on_order * price_30_ma
 
         if bot_balance.ask_available:
-            bot_balance.ask_available_usd = bot_balance.ask_available * price_30_ma
+            if bot_balance.bot.reversed:
+                bot_balance.ask_available_usd = bot_balance.ask_available / price_30_ma
+            else:
+                bot_balance.ask_available_usd = bot_balance.ask_available * price_30_ma
 
         if bot_balance.ask_on_order:
-            bot_balance.ask_on_order_usd = bot_balance.ask_on_order * price_30_ma
+            if bot_balance.bot.reversed:
+                bot_balance.ask_on_order_usd = bot_balance.ask_on_order / price_30_ma
+            else:
+                bot_balance.ask_on_order_usd = bot_balance.ask_on_order * price_30_ma
 
         bot_balance.updated = True
 
