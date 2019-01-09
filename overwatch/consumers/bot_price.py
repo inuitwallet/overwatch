@@ -19,7 +19,7 @@ class BotPriceConsumer(SyncConsumer):
         if bot_price.updated:
             return
 
-        print('Getting usd values for BotPrice: {}) {}'.format(bot_price.pk, bot_price))
+        print('Getting usd values for BotPrice: {} {}'.format(bot_price.pk, bot_price))
 
         # which currency to use?
         # we use quote if the bot is standard or base if it is reversed

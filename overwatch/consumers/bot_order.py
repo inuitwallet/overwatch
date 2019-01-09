@@ -19,7 +19,7 @@ class BotOrderConsumer(SyncConsumer):
         if bot_order.updated:
             return
 
-        print('Getting usd values for BotPlacedOrder: {}) {}'.format(bot_order.pk, bot_order))
+        print('Getting usd values for BotPlacedOrder: {} {}'.format(bot_order.pk, bot_order))
 
         # which currency to use?
         # we use quote if the bot is standard or base if it is reversed
@@ -46,13 +46,13 @@ class BotOrderConsumer(SyncConsumer):
         print('updated bot_order')
 
         # we should scan any other prices that happen to be missing usd prices
-        for bad_bot_order in BotPlacedOrder.objects.filter(updated=False):
-            async_to_sync(self.channel_layer.send)(
-                'bot-order',
-                {
-                    "type": "calculate.usd.values",
-                    "bot_order": bad_bot_order.pk,
-                },
-            )
+        # for bad_bot_order in BotPlacedOrder.objects.filter(updated=False):
+        #     async_to_sync(self.channel_layer.send)(
+        #         'bot-order',
+        #         {
+        #             "type": "calculate.usd.values",
+        #             "bot_order": bad_bot_order.pk,
+        #         },
+        #     )
 
 

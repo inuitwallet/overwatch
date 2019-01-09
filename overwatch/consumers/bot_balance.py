@@ -19,7 +19,7 @@ class BotBalanceConsumer(SyncConsumer):
         if bot_balance.updated:
             return
 
-        print('Getting usd values for BotBalance: {}) {}'.format(bot_balance.pk, bot_balance))
+        print('Getting usd values for BotBalance: {} {}'.format(bot_balance.pk, bot_balance))
 
         # which currency to use?
         # we use quote if the bot is standard or base if it is reversed
@@ -55,13 +55,13 @@ class BotBalanceConsumer(SyncConsumer):
         print('updated bot_balance')
 
         # we should scan any other prices that happen to be missing usd prices
-        for bad_bot_balance in BotBalance.objects.filter(updated=False):
-            async_to_sync(self.channel_layer.send)(
-                'bot-balance',
-                {
-                    "type": "calculate.usd.values",
-                    "bot_balance": bad_bot_balance.pk,
-                },
-            )
+        # for bad_bot_balance in BotBalance.objects.filter(updated=False):
+        #     async_to_sync(self.channel_layer.send)(
+        #         'bot-balance',
+        #         {
+        #             "type": "calculate.usd.values",
+        #             "bot_balance": bad_bot_balance.pk,
+        #         },
+        #     )
 
 
