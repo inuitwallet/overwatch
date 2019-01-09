@@ -23,6 +23,9 @@ def get_price_data(currency, dt=None):
             }
         }
 
+    if currency == 'cnnbt':
+        currency = 'cny'
+
     url = 'https://price-aggregator.crypto-daio.co.uk/price/{}'.format(currency)
 
     if dt is not None:
