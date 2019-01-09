@@ -216,7 +216,7 @@ class Bot(models.Model):
 
     def rendered_ask_price(self, usd=True):
         if usd:
-            dp = str(4)
+            dp = str(6)
             template = '{{ last_price.ask_price_usd|floatformat:' + dp + ' }} {{ currency }}'
         else:
             dp = str(self.base_decimal_places)
@@ -235,7 +235,7 @@ class Bot(models.Model):
 
     def rendered_bid_balance(self, on_order=True, usd=True):
         if usd:
-            dp = str(4)
+            dp = str(6)
             currency = 'USD'
         else:
             dp = str(self.quote_decimal_places) if self.reversed else str(self.base_decimal_places)
@@ -265,7 +265,7 @@ class Bot(models.Model):
 
     def rendered_ask_balance(self, on_order=True, usd=True):
         if usd:
-            dp = str(4)
+            dp = str(6)
             currency = 'USD'
         else:
             dp = str(self.base_decimal_places) if self.reversed else str(self.quote_decimal_places)
