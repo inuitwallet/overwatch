@@ -62,6 +62,7 @@ class BotConsumer(JsonWebsocketConsumer):
                     'message_type': 'price_info',
                     'price_peg': self.bot.rendered_price(usd=True),
                     'price': self.bot.rendered_price(usd=False),
+                    'price_sparkline': self.bot.price_sparkline(),
                     'bid_price_peg': self.bot.rendered_bid_price(usd=True),
                     'bid_price': self.bot.rendered_bid_price(usd=False),
                     'ask_price_peg': self.bot.rendered_ask_price(usd=True),

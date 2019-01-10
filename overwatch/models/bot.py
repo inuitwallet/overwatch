@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import uuid
 
+import pygal
 from django.db import models
 from django.template import Template, Context
 
@@ -194,6 +195,13 @@ class Bot(models.Model):
                 }
             )
         )
+
+    def price_sparkline(self):
+        prices = self.botprice_set.exclude(price_usd__isnull=True)[:30].values_list('price', flat=True)
+
+        chart = pygal.Line()
+        chart.add('', list(prices))
+        return chart.render_sparkline(is_unicode=True)
 
     def rendered_bid_price(self, usd=True):
         if usd:

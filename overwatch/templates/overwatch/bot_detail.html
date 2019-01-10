@@ -70,6 +70,11 @@
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col text-center price-sparkline">
+                                            <!--Price sparkline is populated here-->
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col text-center price-peg">
                                             <!--Price in Peg is populated here-->
                                         </div>
@@ -429,6 +434,7 @@
                 $('.bid-price').html(action['bid_price']);
                 $('.price-peg').html(action['price_peg']);
                 $('.price').html(action['price']);
+                $('.price-sparkline').html(action['price_sparkline']);
                 $('.ask-price-peg').html(action['ask_price_peg']);
                 $('.ask-price').html(action['ask_price']);
             }
