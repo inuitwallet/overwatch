@@ -31,6 +31,13 @@ class BotHeartBeat(models.Model):
             }
         )
 
+        async_to_sync(get_channel_layer().send)(
+            'cloudwatch-logs',
+            {
+                "type": "get.cloudwatch.logs",
+                "bot_pk": self.bot.pk,
+            },
+        )
 
 
 class BotError(models.Model):
