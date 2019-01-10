@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management import BaseCommand
 from django.utils.timezone import make_aware
 
-from overwatch.models.bot import BotTrade, Bot
+from overwatch.models import BotTrade, Bot
 
 
 class Command(BaseCommand):
