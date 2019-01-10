@@ -2,6 +2,7 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
+from django.template.loader import render_to_string
 
 from overwatch.models import Bot
 
@@ -24,6 +25,7 @@ class BotConsumer(JsonWebsocketConsumer):
 
         self.clear({})
 
+        self.get_heart_beats({})
         self.get_price_info({})
         self.get_balance_info({})
 
@@ -39,6 +41,19 @@ class BotConsumer(JsonWebsocketConsumer):
                 }
             )
         )
+
+    def get_heart_beats(self, event):
+        self.send(json.dumps({'message_type': 'heartbeat_clear'}))
+
+        for heartbeat in sorted(self.bot.botheartbeat_set.all()[:15], key=lambda x: x.time):
+            self.send(
+                json.dumps(
+                    {
+                        'message_type': 'heartbeat',
+                        'heartbeat': render_to_string('overwatch/fragments/heartbeat.html', {'heartbeat': heartbeat})
+                    }
+                )
+            )
 
     def get_price_info(self, event):
         self.send(

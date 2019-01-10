@@ -21,6 +21,17 @@ class BotHeartBeat(models.Model):
     class Meta:
         ordering = ['-time']
 
+    def save(self, **kwargs):
+        super().save(kwargs)
+
+        async_to_sync(get_channel_layer().group_send)(
+            'bot_{}'.format(self.bot.pk),
+            {
+                'type': 'get.heart.beats'
+            }
+        )
+
+
 
 class BotError(models.Model):
     bot = models.ForeignKey(
@@ -77,8 +88,7 @@ class BotPlacedOrder(models.Model):
         super().save(kwargs)
 
         if not self.updated:
-            layer = get_channel_layer()
-            async_to_sync(layer.send)(
+            async_to_sync(get_channel_layer().send)(
                 'bot-order',
                 {
                     "type": "calculate.usd.values",
@@ -118,8 +128,7 @@ class BotPrice(models.Model):
         super().save(kwargs)
 
         if not self.updated:
-            layer = get_channel_layer()
-            async_to_sync(layer.send)(
+            async_to_sync(get_channel_layer().send)(
                 'bot-price',
                 {
                     "type": "calculate.usd.values",
@@ -159,8 +168,7 @@ class BotBalance(models.Model):
         super().save(kwargs)
 
         if not self.updated:
-            layer = get_channel_layer()
-            async_to_sync(layer.send)(
+            async_to_sync(get_channel_layer().send)(
                 'bot-balance',
                 {
                     "type": "calculate.usd.values",
@@ -207,8 +215,7 @@ class BotTrade(models.Model):
         super().save(kwargs)
 
         if not self.updated:
-            layer = get_channel_layer()
-            async_to_sync(layer.send)(
+            async_to_sync(get_channel_layer().send)(
                 'bot-trade',
                 {
                     "type": "calculate.usd.values",

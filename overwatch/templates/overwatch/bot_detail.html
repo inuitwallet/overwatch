@@ -317,19 +317,9 @@
                     <h2>Heart Beats</h2>
                 </div>
             </div>
-            <div class="row heart-beats">
-                <div class="col">
-                    {% for heartbeat in heart_beats %}
-                        <div class="row">
-                            <div class="col text-center">
-                                <div class="card">
-                                    <div class="card-body">
-                                        {{ heartbeat.time|timesince }} ago
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+            <div class="row heartbeats">
+                <div class="col" id="heartbeats-col">
+
                 </div>
             </div>
         </div>
@@ -443,11 +433,16 @@
                 $('.ask-price').html(action['ask_price']);
             }
             if (message_type === "balance_info") {
-                console.log(action);
                 $('.bid-balance-peg').html(action['bid_balance_peg']);
                 $('.bid-balance').html(action['bid_balance']);
                 $('.ask-balance-peg').html(action['ask_balance_peg']);
                 $('.ask-balance').html(action['ask_balance']);
+            }
+            if (message_type === "heartbeat_clear") {
+                $('#heartbeats-col').empty();
+            }
+            if (message_type === "heartbeat") {
+                $('#heartbeats-col').prepend(action['heartbeat']).fadeIn();
             }
         });
     </script>
