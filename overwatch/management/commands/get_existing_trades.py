@@ -91,10 +91,10 @@ class Command(BaseCommand):
                     amount=row[7],
                     total=row[8],
                     age=datetime.timedelta(seconds=row[9]),
-                    target_price_peg=usnbt_price,
-                    trade_price_peg=trade_price_usd,
-                    difference_peg=trade_diff_usd,
-                    profit_peg=trade_diff_usd * row[7]
+                    target_price_usd=usnbt_price,
+                    trade_price_usd=trade_price_usd,
+                    difference_usd=trade_diff_usd,
+                    profit_usd=trade_diff_usd * row[7]
                 )
 
                 print(trade)
