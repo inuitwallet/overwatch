@@ -389,25 +389,25 @@
             );
         } );
     </script>
-    <script>
-        const logWebSocketBridge = new channels.WebSocketBridge();
-        logWebSocketBridge.connect('/logs/{{ object.pk }}/');
-        logWebSocketBridge.listen(function(action, stream) {
-            message_type = action['message_type'];
+    <!--<script>-->
+        <!--const logWebSocketBridge = new channels.WebSocketBridge();-->
+        <!--logWebSocketBridge.connect('/logs/{{ object.pk }}/');-->
+        <!--logWebSocketBridge.listen(function(action, stream) {-->
+            <!--message_type = action['message_type'];-->
 
-            if (message_type === "cloudwatch_logs_clear") {
-                $('.logs').empty();
-            }
-            if (message_type === "cloudwatch_logs_add_line") {
-                time = action['time'];
-                message = action['message'];
-                var log_line = '<div class="row"><div class="col-2 text-right">' + time + '</div><div class="col text-left">' + message + '</div></div>'
-                $('.logs').append(log_line);
-                var logsDiv = $('.logs')[0];
-                logsDiv.scrollTop = logsDiv.scrollHeight;
-            }
-        });
-    </script>
+            <!--if (message_type === "cloudwatch_logs_clear") {-->
+                <!--$('.logs').empty();-->
+            <!--}-->
+            <!--if (message_type === "cloudwatch_logs_add_line") {-->
+                <!--time = action['time'];-->
+                <!--message = action['message'];-->
+                <!--var log_line = '<div class="row"><div class="col-2 text-right">' + time + '</div><div class="col text-left">' + message + '</div></div>'-->
+                <!--$('.logs').append(log_line);-->
+                <!--var logsDiv = $('.logs')[0];-->
+                <!--logsDiv.scrollTop = logsDiv.scrollHeight;-->
+            <!--}-->
+        <!--});-->
+    <!--</script>-->
     <script>
         const botWebSocketBridge = new channels.WebSocketBridge();
         botWebSocketBridge.connect('/bot/{{ object.pk }}/');
@@ -449,6 +449,18 @@
             }
             if (message_type === "heartbeat") {
                 $('#heartbeats-col').prepend(action['heartbeat']).fadeIn();
+            }
+
+            if (message_type === "cloudwatch_logs_clear") {
+                $('.logs').empty();
+            }
+            if (message_type === "cloudwatch_logs_add_line") {
+                time = action['time'];
+                message = action['message'];
+                var log_line = '<div class="row"><div class="col-2 text-right">' + time + '</div><div class="col text-left">' + message + '</div></div>'
+                $('.logs').append(log_line);
+                var logsDiv = $('.logs')[0];
+                logsDiv.scrollTop = logsDiv.scrollHeight;
             }
         });
     </script>

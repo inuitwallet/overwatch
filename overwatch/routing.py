@@ -9,7 +9,6 @@ application = ProtocolTypeRouter({
     # http->django views is added by default
     'websocket': AuthMiddlewareStack(
         URLRouter([
-            url(r'^logs/(?P<pk>[^/]+)/$', CloudWatchConsumer),
             url(r'^bot/(?P<pk>[^/]+)/$', BotConsumer)
         ])
     ),

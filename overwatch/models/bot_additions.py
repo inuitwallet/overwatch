@@ -36,6 +36,7 @@ class BotHeartBeat(models.Model):
             {
                 "type": "get.cloudwatch.logs",
                 "bot_pk": self.bot.pk,
+                "sleep": 30
             },
         )
 

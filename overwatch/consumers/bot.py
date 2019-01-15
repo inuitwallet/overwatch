@@ -2,6 +2,7 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
+from channels.layers import get_channel_layer
 from django.template.loader import render_to_string
 
 from overwatch.models import Bot
@@ -11,6 +12,10 @@ class BotConsumer(JsonWebsocketConsumer):
     bot = None
 
     def connect(self):
+        """
+        Add channel to the necessary groups. Initiate data scan
+        """
+        # get the bot from the websocket url
         try:
             self.bot = Bot.objects.get(
                 pk=self.scope['url_route']['kwargs']['pk']
@@ -19,21 +24,44 @@ class BotConsumer(JsonWebsocketConsumer):
             self.close()
             return
 
+        # accept the websocket connection
         self.accept()
 
+        # add the channel to the necessary groups
         async_to_sync(self.channel_layer.group_add)('bot_{}'.format(self.bot.pk), self.channel_name)
+        async_to_sync(self.channel_layer.group_add)('cloudwatch_logs_{}'.format(self.bot.pk), self.channel_name)
 
+        # clear the bot data
         self.clear({})
+        # clear the log data
+        self.logs_clear({})
 
+        # get the bot price and order data
         self.get_heart_beats({})
         self.get_price_info({})
         self.get_balance_info({})
 
+        # get the latest cloudwatch logs
+        async_to_sync(get_channel_layer().send)(
+            'cloudwatch-logs',
+            {
+                "type": "get.cloudwatch.logs",
+                "bot_pk": self.bot.pk
+            },
+        )
+
     def disconnect(self, close_code):
+        """
+        disconnect from the websocket so remove from groups
+        """
         async_to_sync(self.channel_layer.group_discard)('bot_{}'.format(self.bot.pk), self.channel_name)
+        async_to_sync(self.channel_layer.group_discard)('cloudwatch_logs_{}'.format(self.bot.pk), self.channel_name)
         self.close()
 
     def clear(self, event):
+        """
+        Instruct the javascript on the bot_detail page to clear the bot data holders
+        """
         self.send(
             json.dumps(
                 {
@@ -42,9 +70,26 @@ class BotConsumer(JsonWebsocketConsumer):
             )
         )
 
+    def logs_clear(self, event):
+        """
+        Instruct javascript on bot_detail page to clear the cloudwatch_logs holder
+        """
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'cloudwatch_logs_clear'
+                }
+            )
+        )
+
     def get_heart_beats(self, event):
+        """
+        Send the 15 latest heartbeats to the front end
+        """
+        # clear the heartbeat container
         self.send(json.dumps({'message_type': 'heartbeat_clear'}))
 
+        # get the latest 15 heartbeats and send them to the javascript on the bot_detail page
         for heartbeat in sorted(self.bot.botheartbeat_set.all()[:15], key=lambda x: x.time):
             self.send(
                 json.dumps(
@@ -56,6 +101,9 @@ class BotConsumer(JsonWebsocketConsumer):
             )
 
     def get_price_info(self, event):
+        """
+        calculate latest price infor and send to front end
+        """
         self.send(
             json.dumps(
                 {
@@ -72,6 +120,9 @@ class BotConsumer(JsonWebsocketConsumer):
         )
 
     def get_balance_info(self, event):
+        """
+        get the latest balance info and send it to the front end
+        """
         self.send(
             json.dumps(
                 {
@@ -95,3 +146,19 @@ class BotConsumer(JsonWebsocketConsumer):
                 }
             )
         )
+
+    def send_log_line(self, event):
+        """
+        send a single cloudwatch log line to the front end
+        """
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'cloudwatch_logs_add_line',
+                    'time': event.get('time'),
+                    'message': event.get('message')
+                }
+            )
+        )
+
+
