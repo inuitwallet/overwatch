@@ -72,7 +72,12 @@ class Command(BaseCommand):
 
                 prices['usnbt'][dt] = usnbt_price
 
+                print('price = {}'.format(row[6]))
+                print('btc price = {}'.format(btc_price))
+
                 trade_price_usd = row[6] * btc_price
+
+                print('trade_price = {}'.format(trade_price_usd))
 
                 if row[5] == 'buy':
                     trade_diff_usd = usnbt_price - trade_price_usd
