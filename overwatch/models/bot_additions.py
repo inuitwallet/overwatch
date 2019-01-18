@@ -199,6 +199,7 @@ class BotTrade(models.Model):
     trade_type = models.CharField(
         max_length=255,
     )
+    bot_trade = models.BooleanField(default=True)
     price = models.FloatField()
     amount = models.FloatField()
     total = models.FloatField()

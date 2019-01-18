@@ -65,7 +65,8 @@ class DetailBotView(LoginRequiredMixin, DetailView):
         trades = BotTrade.objects.filter(
             bot__pk=self.kwargs['pk'],
             time__gte=now() - datetime.timedelta(days=60),
-            profit_usd__isnull=False
+            profit_usd__isnull=False,
+            bot_trade=True
         )
 
         line_chart = pygal.Bar(
