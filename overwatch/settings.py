@@ -144,7 +144,9 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [("localhost", 6379)],
-
+            "prefix": "overwatch:",
+            "capacity": 15000,
+            "expiry": 30,
         },
     },
 }
