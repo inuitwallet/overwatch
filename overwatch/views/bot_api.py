@@ -172,9 +172,12 @@ class BotApiBalancesView(View):
 
 class BotApiTradeView(View):
     """
-    Endpoint to allow for reporting of trades. Typically this is handled by a second lambda function
-    and not the bot itself
+    Endpoint to allow for reporting of trades.
     """
+
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     @staticmethod
     def post(request):
@@ -186,13 +189,37 @@ class BotApiTradeView(View):
             # if the function returns False, then bot is set to a Response instance
             return bot
 
-        BotTrade.objects.create(
-            bot=bot,
-            time=request.POST.get('trade_time'),
-            trade_id=request.POST.get('trade_id'),
-            trade_type=request.POST.get('trade_type'),
-            price=request.POST.get('price'),
-            amount=request.POST.get('amount'),
-            total=request.POST.get('total'),
-            age=datetime.timedelta(seconds=request.POST.get('age')),
-        )
+        try:
+            BotTrade.objects.get(bot=bot, trade_id=request.POST.get('trade_id'))
+            print('Got existing order with id {}'.format(request.POST.get('trade_id')))
+        except BotTrade.DoesNotExist:
+            BotTrade.objects.create(
+                bot=bot,
+                time=request.POST.get('trade_time'),
+                trade_id=request.POST.get('trade_id'),
+                trade_type=request.POST.get('trade_type'),
+                price=request.POST.get('price'),
+                amount=request.POST.get('amount'),
+                total=request.POST.get('total'),
+                age=datetime.timedelta(seconds=int(request.POST.get('age'))),
+            )
+
+        return JsonResponse({'success': True})
+
+    @staticmethod
+    def get(request):
+        """
+        return the latest trade id so the bot doesn't have to report all trades at once
+        """
+        success, bot = handle_bot_api_auth(request.GET)
+
+        if not success:
+            # if the function returns False, then bot is set to a Response instance
+            return bot
+
+        last_trade = BotTrade.objects.filter(bot=bot).order_by('time').last()
+
+        if last_trade:
+            return JsonResponse({'success': True, 'trade_id': last_trade.trade_id})
+
+        return JsonResponse({'success': True, 'trade_id': None})

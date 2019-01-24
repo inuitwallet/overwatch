@@ -41,6 +41,7 @@ urlpatterns = [
 
     path('bot/prices', views.BotApiPricesView.as_view(), name='bot_prices'),
     path('bot/balances', views.BotApiBalancesView.as_view(), name='bot_balance'),
+    path('bot/trades', views.BotApiTradeView.as_view(), name='bot_trade'),
 
     # Display DataTables
     path('bot/<int:pk>/error/datatables', views.BotErrorsDataTablesView.as_view(), name='bot_error_datatables'),
