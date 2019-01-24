@@ -10,10 +10,6 @@
     Bot Detail
 {% endblock %}
 
-{% block headjs %}
-<script src="https://sdk.amazonaws.com/js/aws-sdk-2.384.0.min.js"></script>
-{% endblock %}
-
 {% block content %}
     <div class="row">
         <div class="col">
@@ -149,7 +145,7 @@
                     </div>
                     <hr />
                     <div class="row bot-logs">
-                        <p class="lead">CloudWatch Logs</p>
+                        <p class="lead">Bot Logs</p>
                         <div class="container-fluid logs">
                             <!-- Logs get streamed here -->
                         </div>

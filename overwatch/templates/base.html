@@ -7,7 +7,6 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4-4.0.0/jq-3.2.1/dt-1.10.16/r-2.2.1/rr-1.2.3/sc-1.4.4/datatables.min.css"/>
     <link rel="stylesheet" href="{% static 'overwatch/css/main.css' %}" >
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.10.0.min.js"></script>
     {% block headjs %}
     {% endblock %}
 
@@ -39,8 +38,14 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4-4.0.0/jq-3.2.1/dt-1.10.16/r-2.2.1/rr-1.2.3/sc-1.4.4/datatables.min.js"></script>
     {% block endbodyjs %}
     {% endblock %}
 </body>
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
 </html>
