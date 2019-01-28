@@ -13,7 +13,9 @@ class BotOrderConsumer(SyncConsumer):
         It fetches the price closest to the time recorded for the bot_order and updates the bot_order instance
         """
         try:
-            bot_order = BotPlacedOrder.objects.get(pk=message.get('bot_order'))
+            bot_order = BotPlacedOrder.objects.get(
+                pk=message.get('bot_order')
+            )
         except BotPlacedOrder.DoesNotExist:
             return
 
@@ -33,6 +35,7 @@ class BotOrderConsumer(SyncConsumer):
             return
 
         price_30_ma = price_data.get('moving_averages', {}).get('30_minute')
+        print(price_30_ma, currency)
 
         if price_30_ma is None:
             return
@@ -41,7 +44,6 @@ class BotOrderConsumer(SyncConsumer):
             bot_order.price_usd = bot_order.price * price_30_ma
 
         bot_order.updated = True
-
         bot_order.save()
 
         print('updated bot_order')
