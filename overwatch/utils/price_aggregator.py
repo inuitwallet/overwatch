@@ -40,3 +40,23 @@ def get_price_data(currency, dt=None):
     except ValueError:
         print('No Json Returned: {}'.format(r.text))
         return None
+
+
+def get_price_movement(currency):
+    """
+    get the price movements for the given currency fromthe price aggregator service
+    """
+    if currency.lower() == 'usd':
+        return None
+
+    if currency.lower() == 'cnnbt':
+        currency = 'cny'
+
+    r = requests.get(url='https://price-aggregator.crypto-daio.co.uk/movement/{}'.format(currency), timeout=30)
+    r.raise_for_status()
+
+    try:
+        return r.json()
+    except ValueError:
+        print('No Json Returned: {}'.format(r.text))
+        return None

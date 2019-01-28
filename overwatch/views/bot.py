@@ -24,105 +24,6 @@ class ListBotView(LoginRequiredMixin, ListView):
 class DetailBotView(LoginRequiredMixin, DetailView):
     model = Bot
 
-    def get_placed_orders_chart(self):
-        bid_points = []
-        ask_points = []
-
-        placed_orders = BotPlacedOrder.objects.filter(
-            bot__pk=self.kwargs['pk'],
-            time__gte=now() - datetime.timedelta(hours=48)
-        ).order_by(
-            'time'
-        )
-
-        for order in placed_orders:
-            if order.order_type == 'sell':
-                bid_points.append((order.time, None))
-                ask_points.append((order.time, order.price))
-
-            if order.order_type == 'buy':
-                bid_points.append((order.time, order.price))
-                ask_points.append((order.time, None))
-
-        datetimeline = pygal.DateTimeLine(
-            x_label_rotation=35,
-            x_title='Date',
-            y_title='Price',
-            truncate_label=-1,
-            legend_at_bottom=True,
-            value_formatter=lambda x: '{:.8f}'.format(x),
-            x_value_formatter=lambda dt: dt.strftime('%Y-%m-%d %H:%M:%S'),
-            fill=True,
-            style=CleanStyle(
-                font_family='googlefont:Raleway',
-            ),
-        )
-        datetimeline.add("Buy", bid_points, dots_size=2)
-        datetimeline.add("Sell", ask_points, dots_size=2)
-        return datetimeline.render_data_uri()
-
-    def get_trades_chart(self):
-        trades = BotTrade.objects.filter(
-            bot__pk=self.kwargs['pk'],
-            time__gte=now() - datetime.timedelta(days=60),
-            profit_usd__isnull=False,
-            bot_trade=True
-        )
-
-        line_chart = pygal.Bar(
-            x_title='Days',
-            y_title='Value in USD',
-            legend_at_bottom=True,
-            style=CleanStyle(
-                font_family='googlefont:Raleway',
-                value_font_size=10
-            ),
-            dynamic_print_values=True,
-        )
-        line_chart.value_formatter = lambda x: "$%.2f USD" % x
-        line_chart.title = 'Aggregated profits over time'
-        days = [30, 14, 7, 3, 2, 1]
-        line_chart.x_labels = days
-        profits = {'buy': [], 'sell': []}
-
-        for day in days:
-            for side in ['buy', 'sell']:
-                profits[side].append(
-                    trades.filter(
-                        trade_type=side, time__gte=now() - datetime.timedelta(days=day)
-                    ).aggregate(
-                        profit=Sum('profit_usd')
-                    )['profit']
-                )
-
-        line_chart.add('Buy', profits['buy'])
-        line_chart.add('Sell', profits['sell'])
-        line_chart.add(
-            'Total',
-            [float(buy or 0) + float(sell or 0) for buy, sell in zip(profits['buy'], profits['sell'])]
-        )
-        return line_chart.render_data_uri()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context['placed_orders_chart'] = self.get_placed_orders_chart()
-        context['trades_chart'] = self.get_trades_chart()
-        context['last_balance'] = self.object.botbalance_set.first()
-
-        context['peg'] = self.object.peg
-
-        if self.object.peg.upper() == 'USNBT':
-            context['peg'] = 'USD'
-
-        if self.object.peg.upper() == 'CNNBT':
-            context['peg'] = 'CNY'
-
-        if self.object.peg.upper() == 'EUNBT':
-            context['peg'] = 'EUR'
-
-        return context
-
 
 class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     model = Bot
@@ -234,9 +135,14 @@ class BotPlacedOrdersDataTablesView(LoginRequiredMixin, View):
                 'recordsFiltered': data['recordsFiltered'],
                 'data': [
                     [
-                        placed_order.time,
+                        Template(
+                            '{{ placed_order.time }}'
+                        ).render(
+                            Context({'placed_order': placed_order})
+                        ),
                         placed_order.order_type,
                         placed_order.price,
+                        placed_order.price_usd,
                         placed_order.amount
                     ] for placed_order in data['data']
                 ]
@@ -254,7 +160,11 @@ class BotTradesDataTablesView(LoginRequiredMixin, View):
                 'recordsFiltered': data['recordsFiltered'],
                 'data': [
                     [
-                        trade.time,
+                        Template(
+                            '{{ trade.time }}'
+                        ).render(
+                            Context({'trade': trade})
+                        ),
                         trade.trade_id,
                         trade.trade_type.title(),
                         round(trade.target_price_usd, 8),

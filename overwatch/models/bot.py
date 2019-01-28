@@ -1,10 +1,17 @@
 import hashlib
 import hmac
 import uuid
+import datetime
 
 import pygal
+import requests
 from django.db import models
+from django.db.models import Sum
 from django.template import Template, Context
+from django.utils.timezone import now
+from pygal.style import CleanStyle
+
+from overwatch.utils.price_aggregator import get_price_movement
 
 
 class Bot(models.Model):
@@ -300,3 +307,97 @@ class Bot(models.Model):
                 }
             )
         )
+
+    def get_placed_orders_chart(self, hours=48):
+        bid_points = []
+        ask_points = []
+
+        placed_orders = self.botplacedorder_set.filter(
+            time__gte=now() - datetime.timedelta(hours=hours)
+        ).exclude(
+            price_usd__isnull=True
+        ).order_by(
+            'time'
+        )
+
+        for order in placed_orders:
+            if order.order_type == 'sell':
+                ask_points.append((order.time, order.price_usd))
+
+            if order.order_type == 'buy':
+                bid_points.append((order.time, order.price_usd))
+
+        datetimeline = pygal.DateTimeLine(
+            x_label_rotation=35,
+            x_title='Date',
+            y_title='Price (USD)',
+            truncate_label=-1,
+            legend_at_bottom=True,
+            value_formatter=lambda x: '{:.4f}'.format(x),
+            x_value_formatter=lambda dt: dt.strftime('%Y-%m-%d %H:%M:%S'),
+            style=CleanStyle(
+                font_family='googlefont:Raleway',
+            ),
+        )
+        datetimeline.add("Buy", bid_points, dots_size=2)
+        datetimeline.add("Sell", ask_points, dots_size=2)
+        return datetimeline.render_data_uri()
+
+    def get_trades_chart(self, days=None):
+        trades = self.bottrade_set.filter(
+            time__gte=now() - datetime.timedelta(days=60),
+            profit_usd__isnull=False,
+            bot_trade=True
+        )
+
+        line_chart = pygal.StackedBar(
+            x_title='Days',
+            y_title='Value in USD',
+            legend_at_bottom=True,
+            style=CleanStyle(
+                font_family='googlefont:Raleway',
+                value_font_size=10
+            ),
+            dynamic_print_values=True,
+        )
+        line_chart.value_formatter = lambda x: "$%.2f USD" % x
+        line_chart.title = 'Aggregated profits over time'
+
+        if days is None:
+            days = [1, 3, 7, 14, 30]
+
+        line_chart.x_labels = days
+        profits = {'buy': [], 'sell': []}
+
+        previous_day = 0
+        movements = get_price_movement(self.quote if self.reversed else self.base)
+
+        for day in days:
+            movement_factor = movements.get('number_of_days', {}).get(str(day), {}).get('movement_factor', 1)
+
+            for side in ['buy', 'sell']:
+                profit = trades.filter(
+                    trade_type=side,
+                    time__lt=now() - datetime.timedelta(days=previous_day),
+                    time__gte=now() - datetime.timedelta(days=day)
+                ).aggregate(
+                    profit=Sum('profit_usd')
+                )['profit']
+
+                if profit:
+                    profits[side].append(
+                        profit * movement_factor
+                    )
+                else:
+                    profits[side].append(None)
+
+            previous_day = day
+
+        line_chart.add('Sell', profits['sell'])
+        line_chart.add('Buy', profits['buy'])
+
+        # line_chart.add(
+        #     'Total',
+        #     [float(buy or 0) + float(sell or 0) for buy, sell in zip(profits['buy'], profits['sell'])]
+        # )
+        return line_chart.render_data_uri()

@@ -100,7 +100,7 @@ nav a:hover {
     word-wrap: break-word;
 }
 
-#placed-orders-chart {
+#placed-orders-chart embed {
     height: 100%;
     width: 100%;
 }
@@ -110,7 +110,7 @@ nav a:hover {
     word-wrap: break-word;
 }
 
-#trades-chart {
+#trades-chart embed {
     height: 100%;
     width: 100%;
 }

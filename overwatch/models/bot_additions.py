@@ -60,6 +60,16 @@ class BotError(models.Model):
     class Meta:
         ordering = ['-time']
 
+    def save(self, **kwargs):
+        super().save(kwargs)
+
+        async_to_sync(get_channel_layer().group_send)(
+            'bot_{}'.format(self.bot.pk),
+            {
+                'type': 'get.errors',
+            }
+        )
+
 
 class BotPlacedOrder(models.Model):
     bot = models.ForeignKey(
@@ -94,6 +104,13 @@ class BotPlacedOrder(models.Model):
 
     def save(self, **kwargs):
         super().save(kwargs)
+
+        async_to_sync(get_channel_layer().group_send)(
+            'bot_{}'.format(self.bot.pk),
+            {
+                'type': 'get.placed.orders',
+            }
+        )
 
         if not self.updated:
             async_to_sync(get_channel_layer().send)(
@@ -223,11 +240,18 @@ class BotTrade(models.Model):
     def save(self, **kwargs):
         super().save(kwargs)
 
+        async_to_sync(get_channel_layer().group_send)(
+            'bot_{}'.format(self.bot.pk),
+            {
+                'type': 'get.trades',
+                'trade': self.pk
+            }
+        )
+
         if not self.updated:
             async_to_sync(get_channel_layer().send)(
                 'bot-trade',
                 {
-                    "type": "calculate.usd.values",
-                    "bot_trade": self.pk,
+                    "type": "calculate.usd.values"
                 },
             )

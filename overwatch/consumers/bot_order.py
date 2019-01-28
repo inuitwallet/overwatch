@@ -6,7 +6,8 @@ from overwatch.utils.price_aggregator import get_price_data
 
 
 class BotOrderConsumer(SyncConsumer):
-    def calculate_usd_values(self, message):
+    @staticmethod
+    def calculate_usd_values(message):
         """
         This method is called when a bot_order is saved.
         It fetches the price closest to the time recorded for the bot_order and updates the bot_order instance
@@ -45,14 +46,6 @@ class BotOrderConsumer(SyncConsumer):
 
         print('updated bot_order')
 
-        # we should scan any other prices that happen to be missing usd prices
-        # for bad_bot_order in BotPlacedOrder.objects.filter(updated=False):
-        #     async_to_sync(self.channel_layer.send)(
-        #         'bot-order',
-        #         {
-        #             "type": "calculate.usd.values",
-        #             "bot_order": bad_bot_order.pk,
-        #         },
-        #     )
+
 
 

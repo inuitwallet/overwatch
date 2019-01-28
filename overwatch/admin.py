@@ -27,7 +27,7 @@ class BotErrorAdmin(admin.ModelAdmin):
 
 @admin.register(BotPlacedOrder)
 class BotPlacedOrderAdmin(admin.ModelAdmin):
-    list_display = ['bot', 'time', 'base', 'quote', 'order_type', 'price', 'amount']
+    list_display = ['bot', 'time', 'base', 'quote', 'order_type', 'price', 'price_usd', 'amount']
     raw_id_fields = ['bot']
 
 

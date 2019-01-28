@@ -5,7 +5,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from channels.layers import get_channel_layer
 from django.template.loader import render_to_string
 
-from overwatch.models import Bot
+from overwatch.models import Bot, BotPlacedOrder, BotTrade
 
 
 class BotConsumer(JsonWebsocketConsumer):
@@ -40,6 +40,8 @@ class BotConsumer(JsonWebsocketConsumer):
         self.get_heart_beats({})
         self.get_price_info({})
         self.get_balance_info({})
+        self.get_placed_orders({})
+        self.get_trades({})
 
         # get the latest cloudwatch logs
         async_to_sync(get_channel_layer().send)(
@@ -161,4 +163,62 @@ class BotConsumer(JsonWebsocketConsumer):
             )
         )
 
+    def get_placed_orders(self, event):
+        """
+        send placed_order table entries or the data url containing the placed_orders_chart to the front end
+        """
+        # this send just redraws the datatable
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'placed_order',
+                }
+            )
+        )
+        # this send pushes the chart data url
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'placed_order_chart',
+                    'chart': '<embed type="image/svg+xml" src="{}"/>'.format(
+                        self.bot.get_placed_orders_chart(hours=event.get('hours', 48))
+                    )
+                }
+            )
+        )
 
+    def get_trades(self, event):
+        """
+        send trade table entries or the data url containing the trades_chart to the front end
+        """
+        # this send just redraws the datatable
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'trade',
+                }
+            )
+        )
+        # this send pushes the chart data url
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'trades_chart',
+                    'chart': '<embed type="image/svg+xml" src="{}" />'.format(
+                        self.bot.get_trades_chart(days=event.get('days'))
+                    )
+                }
+            )
+        )
+
+    def get_errors(self, event):
+        """
+        send the message to redraw the errors table
+        """
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'bot_error'
+                }
+            )
+        )

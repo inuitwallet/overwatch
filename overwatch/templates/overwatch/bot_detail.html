@@ -262,9 +262,8 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="placed-orders" role="tabpanel" aria-labelledby="placed-orders-tab">
-                    <div class="row">
+                    <div class="row" id="placed-orders-chart">
                         <!-- Placed Orders Chart -->
-                        <embed type="image/svg+xml" src="{{ placed_orders_chart|safe }}" id="placed-orders-chart"/>
                     </div>
                     <div class="row">
                         <div class="col tab-content">
@@ -275,6 +274,7 @@
                                         <td scope="col">Placed</td>
                                         <td scope="col">Order Type</td>
                                         <td scope="col">Price</td>
+                                        <td scope="col">Price USD</td>
                                         <td scope="col">Amount</td>
                                     </tr>
                                 </thead>
@@ -285,9 +285,8 @@
                     </div>
                 </div>
                 <div class="tab-pane fade" id="trades" role="tabpanel" aria-labelledby="trades-tab">
-                    <div class="row">
+                    <div class="row" id="trades-chart">
                         <!-- Trades Chart -->
-                        <embed type="image/svg+xml" src="{{ trades_chart|safe }}" id="trades-chart"/>
                     </div>
                     <div class="row">
                         <div class="col tab-content">
@@ -331,6 +330,20 @@
     <script type="text/javascript" src="{% static '/channels/js/websocketbridge.js' %}"></script>
     <script>
         $(document).ready(function() {
+            if (location.hash) {
+                $("a[href='" + location.hash + "']").tab("show");
+            }
+            $(document.body).on("click", "a[data-toggle]", function(event) {
+                location.hash = this.getAttribute("href");
+            });
+        });
+        $(window).on("popstate", function() {
+            var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
+            $("a[href='" + anchor + "']").tab("show");
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
             $('#bot-errors').DataTable(
                 {
                     "pagingType": "full",
@@ -357,6 +370,7 @@
                         { "name": "time", width: "20%" },
                         { "name": "order_type", width: "20%" },
                         { "name": "price", width: "30%" },
+                        { "name": "price_usd", width: "30%" },
                         { "name": "amount", width: "30%" }
                     ],
                     "order": [[ 0, 'desc' ]]
@@ -385,25 +399,6 @@
             );
         } );
     </script>
-    <!--<script>-->
-        <!--const logWebSocketBridge = new channels.WebSocketBridge();-->
-        <!--logWebSocketBridge.connect('/logs/{{ object.pk }}/');-->
-        <!--logWebSocketBridge.listen(function(action, stream) {-->
-            <!--message_type = action['message_type'];-->
-
-            <!--if (message_type === "cloudwatch_logs_clear") {-->
-                <!--$('.logs').empty();-->
-            <!--}-->
-            <!--if (message_type === "cloudwatch_logs_add_line") {-->
-                <!--time = action['time'];-->
-                <!--message = action['message'];-->
-                <!--var log_line = '<div class="row"><div class="col-2 text-right">' + time + '</div><div class="col text-left">' + message + '</div></div>'-->
-                <!--$('.logs').append(log_line);-->
-                <!--var logsDiv = $('.logs')[0];-->
-                <!--logsDiv.scrollTop = logsDiv.scrollHeight;-->
-            <!--}-->
-        <!--});-->
-    <!--</script>-->
     <script>
         const botWebSocketBridge = new channels.WebSocketBridge();
         botWebSocketBridge.connect('/bot/{{ object.pk }}/');
@@ -445,6 +440,38 @@
             }
             if (message_type === "heartbeat") {
                 $('#heartbeats-col').prepend(action['heartbeat']).fadeIn();
+            }
+
+            if (message_type === "bot_error") {
+                $('#bot-errors').DataTable().draw();
+            }
+
+            if (message_type === "placed_order") {
+                $('#bot-placed-orders').DataTable().draw();
+            }
+            if (message_type === "placed_order_chart") {
+                var placed_order_height = $('#placed-orders-chart').height();
+                if (placed_order_height > 0) {
+                    $('#placed-orders-chart').height(placed_order_height);
+                }
+                $('#placed-orders-chart').fadeOut(function() {
+                    $('#placed-orders-chart').html(action['chart']);
+                    $('#placed-orders-chart').fadeIn();
+                });
+            }
+
+            if (message_type === "trade") {
+                $('#bot-trades').DataTable().draw();
+            }
+            if (message_type === "trades_chart") {
+                var trade_height = $('#trades-chart').height();
+                if (trade_height > 0) {
+                    $('#trades-chart').height(trade_height);
+                }
+                $('#trades-chart').fadeOut(function() {
+                    $('#trades-chart').html(action['chart']);
+                    $('#trades-chart').fadeIn();
+                });
             }
 
             if (message_type === "cloudwatch_logs_clear") {
