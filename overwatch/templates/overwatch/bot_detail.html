@@ -443,11 +443,11 @@
             }
 
             if (message_type === "bot_error") {
-                $('#bot-errors').DataTable().draw();
+                $('#bot-errors').DataTable().draw('page');
             }
 
             if (message_type === "placed_order") {
-                $('#bot-placed-orders').DataTable().draw();
+                $('#bot-placed-orders').DataTable().draw('page');
             }
             if (message_type === "placed_order_chart") {
                 var placed_order_height = $('#placed-orders-chart').height();
@@ -461,7 +461,7 @@
             }
 
             if (message_type === "trade") {
-                $('#bot-trades').DataTable().draw();
+                $('#bot-trades').DataTable().draw('page');
             }
             if (message_type === "trades_chart") {
                 var trade_height = $('#trades-chart').height();
