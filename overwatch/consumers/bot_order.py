@@ -41,7 +41,10 @@ class BotOrderConsumer(SyncConsumer):
             return
 
         if bot_order.price:
-            bot_order.price_usd = bot_order.price * price_30_ma
+            if bot_order.bot.reversed:
+                bot_order.price_usd = bot_order.price / price_30_ma
+            else:
+                bot_order.price_usd = bot_order.price * price_30_ma
 
         bot_order.updated = True
         bot_order.save()
