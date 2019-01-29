@@ -371,6 +371,7 @@ class Bot(models.Model):
 
         previous_day = 0
         movements = get_price_movement(self.quote if self.reversed else self.base)
+        running_total = 0
 
         for day in days:
             movement_factor = movements.get('number_of_days', {}).get(str(day), {}).get('movement_factor', 1)
@@ -385,11 +386,12 @@ class Bot(models.Model):
                 )['profit']
 
                 if profit:
-                    profits[side].append(
-                        profit * movement_factor
-                    )
+                    adjusted_profit = profit * movement_factor
                 else:
-                    profits[side].append(None)
+                    adjusted_profit = 0
+
+                running_total += adjusted_profit
+                profits[side].append(running_total)
 
             previous_day = day
 
