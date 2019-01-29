@@ -395,8 +395,8 @@ class Bot(models.Model):
 
             previous_day = day
 
-        line_chart.add('Sell', profits['sell'])
         line_chart.add('Buy', profits['buy'])
+        line_chart.add('Sell', profits['sell'])
 
         # line_chart.add(
         #     'Total',
