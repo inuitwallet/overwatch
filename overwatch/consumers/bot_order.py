@@ -29,7 +29,7 @@ class BotOrderConsumer(SyncConsumer):
         currency = bot_order.bot.quote if bot_order.bot.reversed else bot_order.bot.base
 
         # get the spot price at the time closest to the BotOrder
-        price_data = get_price_data(currency, bot_order.time)
+        price_data = get_price_data(bot_order.bot.base, bot_order.time)
 
         if price_data is None:
             return
@@ -41,10 +41,7 @@ class BotOrderConsumer(SyncConsumer):
             return
 
         if bot_order.price:
-            if bot_order.bot.reversed:
-                bot_order.price_usd = bot_order.price / price_30_ma
-            else:
-                bot_order.price_usd = bot_order.price * price_30_ma
+            bot_order.price_usd = bot_order.price * price_30_ma
 
         bot_order.updated = True
         bot_order.save()
