@@ -333,7 +333,7 @@ class Bot(models.Model):
             y_title='Price (USD)',
             truncate_label=-1,
             legend_at_bottom=True,
-            value_formatter=lambda x: '{:.4f}'.format(x),
+            value_formatter=lambda x: '${:.4f}'.format(x),
             x_value_formatter=lambda dt: dt.strftime('%Y-%m-%d %H:%M:%S'),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
