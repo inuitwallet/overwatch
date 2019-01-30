@@ -248,7 +248,6 @@ class BotTrade(models.Model):
         )
 
         if not self.updated:
-            print('doing the thing')
             async_to_sync(get_channel_layer().send)(
                 'bot-trade',
                 {
