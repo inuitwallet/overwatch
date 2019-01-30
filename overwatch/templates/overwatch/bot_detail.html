@@ -264,6 +264,7 @@
                 <div class="tab-pane fade" id="placed-orders" role="tabpanel" aria-labelledby="placed-orders-tab">
                     <div class="row" id="placed-orders-chart">
                         <!-- Placed Orders Chart -->
+                        <embed />
                     </div>
                     <div class="row">
                         <div class="col tab-content">
@@ -287,6 +288,7 @@
                 <div class="tab-pane fade" id="trades" role="tabpanel" aria-labelledby="trades-tab">
                     <div class="row" id="trades-chart">
                         <!-- Trades Chart -->
+                        <embed />
                     </div>
                     <div class="row">
                         <div class="col tab-content">
@@ -450,24 +452,14 @@
                 $('#bot-placed-orders').DataTable().draw('page');
             }
             if (message_type === "placed_order_chart") {
-                var placed_order_height = $('#placed-orders-chart').css('height');
-                $('#placed-orders-chart').css('min-height', placed_order_height);
-                $('#placed-orders-chart').fadeOut(function() {
-                    $('#placed-orders-chart').html(action['chart']);
-                    $('#placed-orders-chart').fadeIn();
-                });
+                $('#placed-orders-chart embed').replaceWith(action['chart']);
             }
 
             if (message_type === "trade") {
                 $('#bot-trades').DataTable().draw('page');
             }
             if (message_type === "trades_chart") {
-                var trade_height = $('#trades-chart').css('height');
-                $('#trades-chart').css('min-height', trade_height);
-                $('#trades-chart').fadeOut(function() {
-                    $('#trades-chart').html(action['chart']);
-                    $('#trades-chart').fadeIn();
-                });
+                $('#trades-chart embed').replaceWith(action['chart']);
             }
 
             if (message_type === "cloudwatch_logs_clear") {
