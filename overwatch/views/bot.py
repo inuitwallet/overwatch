@@ -141,8 +141,8 @@ class BotPlacedOrdersDataTablesView(LoginRequiredMixin, View):
                             Context({'placed_order': placed_order})
                         ),
                         placed_order.order_type,
-                        placed_order.price,
-                        placed_order.price_usd,
+                        round(placed_order.price, 8),
+                        round(placed_order.price_usd, 8) if placed_order.price_usd else 'Calculating',
                         placed_order.amount
                     ] for placed_order in data['data']
                 ]

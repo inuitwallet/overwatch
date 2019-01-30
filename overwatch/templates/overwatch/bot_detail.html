@@ -450,10 +450,8 @@
                 $('#bot-placed-orders').DataTable().draw('page');
             }
             if (message_type === "placed_order_chart") {
-                var placed_order_height = $('#placed-orders-chart').height();
-                if (placed_order_height > 0) {
-                    $('#placed-orders-chart').height(placed_order_height);
-                }
+                var placed_order_height = $('#placed-orders-chart').css('height');
+                $('#placed-orders-chart').css('min-height', placed_order_height);
                 $('#placed-orders-chart').fadeOut(function() {
                     $('#placed-orders-chart').html(action['chart']);
                     $('#placed-orders-chart').fadeIn();
@@ -464,10 +462,8 @@
                 $('#bot-trades').DataTable().draw('page');
             }
             if (message_type === "trades_chart") {
-                var trade_height = $('#trades-chart').height();
-                if (trade_height > 0) {
-                    $('#trades-chart').height(trade_height);
-                }
+                var trade_height = $('#trades-chart').css('height');
+                $('#trades-chart').css('min-height', trade_height);
                 $('#trades-chart').fadeOut(function() {
                     $('#trades-chart').html(action['chart']);
                     $('#trades-chart').fadeIn();
