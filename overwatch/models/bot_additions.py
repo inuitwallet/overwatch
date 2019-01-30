@@ -244,14 +244,15 @@ class BotTrade(models.Model):
             'bot_{}'.format(self.bot.pk),
             {
                 'type': 'get.trades',
-                'trade': self.pk
             }
         )
 
         if not self.updated:
+            print('doing the thing')
             async_to_sync(get_channel_layer().send)(
                 'bot-trade',
                 {
-                    "type": "calculate.usd.values"
+                    "type": "calculate.usd.values",
+                    'bot_trade': self.pk
                 },
             )
