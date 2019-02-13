@@ -412,8 +412,8 @@ class Bot(models.Model):
         earliest = balances.first()
         bid_balances.append(earliest.bid_available + earliest.bid_on_order)
         ask_balances.append(earliest.ask_available + earliest.ask_on_order)
-        bid_balances_usd.append(earliest.bid_available_usd + earliest.bid_on_order_usd)
-        ask_balances_usd.append(earliest.ask_available_usd + earliest.ask_on_order_usd)
+        bid_balances_usd.append((earliest.bid_available_usd or 0) + (earliest.bid_on_order_usd or 0))
+        ask_balances_usd.append((earliest.ask_available_usd or 0) + (earliest.ask_on_order_usd or 0))
 
         next_time = earliest.time + datetime.timedelta(hours=6)
 
@@ -423,8 +423,8 @@ class Bot(models.Model):
 
             bid_balances.append(balance.bid_available + balance.bid_on_order)
             ask_balances.append(balance.ask_available + balance.ask_on_order)
-            bid_balances_usd.append(balance.bid_available_usd + balance.bid_on_order_usd)
-            ask_balances_usd.append(balance.ask_available_usd + balance.ask_on_order_usd)
+            bid_balances_usd.append((balance.bid_available_usd or 0) + (balance.bid_on_order_usd or 0))
+            ask_balances_usd.append((balance.ask_available_usd or 0) + (balance.ask_on_order_usd or 0))
             next_time = next_time + datetime.timedelta(hours=6)
 
         line = pygal.Line(
