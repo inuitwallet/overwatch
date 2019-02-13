@@ -406,14 +406,10 @@ class Bot(models.Model):
 
         bid_balances = []
         ask_balances = []
-        bid_balances_usd = []
-        ask_balances_usd = []
 
         earliest = balances.first()
         bid_balances.append(earliest.bid_available + earliest.bid_on_order)
         ask_balances.append(earliest.ask_available + earliest.ask_on_order)
-        bid_balances_usd.append((earliest.bid_available_usd or 0) + (earliest.bid_on_order_usd or 0))
-        ask_balances_usd.append((earliest.ask_available_usd or 0) + (earliest.ask_on_order_usd or 0))
 
         next_time = earliest.time + datetime.timedelta(hours=6)
 
@@ -423,22 +419,18 @@ class Bot(models.Model):
 
             bid_balances.append(balance.bid_available + balance.bid_on_order)
             ask_balances.append(balance.ask_available + balance.ask_on_order)
-            bid_balances_usd.append((balance.bid_available_usd or 0) + (balance.bid_on_order_usd or 0))
-            ask_balances_usd.append((balance.ask_available_usd or 0) + (balance.ask_on_order_usd or 0))
             next_time = next_time + datetime.timedelta(hours=6)
 
         line = pygal.Line(
-            y_title='Amount',
+            y_title='Amount in ({})'.format(self.base if self.reversed else self.quote),
             truncate_label=-1,
             legend_at_bottom=True,
-            value_formatter=lambda x: '{:.4f}'.format(x),
+            value_formatter=lambda x: '{}{:.4f}'.format(self.base if self.reversed else self.quote, x),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
             ),
         )
         line.add("Bid Available", bid_balances, stroke_style={'width': 5}, dot_size=1)
         line.add("Ask Available", ask_balances, stroke_style={'width': 5}, dot_size=1)
-        line.add("Bid Available USD", bid_balances, stroke_style={'width': 5}, dot_size=1, secondary=True)
-        line.add("Ask Available USD", ask_balances, stroke_style={'width': 5}, dot_size=1, secondary=True)
         return line.render_data_uri()
 
