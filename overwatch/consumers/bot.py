@@ -148,6 +148,16 @@ class BotConsumer(JsonWebsocketConsumer):
                 }
             )
         )
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'balances_chart',
+                    'chart': '<embed type="image/svg+xml" src="{}" />'.format(
+                        self.bot.get_balances_chart()
+                    )
+                }
+            )
+        )
 
     def send_log_line(self, event):
         """

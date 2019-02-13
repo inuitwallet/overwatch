@@ -35,6 +35,9 @@
                 <li class="nav-item">
                     <a class="nav-link" id="trades-tab" data-toggle="tab" href="#trades" role="tab" aria-controls="trades" aria-selected="false">Trades</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="balances-tab" data-toggle="tab" href="#balances" role="tab" aria-controls="balances" aria-selected="false">Balances</a>
+                </li>
             </ul>
             <div class="tab-content" id="botTabsContent">
                 <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
@@ -311,6 +314,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="tab-pane fade" id="balances" role="tabpanel" aria-labelledby="balances-tab">
+                    <div class="row" id="balances-chart">
+                        <!-- Balances Chart -->
+                        <embed />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-2">
@@ -375,7 +384,7 @@
                         { "name": "price_usd", width: "30%" },
                         { "name": "amount", width: "30%" }
                     ],
-                    "order": [[ 0, 'desc' ]]
+                    "order": [[ 0, 'asc' ]]
                 }
             );
         } );
@@ -460,6 +469,11 @@
             }
             if (message_type === "trades_chart") {
                 $('#trades-chart embed').replaceWith(action['chart']);
+            }
+
+            if (message_type === "balances_chart") {
+                console.log(action['chart']);
+                $('#balances-chart embed').replaceWith(action['chart']);
             }
 
             if (message_type === "cloudwatch_logs_clear") {

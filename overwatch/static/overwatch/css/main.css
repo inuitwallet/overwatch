@@ -114,3 +114,8 @@ nav a:hover {
     height: 100%;
     width: 100%;
 }
+
+#balances-chart embed {
+    height: 100%;
+    width: 100%;
+}

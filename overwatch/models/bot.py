@@ -4,13 +4,11 @@ import uuid
 import datetime
 
 import pygal
-import requests
 from django.db import models
 from django.db.models import Sum
 from django.template import Template, Context
 from django.utils.timezone import now
 from pygal.style import CleanStyle
-
 from overwatch.utils.price_aggregator import get_price_movement
 
 
@@ -350,7 +348,7 @@ class Bot(models.Model):
             bot_trade=True
         )
 
-        line_chart = pygal.StackedBar(
+        chart = pygal.StackedBar(
             x_title='Days',
             y_title='Value in USD',
             legend_at_bottom=True,
@@ -360,13 +358,13 @@ class Bot(models.Model):
             ),
             dynamic_print_values=True,
         )
-        line_chart.value_formatter = lambda x: "$%.2f USD" % x
-        line_chart.title = 'Aggregated profits over time'
+        chart.value_formatter = lambda x: "$%.2f USD" % x
+        chart.title = 'Aggregated profits over time'
 
         if days is None:
             days = [1, 3, 7, 14, 30]
 
-        line_chart.x_labels = days
+        chart.x_labels = days
         profits = {'buy': [], 'sell': []}
 
         previous_day = 0
@@ -395,11 +393,32 @@ class Bot(models.Model):
 
             previous_day = day
 
-        line_chart.add('Buy', profits['buy'])
-        line_chart.add('Sell', profits['sell'])
+        chart.add('Buy', profits['buy'])
+        chart.add('Sell', profits['sell'])
+        return chart.render_data_uri()
 
-        # line_chart.add(
-        #     'Total',
-        #     [float(buy or 0) + float(sell or 0) for buy, sell in zip(profits['buy'], profits['sell'])]
-        # )
-        return line_chart.render_data_uri()
+    def get_balances_chart(self):
+        balances = self.botbalance_set.filter(
+            time__gte=now() - datetime.timedelta(days=60),
+        )
+
+        bid_balances = []
+        ask_balances = []
+
+        for balance in balances:
+            bid_balances.append(balance.bid_available)
+            ask_balances.append(balance.ask_available)
+
+        line = pygal.Line(
+            y_title='Amount',
+            truncate_label=-1,
+            legend_at_bottom=True,
+            value_formatter=lambda x: '${:.4f}'.format(x),
+            style=CleanStyle(
+                font_family='googlefont:Raleway',
+            ),
+        )
+        line.add("Bid Available", bid_balances, dots_size=2)
+        line.add("Ask Available", ask_balances, dots_size=2)
+        return line.render_data_uri()
+
