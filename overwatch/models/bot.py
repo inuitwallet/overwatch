@@ -405,7 +405,10 @@ class Bot(models.Model):
         bid_balances = []
         ask_balances = []
 
+        print(balances.count())
+
         for balance in balances:
+            print(balance)
             bid_balances.append(balance.bid_available)
             ask_balances.append(balance.ask_available)
 
