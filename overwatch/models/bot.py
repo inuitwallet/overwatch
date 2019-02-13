@@ -399,23 +399,33 @@ class Bot(models.Model):
 
     def get_balances_chart(self):
         balances = self.botbalance_set.filter(
-            time__gte=now() - datetime.timedelta(days=1),
+            time__gte=now() - datetime.timedelta(days=60),
+        ).order_by(
+            'time'
         )
 
         bid_balances = []
         ask_balances = []
 
-        print(balances.count())
+        earliest = balances.first()
+        bid_balances.append(earliest.bid_available)
+        ask_balances.append(earliest.ask_available)
+
+        next_time = earliest + datetime.timedelta(hours=6)
 
         for balance in balances:
+            if balance.time < next_time:
+                continue
+
             bid_balances.append(balance.bid_available)
             ask_balances.append(balance.ask_available)
+            next_time = next_time + datetime.timedelta(hours=6)
 
         line = pygal.Line(
             y_title='Amount',
             truncate_label=-1,
             legend_at_bottom=True,
-            value_formatter=lambda x: '${:.4f}'.format(x),
+            value_formatter=lambda x: '{:.4f}'.format(x),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
             ),
