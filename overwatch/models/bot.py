@@ -411,7 +411,7 @@ class Bot(models.Model):
         bid_balances.append(earliest.bid_available)
         ask_balances.append(earliest.ask_available)
 
-        next_time = earliest + datetime.timedelta(hours=6)
+        next_time = earliest.time + datetime.timedelta(hours=6)
 
         for balance in balances:
             if balance.time < next_time:
