@@ -399,7 +399,7 @@ class Bot(models.Model):
 
     def get_balances_chart(self):
         balances = self.botbalance_set.filter(
-            time__gte=now() - datetime.timedelta(days=60),
+            time__gte=now() - datetime.timedelta(days=30),
         )
 
         bid_balances = []
