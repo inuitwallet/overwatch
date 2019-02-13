@@ -425,13 +425,12 @@ class Bot(models.Model):
             y_title='Amount',
             truncate_label=-1,
             legend_at_bottom=True,
-            show_dots=False,
             value_formatter=lambda x: '{:.4f}'.format(x),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
             ),
         )
-        line.add("Bid Available", bid_balances, stroke_style={'width': 5})
-        line.add("Ask Available", ask_balances, stroke_style={'width': 5}, secondary=True)
+        line.add("Bid Available", bid_balances, stroke_style={'width': 5}, dot_size=1)
+        line.add("Ask Available", ask_balances, stroke_style={'width': 5}, dot_size=1, secondary=True)
         return line.render_data_uri()
 
