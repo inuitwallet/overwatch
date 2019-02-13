@@ -408,8 +408,8 @@ class Bot(models.Model):
         ask_balances = []
 
         earliest = balances.first()
-        bid_balances.append(earliest.bid_available)
-        ask_balances.append(earliest.ask_available)
+        bid_balances.append(earliest.bid_available + earliest.bid_on_order)
+        ask_balances.append(earliest.ask_available + earliest.ask_on_order)
 
         next_time = earliest.time + datetime.timedelta(hours=6)
 
@@ -417,20 +417,22 @@ class Bot(models.Model):
             if balance.time < next_time:
                 continue
 
-            bid_balances.append(balance.bid_available)
-            ask_balances.append(balance.ask_available)
+            bid_balances.append(balance.bid_available + balance.bid_on_order)
+            ask_balances.append(balance.ask_available + balance.ask_on_order)
             next_time = next_time + datetime.timedelta(hours=6)
 
         line = pygal.Line(
             y_title='Amount',
             truncate_label=-1,
             legend_at_bottom=True,
+            show_dots=False,
+            interpolate='cubic',
             value_formatter=lambda x: '{:.4f}'.format(x),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
             ),
         )
-        line.add("Bid Available", bid_balances, dots_size=2)
-        line.add("Ask Available", ask_balances, dots_size=2)
+        line.add("Bid Available", bid_balances)
+        line.add("Ask Available", ask_balances)
         return line.render_data_uri()
 
