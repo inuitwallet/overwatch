@@ -245,7 +245,11 @@
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-dark">Save</button>
-            <a href="{% url 'bot_detail' pk=object.pk %}" role="button" class="btn btn-secondary">Back</a>
+            {% if form.instance.pk is not None %}
+                <a href="{% url 'bot_detail' pk=object.pk %}" role="button" class="btn btn-secondary">Back</a>
+            {% else %}
+                   <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
+            {% endif %}
         </div>
     </form>
 {% endblock %}
