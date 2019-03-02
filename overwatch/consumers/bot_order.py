@@ -29,7 +29,7 @@ class BotOrderConsumer(SyncConsumer):
         currency = bot_order.bot.quote if bot_order.bot.reversed else bot_order.bot.base
 
         # get the spot price at the time closest to the BotOrder
-        price_data = get_price_data(bot_order.bot.base, bot_order.time)
+        price_data = get_price_data(bot_order.bot.price_url, bot_order.bot.base, bot_order.time)
 
         if price_data is None:
             return

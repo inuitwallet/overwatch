@@ -26,7 +26,7 @@ class BotBalanceConsumer(SyncConsumer):
         currency = bot_balance.bot.base if bot_balance.bot.reversed else bot_balance.bot.quote
 
         # get the spot price at the time closest to the botbalance
-        price_data = get_price_data(currency, bot_balance.time)
+        price_data = get_price_data(bot_balance.bot.price_url, currency, bot_balance.time)
 
         if price_data is None:
             return

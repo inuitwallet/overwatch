@@ -22,7 +22,7 @@ class BotTradeConsumer(SyncConsumer):
         print('Getting usd values for BotTrade: {}) {}'.format(bot_trade.pk, bot_trade))
 
         # get the spot prices at the time closest to the BotOrder
-        base_price_data = get_price_data(bot_trade.bot.base, bot_trade.time)
+        base_price_data = get_price_data(bot_trade.bot.price_url, bot_trade.bot.base, bot_trade.time)
 
         if base_price_data is None:
             return
@@ -32,7 +32,7 @@ class BotTradeConsumer(SyncConsumer):
         if base_price_30_ma is None:
             return
 
-        quote_price_data = get_price_data(bot_trade.bot.quote, bot_trade.time)
+        quote_price_data = get_price_data(bot_trade.bot.price_url, bot_trade.bot.quote, bot_trade.time)
 
         if quote_price_data is None:
             return

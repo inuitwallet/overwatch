@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 
 
-def get_price_data(currency, dt=None):
+def get_price_data(price_url, currency, dt=None):
     """
     Contact the price-aggregator service and fetch a price for the given currency
     If time_stamp is None, the latest price is retrieved.
@@ -26,7 +26,7 @@ def get_price_data(currency, dt=None):
     if currency.lower() == 'cnnbt':
         currency = 'cny'
 
-    url = 'https://price-aggregator.crypto-daio.co.uk/price/{}'.format(currency)
+    url = '{}/{}'.format(price_url, currency)
 
     if dt is not None:
         # price service expects timestamp in format yyyy-mm-ddTHH:MM:SS
@@ -42,7 +42,7 @@ def get_price_data(currency, dt=None):
         return None
 
 
-def get_price_movement(currency):
+def get_price_movement(price_url, currency):
     """
     get the price movements for the given currency fromthe price aggregator service
     """
@@ -52,7 +52,7 @@ def get_price_movement(currency):
     if currency.lower() == 'cnnbt':
         currency = 'cny'
 
-    r = requests.get(url='https://price-aggregator.crypto-daio.co.uk/movement/{}'.format(currency), timeout=30)
+    r = requests.get(url='{}/{}'.format(price_url, currency), timeout=30)
     r.raise_for_status()
 
     try:

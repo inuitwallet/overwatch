@@ -66,6 +66,9 @@ class Bot(models.Model):
     last_nonce = models.BigIntegerField(
         default=0
     )
+    price_url = models.URLField(
+        default='https://price-aggregator.crypto-daio.co.uk/price'
+    )
     logs_group = models.CharField(
         max_length=255,
         help_text='AWS Cloudwatch logs group name',
@@ -108,7 +111,8 @@ class Bot(models.Model):
             'ask_spread': self.ask_spread / 100,
             'order_amount': self.order_amount,
             'total_bid': self.total_bid,
-            'total_ask': self.total_ask
+            'total_ask': self.total_ask,
+            'url': self.price_url
         }
 
     def auth(self, supplied_hash, name, exchange, nonce):
@@ -368,7 +372,7 @@ class Bot(models.Model):
         profits = {'buy': [], 'sell': []}
 
         previous_day = 0
-        movements = get_price_movement(self.quote if self.reversed else self.base)
+        movements = get_price_movement(self.price_url, self.quote if self.reversed else self.base)
         running_total = 0
 
         for day in days:
