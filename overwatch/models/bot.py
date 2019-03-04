@@ -371,14 +371,13 @@ class Bot(models.Model):
         chart.x_labels = days
         profits = {'buy': [], 'sell': []}
 
-        previous_day = 0
         movements = get_price_movement(self.price_url, self.quote if self.reversed else self.base)
-        running_total = 0
 
-        for day in days:
-            movement_factor = movements.get('number_of_days', {}).get(str(day), {}).get('movement_factor', 1)
+        for side in ['buy', 'sell']:
+            running_total = 0
+            previous_day = 0
 
-            for side in ['buy', 'sell']:
+            for day in days:
                 profit = trades.filter(
                     trade_type=side,
                     time__lt=now() - datetime.timedelta(days=previous_day),
@@ -386,6 +385,8 @@ class Bot(models.Model):
                 ).aggregate(
                     profit=Sum('profit_usd')
                 )['profit']
+
+                movement_factor = movements.get('number_of_days', {}).get(str(day), {}).get('movement_factor', 1)
 
                 if profit:
                     adjusted_profit = profit * movement_factor
@@ -395,7 +396,7 @@ class Bot(models.Model):
                 running_total += adjusted_profit
                 profits[side].append(running_total)
 
-            previous_day = day
+                previous_day = day
 
         chart.add('Buy', profits['buy'])
         chart.add('Sell', profits['sell'])
