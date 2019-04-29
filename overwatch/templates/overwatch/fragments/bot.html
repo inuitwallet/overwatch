@@ -7,23 +7,23 @@
         </a>
     </td>
     <td>{{ bot.exchange }}</td>
-    <td>{{ bot.tolerance }}</td>
-    <td>{{ bot.fee }}</td>
-    <td>{{ bot.order_amount }}</td>
-    <td>{{ bot.total_bid }}</td>
-    <td>{{ bot.total_ask }}</td>
-    <td>
-        {% if bot.latest_heartbeat %}
-            {{ bot.latest_heartbeat|timesince }} ago
-        {% else %}
-            No heartbeat yet
-        {% endif %}
-    </td>
-    <td>
-        {% if bot.last_error %}
-            {{ bot.last_error|timesince }} ago
-        {% else %}
-            No errors
-        {% endif %}
-    </td>
+    <!--<td>{{ bot.tolerance }}</td>-->
+    <!--<td>{{ bot.fee }}</td>-->
+    <!--<td>{{ bot.order_amount }}</td>-->
+    <!--<td>{{ bot.total_bid }}</td>-->
+    <!--<td>{{ bot.total_ask }}</td>-->
+    <!--<td>-->
+        <!--{% if bot.latest_heartbeat %}-->
+            <!--{{ bot.latest_heartbeat|timesince }} ago-->
+        <!--{% else %}-->
+            <!--No heartbeat yet-->
+        <!--{% endif %}-->
+    <!--</td>-->
+    <!--<td>-->
+        <!--{% if bot.last_error %}-->
+            <!--{{ bot.last_error|timesince }} ago-->
+        <!--{% else %}-->
+            <!--No errors-->
+        <!--{% endif %}-->
+    <!--</td>-->
 </tr>
