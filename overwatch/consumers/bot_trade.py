@@ -39,7 +39,7 @@ class BotTradeConsumer(SyncConsumer):
             print('no closest BotPrice for calculation')
             return
 
-        quote_price_30_ma = closest_bot_price.ask_price
+        quote_price_30_ma = closest_bot_price.ask_price_usd
 
         if quote_price_30_ma is None:
             return
