@@ -1,7 +1,7 @@
 from asgiref.sync import async_to_sync
 from channels.consumer import SyncConsumer
 
-from overwatch.models import BotTrade
+from overwatch.models import BotTrade, BotPrice
 from overwatch.utils.price_aggregator import get_price_data
 
 
@@ -32,12 +32,14 @@ class BotTradeConsumer(SyncConsumer):
         if base_price_30_ma is None:
             return
 
-        quote_price_data = get_price_data(bot_trade.bot.quote_price_url, bot_trade.bot.quote, bot_trade.time)
-
-        if quote_price_data is None:
+        # the quote price should be the bot_price closest to the trade time
+        try:
+            closest_bot_price = BotPrice.objects.get_closest_to(bot_trade.time)
+        except BotPrice.DoesNotExist:
+            print('no closest BotPrice for calculation')
             return
 
-        quote_price_30_ma = quote_price_data.get('moving_averages', {}).get('30_minute')
+        quote_price_30_ma = closest_bot_price.ask_price
 
         if quote_price_30_ma is None:
             return
