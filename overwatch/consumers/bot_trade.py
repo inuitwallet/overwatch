@@ -34,7 +34,7 @@ class BotTradeConsumer(SyncConsumer):
 
         # the quote price should be the bot_price closest to the trade time
         try:
-            closest_bot_price = BotPrice.objects.get_closest_to(bot_trade.time)
+            closest_bot_price = BotPrice.objects.get_closest_to(bot_trade.bot, bot_trade.time)
         except BotPrice.DoesNotExist:
             print('no closest BotPrice for calculation')
             return
