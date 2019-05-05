@@ -2,7 +2,7 @@ import logging
 
 from django.core.management import BaseCommand
 
-from overwatch.models import BotBalance, BotPlacedOrder, BotPrice, BotTrade
+from overwatch.models import BotBalance, BotPlacedOrder, BotPrice, BotTrade, Bot
 
 
 class Command(BaseCommand):
@@ -19,10 +19,34 @@ class Command(BaseCommand):
             dest='limit',
             default=None
         )
+        parser.add_argument(
+            '-b',
+            '--bot',
+            help='pk of bot to limit to',
+            dest='bot',
+            default=None
+        )
 
     def handle(self, *args, **options):
+        bot = None
+
+        if options['bot']:
+            try:
+                bot = Bot.objects.get(pk=options['bot'])
+            except Bot.DoesNotExist:
+                bot = None
+
+        limit = options['limit']
+
         # bot_balance
-        balances = BotBalance.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
+        balances = BotBalance.objects.filter(updated=False).order_by('-time')
+
+        if bot:
+            balances.filter(bot=bot)
+
+        if limit:
+            balances = balances[:int(limit)]
+
         self.log.info('Processing {} BotBalances'.format(balances.count()))
 
         for balance in balances:
@@ -30,7 +54,14 @@ class Command(BaseCommand):
             balance.save()
 
         # bot_price
-        prices = BotPrice.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
+        prices = BotPrice.objects.filter(updated=False).order_by('-time')
+
+        if bot:
+            prices.filter(bot=bot)
+
+        if limit:
+            prices = prices[:int(limit)]
+
         self.log.info('Processing {} BotPrices'.format(prices.count()))
 
         for price in prices:
@@ -38,7 +69,14 @@ class Command(BaseCommand):
             price.save()
 
         # bot_order
-        orders = BotPlacedOrder.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
+        orders = BotPlacedOrder.objects.filter(updated=False).order_by('-time')
+
+        if bot:
+            orders.filter(bot=bot)
+
+        if limit:
+            orders = orders[:int(limit)]
+
         self.log.info('Processing {} BotPlacedOrders'.format(orders.count()))
 
         for order in orders:
@@ -46,7 +84,14 @@ class Command(BaseCommand):
             order.save()
 
         # bot_trade
-        trades = BotTrade.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
+        trades = BotTrade.objects.filter(updated=False).order_by('-time')
+
+        if bot:
+            trades.filter(bot=bot)
+
+        if limit:
+            trades = trades[:int(limit)]
+
         self.log.info('Processing {} BotTrades'.format(trades.count()))
 
         for trade in trades:
