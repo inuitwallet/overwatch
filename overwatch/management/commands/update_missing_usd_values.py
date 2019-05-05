@@ -11,9 +11,18 @@ class Command(BaseCommand):
     """
     log = logging.getLogger(__name__)
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-l',
+            '--limit',
+            help='limit the number of blocks to process. useful in combination with -s',
+            dest='limit',
+            default=None
+        )
+
     def handle(self, *args, **options):
         # bot_balance
-        balances = BotBalance.objects.filter(updated=False).order_by('-time')
+        balances = BotBalance.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
         self.log.info('Processing {} BotBalances'.format(balances.count()))
 
         for balance in balances:
@@ -21,7 +30,7 @@ class Command(BaseCommand):
             balance.save()
 
         # bot_price
-        prices = BotPrice.objects.filter(updated=False).order_by('-time')
+        prices = BotPrice.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
         self.log.info('Processing {} BotPrices'.format(prices.count()))
 
         for price in prices:
@@ -29,7 +38,7 @@ class Command(BaseCommand):
             price.save()
 
         # bot_order
-        orders = BotPlacedOrder.objects.filter(updated=False).order_by('-time')
+        orders = BotPlacedOrder.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
         self.log.info('Processing {} BotPlacedOrders'.format(orders.count()))
 
         for order in orders:
@@ -37,7 +46,7 @@ class Command(BaseCommand):
             order.save()
 
         # bot_trade
-        trades = BotTrade.objects.filter(updated=False).order_by('-time')
+        trades = BotTrade.objects.filter(updated=False).order_by('-time')[:int(options['limit'])]
         self.log.info('Processing {} BotTrades'.format(trades.count()))
 
         for trade in trades:
