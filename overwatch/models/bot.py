@@ -66,7 +66,10 @@ class Bot(models.Model):
     last_nonce = models.BigIntegerField(
         default=0
     )
-    price_url = models.URLField(
+    base_price_url = models.URLField(
+        default='https://price-aggregator.crypto-daio.co.uk/price'
+    )
+    quote_price_url = models.URLField(
         default='https://price-aggregator.crypto-daio.co.uk/price'
     )
     logs_group = models.CharField(
@@ -90,6 +93,9 @@ class Bot(models.Model):
         max_length=255,
         default='eu-west-1'
     )
+    market_price = models.BooleanField(
+        default=False
+    )
     peg_decimal_places = models.IntegerField(default=6)
     base_decimal_places = models.IntegerField(default=6)
     quote_decimal_places = models.IntegerField(default=6)
@@ -112,7 +118,9 @@ class Bot(models.Model):
             'order_amount': self.order_amount,
             'total_bid': self.total_bid,
             'total_ask': self.total_ask,
-            'url': self.price_url
+            'base_url': self.base_price_url,
+            'quote_url': self.quote_price_url,
+            'market_price': self.market_price
         }
 
     def auth(self, supplied_hash, name, exchange, nonce):
@@ -413,6 +421,10 @@ class Bot(models.Model):
         ask_balances = []
 
         earliest = balances.first()
+
+        if earliest is None:
+            return ''
+
         bid_balances.append(earliest.bid_available + earliest.bid_on_order)
         ask_balances.append(earliest.ask_available + earliest.ask_on_order)
 

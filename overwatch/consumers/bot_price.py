@@ -23,9 +23,10 @@ class BotPriceConsumer(SyncConsumer):
         # which currency to use?
         # we use quote if the bot is standard or base if it is reversed
         currency = bot_price.bot.quote if bot_price.bot.reversed else bot_price.bot.base
+        url = bot_price.bot.quote_price_url if bot_price.bot.reversed else bot_price.bot.base_price_url
 
         # get the spot price at the time closest to the botprice
-        price_data = get_price_data(bot_price.bot.price_url, currency, bot_price.time)
+        price_data = get_price_data(url, currency, bot_price.time)
 
         if price_data is None:
             return

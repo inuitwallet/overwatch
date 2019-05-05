@@ -243,6 +243,47 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.base_price_url.id_for_label }}">Base Price URL</label>
+                    {% if form.base_price_url.errors %}
+                        {{ form.base_price_url|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.base_price_url|add_class:"form-control" }}
+                    {% endif %}
+                    {% if base_price_url.help_text %}
+                        <small class="form-text">{{ base_price_url.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.quote_price_url.id_for_label }}">Quote Price URL</label>
+                    {% if form.quote_price_url.errors %}
+                        {{ form.quote_price_url|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.quote_price_url|add_class:"form-control" }}
+                    {% endif %}
+                    {% if quote_price_url.help_text %}
+                        <small class="form-text">{{ quote_price_url.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="{{ form.market_price.id_for_label }}">Use Market Price</label>
+                    {% if form.market_price.errors %}
+                        {{ form.market_price|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.market_price|add_class:"form-control" }}
+                    {% endif %}
+                    {% if market_price.help_text %}
+                        <small class="form-text">{{ market_price.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
         <div class="form-group">
             <button type="submit" class="btn btn-dark">Save</button>
             {% if form.instance.pk is not None %}

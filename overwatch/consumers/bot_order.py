@@ -27,15 +27,15 @@ class BotOrderConsumer(SyncConsumer):
         # which currency to use?
         # we use quote if the bot is standard or base if it is reversed
         currency = bot_order.bot.quote if bot_order.bot.reversed else bot_order.bot.base
+        url = bot_order.bot.quote_price_url if bot_order.bot.reversed else bot_order.bot.base_price_url
 
         # get the spot price at the time closest to the BotOrder
-        price_data = get_price_data(bot_order.bot.price_url, bot_order.bot.base, bot_order.time)
+        price_data = get_price_data(url, currency, bot_order.time)
 
         if price_data is None:
             return
 
         price_30_ma = price_data.get('moving_averages', {}).get('30_minute')
-        print(price_30_ma, currency)
 
         if price_30_ma is None:
             return

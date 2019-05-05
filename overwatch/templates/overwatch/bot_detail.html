@@ -68,19 +68,18 @@
                                             <h2>Price</h2>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col text-center price-sparkline">
-                                            <!--Price sparkline is populated here-->
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center price-peg">
-                                            <!--Price in Peg is populated here-->
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <small class="price"><!--Price is populated here--></small>
+                                    <div class="row text-center price-sparkline">
+                                        <div class="col">
+                                            <div class="row">
+                                                <div class="col text-center price-peg">
+                                                    <!--Price in Peg is populated here-->
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col text-center">
+                                                    <small class="price"><!--Price is populated here--></small>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -436,7 +435,7 @@
                 $('.bid-price').html(action['bid_price']);
                 $('.price-peg').html(action['price_peg']);
                 $('.price').html(action['price']);
-                $('.price-sparkline').html(action['price_sparkline']);
+                $('.price-sparkline').css("background-image", "url(action['price_sparkline'])");
                 $('.ask-price-peg').html(action['ask_price_peg']);
                 $('.ask-price').html(action['ask_price']);
             }
