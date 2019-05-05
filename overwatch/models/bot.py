@@ -379,7 +379,10 @@ class Bot(models.Model):
         chart.x_labels = days
         profits = {'buy': [], 'sell': []}
 
-        movements = get_price_movement(self.price_url, self.quote if self.reversed else self.base)
+        movements = get_price_movement(
+            self.quote_price_url if self.reversed else self.base_price_url,
+            self.quote if self.reversed else self.base
+        )
 
         for side in ['buy', 'sell']:
             running_total = 0
