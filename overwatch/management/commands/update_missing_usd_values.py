@@ -13,29 +13,33 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # bot_balance
-        self.log.info('Processing BotBalances')
+        balances = BotBalance.objects.filter(updated=False).order_by('-time')
+        self.log.info('Processing {} BotBalances'.format(balances.count()))
 
-        for balance in BotBalance.objects.filter(updated=False):
+        for balance in balances:
             self.log.info(balance)
             balance.save()
 
         # bot_price
-        self.log.info('Processing BotPrices')
+        prices = BotPrice.objects.filter(updated=False).order_by('-time')
+        self.log.info('Processing {} BotPrices'.format(prices.count()))
 
-        for price in BotPrice.objects.filter(updated=False):
+        for price in prices:
             self.log.info(price)
             price.save()
 
         # bot_order
-        self.log.info('Processing BotPlacedOrders')
+        orders = BotPlacedOrder.objects.filter(updated=False).order_by('-time')
+        self.log.info('Processing {} BotPlacedOrders'.format(orders.count()))
 
-        for order in BotPlacedOrder.objects.filter(updated=False):
+        for order in orders:
             self.log.info(order)
             order.save()
 
         # bot_trade
-        self.log.info('Processing BotTrades')
+        trades = BotTrade.objects.filter(updated=False).order_by('-time')
+        self.log.info('Processing {} BotTrades'.format(trades.count()))
 
-        for trade in BotTrade.objects.filter(updated=False):
+        for trade in trades:
             self.log.info(trade)
             trade.save()
