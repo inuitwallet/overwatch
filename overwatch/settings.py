@@ -151,6 +151,29 @@ CHANNEL_LAYERS = {
     },
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'dated': {
+            'format': '%(asctime)s '
+                      '[%(levelname)s] (%(funcName)s) %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'dated',
+        },
+    },
+    'loggers': {
+        'overwatch': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+
 # Load local_settings
 try:
     from overwatch.local_settings import *  # noqa
