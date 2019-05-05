@@ -125,13 +125,13 @@ class BotPlacedOrder(models.Model):
 class BotPriceManager(models.Manager):
     def get_closest_to(self, target):
         closest_greater_qs = self.filter(
-            date_time__gt=target
+            time__gt=target
         ).order_by(
             'date_time'
         )
 
         closest_less_qs = self.filter(
-            date_time__lt=target
+            time__lt=target
         ).order_by(
             '-date_time'
         )
