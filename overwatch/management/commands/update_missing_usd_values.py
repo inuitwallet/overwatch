@@ -33,7 +33,7 @@ class Command(BaseCommand):
         if options['bot']:
             try:
                 bot = Bot.objects.get(pk=options['bot'])
-                self.logger.info('Using bot {}'.format(bot))
+                self.log.info('Using bot {}'.format(bot))
             except Bot.DoesNotExist:
                 bot = None
 
