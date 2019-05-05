@@ -38,7 +38,7 @@ class BotPlacedOrderAdmin(admin.ModelAdmin):
 
 @admin.register(BotPrice)
 class BotPriceAdmin(admin.ModelAdmin):
-    list_display = ['bot', 'time', 'price', 'unit']
+    list_display = ['bot', 'time', 'price', 'price_usd', 'unit']
     raw_id_fields = ['bot']
     list_filter = ['bot']
 
