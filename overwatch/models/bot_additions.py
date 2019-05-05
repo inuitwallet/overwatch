@@ -127,13 +127,13 @@ class BotPriceManager(models.Manager):
         closest_greater_qs = self.filter(
             time__gt=target
         ).order_by(
-            'date_time'
+            'time'
         )
 
         closest_less_qs = self.filter(
             time__lt=target
         ).order_by(
-            '-date_time'
+            '-time'
         )
 
         try:
