@@ -9,7 +9,8 @@ application = ProtocolTypeRouter({
     # http->django views is added by default
     'websocket': AuthMiddlewareStack(
         URLRouter([
-            url(r'^bot/(?P<pk>[^/]+)/$', BotConsumer)
+            url(r'^bot/(?P<pk>[^/]+)/$', BotConsumer),
+            url(r'^bot_list/$', BotListConsumer),
         ])
     ),
     'channel': ChannelNameRouter({

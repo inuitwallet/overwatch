@@ -174,6 +174,8 @@ LOGGING = {
     },
 }
 
+USE_THOUSAND_SEPARATOR = True
+
 # Load local_settings
 try:
     from overwatch.local_settings import *  # noqa

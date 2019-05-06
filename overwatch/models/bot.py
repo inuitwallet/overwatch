@@ -118,8 +118,8 @@ class Bot(models.Model):
             'order_amount': self.order_amount,
             'total_bid': self.total_bid,
             'total_ask': self.total_ask,
-            'base_url': self.base_price_url,
-            'quote_url': self.quote_price_url,
+            'track_url': self.base_price_url,
+            'peg_url': self.quote_price_url,
             'market_price': self.market_price
         }
 
@@ -207,8 +207,8 @@ class Bot(models.Model):
         ).render(
             Context(
                 {
-                    'last_price': self.last_price,
-                    'currency': 'USD' if usd else self.base
+                    'last_price': self.last_price if self.last_price else 0,
+                    'currency': ('USD' if usd else self.base) if self.last_price else ''
                 }
             )
         )
@@ -282,7 +282,7 @@ class Bot(models.Model):
         ).render(
             Context(
                 {
-                    'last_balance': self.last_balance,
+                    'last_balance': self.last_balance if self.last_balance else 0,
                     'currency': currency
                 }
             )
@@ -312,11 +312,21 @@ class Bot(models.Model):
         ).render(
             Context(
                 {
-                    'last_balance': self.last_balance,
+                    'last_balance': self.last_balance if self.last_balance else 0,
                     'currency': currency
                 }
             )
         )
+
+    def rendered_profit(self, days=1):
+        profit = self.bottrade_set.filter(
+            time__gte=now() - datetime.timedelta(days=days),
+            profit_usd__isnull=False,
+            bot_trade=True
+        ).aggregate(
+            profit=Sum('profit_usd')
+        )['profit']
+        return Template('{{ profit|floatformat:4 }} USD').render(Context({'profit': profit or 0}))
 
     def get_placed_orders_chart(self, hours=48):
         bid_points = []
