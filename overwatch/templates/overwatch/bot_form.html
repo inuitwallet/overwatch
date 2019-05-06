@@ -270,8 +270,10 @@
                     {% endif %}
                 </div>
             </div>
+        </div>
+        <div class="row">
             <div class="col">
-                <div class="form-group">
+                <div class="form-group text-center">
                     <label for="{{ form.market_price.id_for_label }}">Use Market Price</label>
                     {% if form.market_price.errors %}
                         {{ form.market_price|add_class:"form-control"|add_class:"is-invalid" }}
@@ -280,6 +282,19 @@
                     {% endif %}
                     {% if market_price.help_text %}
                         <small class="form-text">{{ market_price.help_text|safe }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group text-center">
+                    <label for="{{ form.active.id_for_label }}">Active</label>
+                    {% if form.active.errors %}
+                        {{ form.active|add_class:"form-control"|add_class:"is-invalid" }}
+                    {% else %}
+                        {{ form.active|add_class:"form-control" }}
+                    {% endif %}
+                    {% if active.help_text %}
+                        <small class="form-text">{{ active.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>

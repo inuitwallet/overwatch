@@ -16,6 +16,9 @@ from overwatch.models import Bot, BotError, BotPlacedOrder, BotTrade
 class ListBotView(LoginRequiredMixin, ListView):
     model = Bot
 
+    def get_queryset(self):
+        return Bot.objects.filter(active=True)
+
 
 class DetailBotView(LoginRequiredMixin, DetailView):
     model = Bot
@@ -25,7 +28,8 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     model = Bot
     fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'logs_group', 'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price']
+              'logs_group', 'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
+              'active']
     success_message = '%(name)s@%(exchange)s has been updated'
 
     def get_success_url(self):
@@ -36,7 +40,8 @@ class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
     model = Bot
     fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'logs_group', 'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price']
+              'logs_group', 'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
+              'active']
     success_message = '%(name)s@%(exchange)s has been created'
     success_url = reverse_lazy('index')
 

@@ -237,13 +237,14 @@
                             </div>
                         </div>
                     </div>
+                    {% if user == bot.owner %}
                     <div class="row">
                         <div class="col">
                             <a href="{% url 'bot_update' pk=object.pk %}" role="button" class="btn btn-dark">Edit</a>
-                            <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
                             <a href="{% url 'bot_delete' pk=object.pk %}" role="button" class="btn btn-outline-danger">Delete</a>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
                 <div class="tab-pane fade" id="errors" role="tabpanel" aria-labelledby="errors-tab">
                     <div class="row">

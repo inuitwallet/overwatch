@@ -4,6 +4,7 @@ import uuid
 import datetime
 
 import pygal
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum
 from django.template import Template, Context
@@ -21,6 +22,13 @@ class Bot(models.Model):
         max_length=255,
         help_text='The exchange the bot operates on. '
                   'Together with the name this forms a unique identifier for this bot'
+    )
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    active = models.BooleanField(
+        default=True
     )
     base = models.CharField(
         max_length=255,
