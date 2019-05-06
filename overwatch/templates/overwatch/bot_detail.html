@@ -237,7 +237,7 @@
                             </div>
                         </div>
                     </div>
-                    {% if user == bot.owner %}
+                    {% if user == bot.owner or user.is_staff %}
                     <div class="row">
                         <div class="col">
                             <a href="{% url 'bot_update' pk=object.pk %}" role="button" class="btn btn-dark">Edit</a>
