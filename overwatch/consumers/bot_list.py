@@ -15,7 +15,7 @@ class BotListConsumer(JsonWebsocketConsumer):
         self.close()
 
     def get_bots_data(self):
-        for bot in Bot.objects.all():
+        for bot in Bot.objects.filter(active=True):
             self.send_bot_data({'bot': bot.pk})
 
     def send_bot_data(self, event):
