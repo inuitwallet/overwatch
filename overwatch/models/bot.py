@@ -415,7 +415,10 @@ class Bot(models.Model):
                     profit=Sum('profit_usd')
                 )['profit']
 
-                movement_factor = movements.get('number_of_days', {}).get(str(day), {}).get('movement_factor', 1)
+                movement_factor = 1
+
+                if movements:
+                    movement_factor = movements.get('number_of_days', {}).get(str(day), {}).get('movement_factor', 1)
 
                 if profit:
                     adjusted_profit = profit * movement_factor
