@@ -24,6 +24,7 @@ class BotHeartBeat(models.Model):
     def save(self, **kwargs):
         super().save(kwargs)
 
+        # update the heartbeat list on the bot page
         async_to_sync(get_channel_layer().group_send)(
             'bot_{}'.format(self.bot.pk),
             {
@@ -31,6 +32,7 @@ class BotHeartBeat(models.Model):
             }
         )
 
+        # stream the cloudwatch logs
         async_to_sync(get_channel_layer().send)(
             'cloudwatch-logs',
             {
@@ -38,6 +40,15 @@ class BotHeartBeat(models.Model):
                 "bot_pk": self.bot.pk,
                 "sleep": 30
             },
+        )
+
+        # update the main list page
+        async_to_sync(get_channel_layer().group_send)(
+            'bot_list',
+            {
+                'type': 'send.bot.data',
+                'bot': self.bot.pk
+            }
         )
 
 
