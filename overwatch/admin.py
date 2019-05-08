@@ -53,6 +53,6 @@ class BotBalanceAdmin(admin.ModelAdmin):
 @admin.register(BotTrade)
 class BotTradeAdmin(admin.ModelAdmin):
     list_display = ['bot', 'time', 'trade_type', 'trade_id', 'price', 'amount', 'total', 'target_price_usd',
-                    'trade_price_usd', 'profit_usd']
+                    'trade_price_usd', 'profit_usd', 'updated']
     raw_id_fields = ['bot']
     list_filter = ['bot', 'trade_type']
