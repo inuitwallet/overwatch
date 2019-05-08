@@ -74,12 +74,12 @@ class BotError(models.Model):
     def save(self, **kwargs):
         super().save(kwargs)
 
-        async_to_sync(get_channel_layer().group_send)(
-            'bot_{}'.format(self.bot.pk),
-            {
-                'type': 'get.errors',
-            }
-        )
+        # async_to_sync(get_channel_layer().group_send)(
+        #     'bot_{}'.format(self.bot.pk),
+        #     {
+        #         'type': 'get.errors',
+        #     }
+        # )
 
 
 class BotPlacedOrder(models.Model):
@@ -116,12 +116,12 @@ class BotPlacedOrder(models.Model):
     def save(self, **kwargs):
         super().save(kwargs)
 
-        async_to_sync(get_channel_layer().group_send)(
-            'bot_{}'.format(self.bot.pk),
-            {
-                'type': 'get.placed.orders',
-            }
-        )
+        # async_to_sync(get_channel_layer().group_send)(
+        #     'bot_{}'.format(self.bot.pk),
+        #     {
+        #         'type': 'get.placed.orders',
+        #     }
+        # )
 
         if not self.updated:
             async_to_sync(get_channel_layer().send)(
@@ -290,12 +290,12 @@ class BotTrade(models.Model):
     def save(self, **kwargs):
         super().save(kwargs)
 
-        async_to_sync(get_channel_layer().group_send)(
-            'bot_{}'.format(self.bot.pk),
-            {
-                'type': 'get.trades',
-            }
-        )
+        # async_to_sync(get_channel_layer().group_send)(
+        #     'bot_{}'.format(self.bot.pk),
+        #     {
+        #         'type': 'get.trades',
+        #     }
+        # )
 
         if not self.updated:
             async_to_sync(get_channel_layer().send)(
