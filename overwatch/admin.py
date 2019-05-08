@@ -54,5 +54,6 @@ class BotBalanceAdmin(admin.ModelAdmin):
 class BotTradeAdmin(admin.ModelAdmin):
     list_display = ['bot', 'time', 'trade_type', 'trade_id', 'price', 'amount', 'total', 'target_price_usd',
                     'trade_price_usd', 'profit_usd', 'updated']
+    list_editable = ['updated']
     raw_id_fields = ['bot']
     list_filter = ['bot', 'trade_type']
