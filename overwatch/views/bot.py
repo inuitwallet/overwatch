@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.template import Template, Context
 from django.urls import reverse_lazy
 from django.views import View
@@ -41,7 +41,7 @@ class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
     fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
               'logs_group', 'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
-              'active']
+              'active', 'owner']
     success_message = '%(name)s@%(exchange)s has been created'
     success_url = reverse_lazy('index')
 

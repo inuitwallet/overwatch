@@ -300,6 +300,7 @@
             </div>
         </div>
         <div class="form-group">
+            <input type="hidden" name="owner" value="{{ user.pk }}" />
             <button type="submit" class="btn btn-dark">Save</button>
             {% if form.instance.pk is not None %}
                 <a href="{% url 'bot_detail' pk=object.pk %}" role="button" class="btn btn-secondary">Back</a>
