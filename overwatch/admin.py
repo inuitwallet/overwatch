@@ -12,7 +12,7 @@ class ApiProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):
-    list_display = ['name', 'exchange', 'api_secret']
+    list_display = ['name', 'exchange', 'api_secret', 'logs_group']
     list_filter = ['name', 'exchange']
 
 
