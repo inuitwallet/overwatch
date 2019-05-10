@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum
 from django.template import Template, Context
+from django.template.loader import render_to_string
 from django.utils.timezone import now
 from pygal.style import CleanStyle
 from overwatch.utils.price_aggregator import get_price_movement
@@ -334,7 +335,7 @@ class Bot(models.Model):
         ).aggregate(
             profit=Sum('profit_usd')
         )['profit']
-        return Template('{{ profit|floatformat:4 }} USD').render(Context({'profit': profit or 0}))
+        return render_to_string('overwatch/fragments/bot_list/profit.html', {'profit': profit or 0})
 
     def get_placed_orders_chart(self, hours=48):
         bid_points = []
