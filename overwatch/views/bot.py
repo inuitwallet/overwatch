@@ -119,7 +119,11 @@ class BotErrorsDataTablesView(LoginRequiredMixin, View):
                             Context({'error': error})
                         ),
                         error.title,
-                        error.message
+                        Template(
+                            '{{ error.message | escape }}'
+                        ).render(
+                            Context({'error': error})
+                        )
                     ] for error in data['data']
                 ]
             }
