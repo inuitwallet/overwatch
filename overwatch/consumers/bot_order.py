@@ -1,7 +1,7 @@
 from asgiref.sync import async_to_sync
 from channels.consumer import SyncConsumer
 
-from overwatch.models import BotPlacedOrder
+from overwatch.models import BotPlacedOrder, BotPrice
 from overwatch.utils.price_aggregator import get_price_data
 
 
@@ -24,24 +24,21 @@ class BotOrderConsumer(SyncConsumer):
 
         print('Getting usd values for BotPlacedOrder: {} {}'.format(bot_order.pk, bot_order))
 
-        # which currency to use?
-        # we use quote if the bot is standard or base if it is reversed
-        currency = bot_order.bot.quote if bot_order.bot.reversed else bot_order.bot.base
-        url = bot_order.bot.quote_price_url if bot_order.bot.reversed else bot_order.bot.base_price_url
-
-        # get the spot price at the time closest to the BotOrder
-        price_data = get_price_data(url, currency, bot_order.time)
-
-        if price_data is None:
+        # we should use the bot price closest to the order being placed to calculate the USD value
+        try:
+            closest_bot_price = BotPrice.objects.get_closest_to(bot_order.bot, bot_order.time)
+        except BotPrice.DoesNotExist:
+            print('no closest BotPrice for calculation')
             return
 
-        price_30_ma = price_data.get('moving_averages', {}).get('30_minute')
+        bot_price_usd = closest_bot_price.price_usd
+        print(bot_price_usd)
 
-        if price_30_ma is None:
+        if bot_price_usd is None:
             return
 
         if bot_order.price:
-            bot_order.price_usd = bot_order.price * price_30_ma
+            bot_order.price_usd = bot_order.price * bot_price_usd
 
         bot_order.updated = True
         bot_order.save()
