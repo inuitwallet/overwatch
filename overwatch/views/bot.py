@@ -174,7 +174,7 @@ class BotTradesDataTablesView(LoginRequiredMixin, View):
                         trade.trade_type.title(),
                         round(trade.target_price_usd, 8) if trade.target_price_usd else 'Calculating',
                         round(trade.trade_price_usd, 8) if trade.trade_price_usd else 'Calculating',
-                        trade.amount,
+                        trade.total if trade.bot.reversed else trade.amount,
                         round(trade.profit_usd, 2) if trade.profit_usd else 'Calculating'
                     ] for trade in data['data']
                 ]
