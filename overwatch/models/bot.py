@@ -110,7 +110,7 @@ class Bot(models.Model):
     quote_decimal_places = models.IntegerField(default=6)
 
     def __str__(self):
-        return self.name
+        return '{}@{}'.format(self.name, self.exchange)
 
     def serialize(self):
         return {
