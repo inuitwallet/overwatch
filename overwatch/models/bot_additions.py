@@ -137,14 +137,16 @@ class BotPriceManager(models.Manager):
     def get_closest_to(self, bot, target):
         closest_greater_qs = self.filter(
             bot=bot,
-            time__gt=target
+            time__gt=target,
+            updated=True
         ).order_by(
             'time'
         )
 
         closest_less_qs = self.filter(
             bot=bot,
-            time__lt=target
+            time__lt=target,
+            updated=True
         ).order_by(
             '-time'
         )
