@@ -267,6 +267,25 @@ class Bot(models.Model):
             )
         )
 
+    def rendered_market_price(self, usd=True):
+        if usd:
+            dp = str(4)
+            template = '{{ last_price.market_price_usd|floatformat:' + dp + ' }} {{ currency }}'
+        else:
+            dp = str(self.base_decimal_places)
+            template = '{{ last_price.market_price|floatformat:' + dp + ' }} {{ currency }}'
+
+        return Template(
+            template
+        ).render(
+            Context(
+                {
+                    'last_price': self.last_price,
+                    'currency': 'USD' if usd else self.base
+                }
+            )
+        )
+
     def rendered_bid_balance(self, on_order=True, usd=True):
         if usd:
             dp = str(4)
