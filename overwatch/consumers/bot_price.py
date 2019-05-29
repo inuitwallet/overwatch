@@ -54,6 +54,12 @@ class BotPriceConsumer(SyncConsumer):
             else:
                 bot_price.ask_price_usd = bot_price.ask_price * price_30_ma
 
+        if bot_price.market_price:
+            if bot_price.bot.reversed:
+                bot_price.market_price_usd = price_30_ma / bot_price.market_price
+            else:
+                bot_price.market_price_usd = bot_price.market_price * price_30_ma
+
         bot_price.unit = currency
         bot_price.updated = True
 
