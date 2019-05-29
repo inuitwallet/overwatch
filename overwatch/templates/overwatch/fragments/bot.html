@@ -1,18 +1,15 @@
 {% load static %}
 
 <tr id="{{ bot.pk }}">
-    <td>
+    <td class="text-center">
         <a href="{% url 'bot_detail' pk=bot.pk %}" class="bot-link">
             <img src="{% static 'overwatch/img/svg/gear.svg' %}" class="settings-icon" /> {{ bot.name }}
         </a>
     </td>
-    <td>{{ bot.exchange }}</td>
-    <td>
-        {{ bot.market_price }}<br />
-        <span class="market_price"></span>
-    </td>
-    <td class="activity"></td>
-    <td class="price"></td>
-    <td class="balance"></td>
-    <td class="profit"></td>
+    <td class="text-center">{{ bot.exchange }}</td>
+    <td class="market_price text-center"></td>
+    <td class="activity text-center"></td>
+    <td class="price text-center"></td>
+    <td class="balance text-center"></td>
+    <td class="profit text-center"></td>
 </tr>

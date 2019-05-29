@@ -1,0 +1,7 @@
+{% load static %}
+{% if bot.market_price %}
+    <img src="{% static '/overwatch/icons/check.svg' %}" alt="icon check">
+{% else %}
+    <img src="{% static '/overwatch/icons/x.svg' %}" alt="icon x">
+    <br /><small>{{ market_price_value }}</small>
+{% endif %}

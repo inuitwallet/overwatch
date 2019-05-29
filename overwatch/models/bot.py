@@ -275,7 +275,7 @@ class Bot(models.Model):
             dp = str(self.base_decimal_places)
             template = '{{ last_price.market_price|floatformat:' + dp + ' }} {{ currency }}'
 
-        return Template(
+        market_price_value = Template(
             template
         ).render(
             Context(
@@ -284,6 +284,14 @@ class Bot(models.Model):
                     'currency': 'USD' if usd else self.base
                 }
             )
+        )
+
+        return render_to_string(
+            'overwatch/fragments/bot_list/market-price.html',
+            {
+                'market_price': self.market_price,
+                'market_price_value': market_price_value
+            }
         )
 
     def rendered_bid_balance(self, on_order=True, usd=True):

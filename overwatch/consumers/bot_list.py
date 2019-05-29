@@ -35,7 +35,7 @@ class BotListConsumer(JsonWebsocketConsumer):
                 ),
                 'price': bot.rendered_price(usd=False),
                 'price_usd': bot.rendered_price(usd=True),
-                'market_usd': bot.rendered_market_price(usd=True),
+                'market_price': bot.rendered_market_price(usd=True),
                 'ask_balance': bot.rendered_ask_balance(on_order=True),
                 'bid_balance': bot.rendered_bid_balance(on_order=True),
                 'profit': bot.rendered_profit()

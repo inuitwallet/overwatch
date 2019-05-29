@@ -58,7 +58,7 @@
             message_type = action['message_type'];
 
             if (message_type === 'data_update'){
-                $('#' + action['bot'] + ' span.market_price').html('<small>' + action['market_usd'] + '</small>');
+                $('#' + action['bot'] + ' .market_price').html(action['market_price']);
                 $('#' + action['bot'] + ' .activity').html(action['activity']);
                 $('#' + action['bot'] + ' .price').html('<div class="row"><div class="col">' + action['price'] + '</div></div><div class="row"><div class="col"><small>' + action['price_usd'] + '</small></div></div>');
                 $('#' + action['bot'] + ' .balance').html('<div class="row"><div class="col"><small>Ask: ' + action['ask_balance'] + '</small></div></div><div class="row"><div class="col"><small>Bid: ' + action['bid_balance'] + '</small></div></div>');
