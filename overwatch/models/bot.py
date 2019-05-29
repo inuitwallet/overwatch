@@ -270,7 +270,7 @@ class Bot(models.Model):
     def rendered_market_price(self, usd=True):
         if usd:
             dp = str(4)
-            template = '{{ last_price.market_price_usd|floatformat:' + dp + ' }} {{ currency }}'
+            template = '{{ last_price.market_price_usd|default:0.0|floatformat:' + dp + ' }} {{ currency }}'
         else:
             dp = str(self.base_decimal_places)
             template = '{{ last_price.market_price|floatformat:' + dp + ' }} {{ currency }}'
