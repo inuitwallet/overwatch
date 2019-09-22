@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
         total_profit = 0
 
-        trades = BotTrade.objects.all()
+        trades = BotTrade.objects.filter(profit_usd__isnull=False)
 
         if options['time']:
             trades = trades.filter(time__gte=now() - timedelta(days=int(options['time'])))
