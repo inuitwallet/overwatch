@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from django.utils.timezone import now
 from pygal.style import CleanStyle
 from overwatch.utils.price_aggregator import get_price_movement
+from encrypted_model_fields.fields import EncryptedCharField
 
 
 class Bot(models.Model):
@@ -88,14 +89,15 @@ class Bot(models.Model):
         blank=True,
         null=True
     )
-    aws_access_key = models.CharField(
+    aws_access_key = EncryptedCharField(
         max_length=255,
-        help_text='',
+        help_text='database encrypted',
         blank=True,
         null=True
     )
-    aws_secret_key = models.CharField(
+    aws_secret_key = EncryptedCharField(
         max_length=255,
+        help_text='database encrypted and hidden from display',
         blank=True,
         null=True
     )

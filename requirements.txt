@@ -22,6 +22,7 @@ curtsies==0.3.0
 daphne==2.2.4
 Django==2.1.5
 django-bootstrap-form==3.4
+django-encrypted-model-fields
 django-etc==0.11.1
 django-registration==3.0
 django-storages==1.7.1

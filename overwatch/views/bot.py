@@ -1,3 +1,4 @@
+from django.forms import PasswordInput
 from math import ceil
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -35,6 +36,11 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('bot_detail', kwargs={'pk': self.object.pk})
 
+    def get_form(self, **kwargs):
+        form = super(UpdateBotView, self).get_form(kwargs.get('form_class'))
+        form.fields['aws_secret_key'].widget = PasswordInput()
+        return form
+
 
 class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
     model = Bot
@@ -44,6 +50,11 @@ class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
               'active', 'owner']
     success_message = '%(name)s@%(exchange)s has been created'
     success_url = reverse_lazy('index')
+
+    def get_form(self, **kwargs):
+        form = super(CreateBotView, self).get_form(kwargs.get('form_class'))
+        form.fields['aws_secret_key'].widget = PasswordInput()
+        return form
 
 
 class DeleteBotView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):

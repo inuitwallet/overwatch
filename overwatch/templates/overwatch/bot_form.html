@@ -221,8 +221,8 @@
                     {% else %}
                         {{ form.logs_group|add_class:"form-control" }}
                     {% endif %}
-                    {% if logs_group.help_text %}
-                        <small class="form-text">{{ logs_group.help_text|safe }}</small>
+                    {% if form.logs_group.help_text %}
+                        <small class="form-text">{{ form.logs_group.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -234,8 +234,8 @@
                     {% else %}
                         {{ form.aws_access_key|add_class:"form-control" }}
                     {% endif %}
-                    {% if aws_access_key.help_text %}
-                        <small class="form-text">{{ aws_access_key.help_text|safe }}</small>
+                    {% if form.aws_access_key.help_text %}
+                        <small class="form-text">{{ form.aws_access_key.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -247,8 +247,8 @@
                     {% else %}
                         {{ form.aws_secret_key|add_class:"form-control" }}
                     {% endif %}
-                    {% if aws_secret_key.help_text %}
-                        <small class="form-text">{{ aws_secret_key.help_text|safe }}</small>
+                    {% if form.aws_secret_key.help_text %}
+                        <small class="form-text">{{ form.aws_secret_key.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -262,8 +262,8 @@
                     {% else %}
                         {{ form.base_price_url|add_class:"form-control" }}
                     {% endif %}
-                    {% if base_price_url.help_text %}
-                        <small class="form-text">{{ base_price_url.help_text|safe }}</small>
+                    {% if form.base_price_url.help_text %}
+                        <small class="form-text">{{ form.base_price_url.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -275,8 +275,8 @@
                     {% else %}
                         {{ form.quote_price_url|add_class:"form-control" }}
                     {% endif %}
-                    {% if quote_price_url.help_text %}
-                        <small class="form-text">{{ quote_price_url.help_text|safe }}</small>
+                    {% if form.quote_price_url.help_text %}
+                        <small class="form-text">{{ form.quote_price_url.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -290,8 +290,8 @@
                     {% else %}
                         {{ form.market_price|add_class:"form-control" }}
                     {% endif %}
-                    {% if market_price.help_text %}
-                        <small class="form-text">{{ market_price.help_text|safe }}</small>
+                    {% if form.market_price.help_text %}
+                        <small class="form-text">{{ form.market_price.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>
@@ -303,8 +303,8 @@
                     {% else %}
                         {{ form.active|add_class:"form-control" }}
                     {% endif %}
-                    {% if active.help_text %}
-                        <small class="form-text">{{ active.help_text|safe }}</small>
+                    {% if form.active.help_text %}
+                        <small class="form-text">{{ form.active.help_text|safe }}</small>
                     {% endif %}
                 </div>
             </div>

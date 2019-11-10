@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'channels',
     'etc',
+    'encrypted_model_fields',
 ]
 
 MIDDLEWARE = [
