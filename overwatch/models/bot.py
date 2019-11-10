@@ -29,7 +29,8 @@ class Bot(models.Model):
         on_delete=models.CASCADE
     )
     active = models.BooleanField(
-        default=True
+        default=True,
+        db_index=True
     )
     base = models.CharField(
         max_length=255,
@@ -103,7 +104,8 @@ class Bot(models.Model):
         default='eu-west-1'
     )
     market_price = models.BooleanField(
-        default=False
+        default=False,
+        db_index=True
     )
     peg_decimal_places = models.IntegerField(default=6)
     base_decimal_places = models.IntegerField(default=6)

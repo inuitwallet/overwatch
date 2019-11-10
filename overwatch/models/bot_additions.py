@@ -85,10 +85,12 @@ class BotError(models.Model):
 class BotPlacedOrder(models.Model):
     bot = models.ForeignKey(
         Bot,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     time = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
+        db_index=True
     )
     base = models.CharField(
         max_length=255,
@@ -102,10 +104,14 @@ class BotPlacedOrder(models.Model):
     price = models.FloatField()
     price_usd = models.FloatField(
         blank=True,
-        null=True
+        null=True,
+        db_index=True
     )
     amount = models.FloatField()
-    updated = models.BooleanField(default=False)
+    updated = models.BooleanField(
+        default=False,
+        db_index=True
+    )
 
     def __str__(self):
         return '{} {:.4f} {}@{:.4f} {}'.format(self.order_type, self.amount, self.quote, self.price, self.base)
@@ -175,10 +181,12 @@ class BotPriceManager(models.Manager):
 class BotPrice(models.Model):
     bot = models.ForeignKey(
         Bot,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     time = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
+        db_index=True
     )
     price = models.FloatField(null=True, blank=True)
     price_usd = models.FloatField(null=True, blank=True)
@@ -193,7 +201,10 @@ class BotPrice(models.Model):
         null=True,
         blank=True
     )
-    updated = models.BooleanField(default=False)
+    updated = models.BooleanField(
+        default=False,
+        db_index=True
+    )
 
     objects = BotPriceManager()
 
@@ -219,10 +230,12 @@ class BotPrice(models.Model):
 class BotBalance(models.Model):
     bot = models.ForeignKey(
         Bot,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     time = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
+        db_index=True
     )
     bid_available = models.FloatField()
     ask_available = models.FloatField()
@@ -235,7 +248,10 @@ class BotBalance(models.Model):
     unit = models.CharField(
         max_length=255,
     )
-    updated = models.BooleanField(default=False)
+    updated = models.BooleanField(
+        default=False,
+        db_index=True
+    )
 
     def __str__(self):
         return '{}@{}'.format(self.bot, self.time)
@@ -259,27 +275,52 @@ class BotBalance(models.Model):
 class BotTrade(models.Model):
     bot = models.ForeignKey(
         Bot,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     time = models.DateTimeField(
-        default=timezone.now  # there is some historical data so need to be able to set this field
+        default=timezone.now,  # there is some historical data so need to be able to set this field
+        db_index=True
     )
     trade_id = models.CharField(
         max_length=255
     )
     trade_type = models.CharField(
         max_length=255,
+        db_index=True
     )
-    bot_trade = models.BooleanField(default=True)
+    bot_trade = models.BooleanField(
+        default=True,
+        db_index=True
+    )
     price = models.FloatField()
     amount = models.FloatField()
     total = models.FloatField()
-    age = models.DurationField(null=True, blank=True)
-    target_price_usd = models.FloatField(null=True, blank=True)
-    trade_price_usd = models.FloatField(null=True, blank=True)
-    difference_usd = models.FloatField(null=True, blank=True)
-    profit_usd = models.FloatField(null=True, blank=True)
-    updated = models.BooleanField(default=False)
+    age = models.DurationField(
+        null=True,
+        blank=True
+    )
+    target_price_usd = models.FloatField(
+        null=True,
+        blank=True
+    )
+    trade_price_usd = models.FloatField(
+        null=True,
+        blank=True
+    )
+    difference_usd = models.FloatField(
+        null=True,
+        blank=True
+    )
+    profit_usd = models.FloatField(
+        null=True,
+        blank=True,
+        db_index=True
+    )
+    updated = models.BooleanField(
+        default=False,
+        db_index=True
+    )
 
     def __str__(self):
         if self.profit_usd:
