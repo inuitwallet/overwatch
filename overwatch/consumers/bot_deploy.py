@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -11,6 +12,8 @@ from channels.consumer import SyncConsumer
 from django.conf import settings
 
 from overwatch.models import Bot
+
+logger = logging.getLogger(__name__)
 
 
 class BotDeployConsumer(SyncConsumer):
@@ -37,10 +40,10 @@ class BotDeployConsumer(SyncConsumer):
         try:
             bot = Bot.objects.get(pk=bot_pk)
         except Bot.DoesNotExist:
-            print('Could not find a Bot with pk {}'.format(bot_pk))
+            logger.info('Could not find a Bot with pk {}'.format(bot_pk))
             return
 
-        print('Deploying bot {}'.format(bot))
+        logger.info('Deploying bot {}'.format(bot))
 
         # Ensure the bot has the fields needed
         missing_fields = False
@@ -48,25 +51,25 @@ class BotDeployConsumer(SyncConsumer):
         for field in ['name', 'exchange', 'bot_type', 'aws_access_key', 'aws_secret_key', 'exchange_api_key',
                       'exchange_api_secret', 'base_url', 'schedule', 'aws_region']:
             if not getattr(bot, field):
-                print('Bot does not have a valid {} field'.format(field))
+                logger.info('Bot does not have a valid {} field'.format(field))
                 missing_fields = True
 
         if missing_fields:
-            print('Aborting deploy due to missing fields')
+            logger.info('Aborting deploy due to missing fields')
             return
 
         # we should move the chosen bot code to a temp directory ready for building
         working_dir = mkdtemp()
-        print('Working in {}'.format(working_dir))
+        logger.info('Working in {}'.format(working_dir))
         shutil.copytree(
             os.path.join(settings.BASE_DIR, 'overwatch', 'bots', bot.bot_type),
             os.path.join(working_dir, 'bot')
         )
-        print('Creating virtualenv')
+        logger.info('Creating virtualenv')
         create('{}/ve'.format(os.path.join(working_dir, 'bot')), with_pip=True)
 
         try:
-            print('Installing dependencies')
+            logger.info('Installing dependencies')
             subprocess.run(
                 [
                     've/bin/pip',
@@ -89,13 +92,13 @@ class BotDeployConsumer(SyncConsumer):
             )
 
         except Exception as e:
-            print('Error installing requirements: {}'.format(e))
+            logger.info('Error installing requirements: {}'.format(e))
             shutil.rmtree(working_dir)
             return
 
         return
 
-        print('Creating Zappa settings file')
+        logger.info('Creating Zappa settings file')
         project_name = 'overwatch_bot_{}_{}'.format(bot.exchange, bot.name)
         json.dump(
             {
@@ -111,7 +114,7 @@ class BotDeployConsumer(SyncConsumer):
             open('{}/zappa_settings.json'.format(os.path.join(working_dir, 'bot')), 'w+')
         )
 
-        print('Zipping Archive with Zappa')
+        logger.info('Zipping Archive with Zappa')
 
         # create the zappa bash file to handle activating the project virtualenv
         with open('{}/zappa_package.sh'.format(os.path.join(working_dir, 'bot')), 'w+') as zappa_bash:
@@ -131,11 +134,11 @@ class BotDeployConsumer(SyncConsumer):
             )
 
         except Exception as e:
-            print('Error Zipping with Zappa: {}'.format(e))
+            logger.info('Error Zipping with Zappa: {}'.format(e))
             shutil.rmtree(working_dir)
             return
 
-        print('Uploading {}.zip archive to Lambda'.format(project_name))
+        logger.info('Uploading {}.zip archive to Lambda'.format(project_name))
 
         config = Config(connect_timeout=120, read_timeout=120)
         client = boto3.client(
@@ -204,13 +207,13 @@ class BotDeployConsumer(SyncConsumer):
                         Handler='bot.main',
                         Code={'ZipFile': function_zip.read()},
                     )
-                print('Upload Successful')
+                logger.info('Upload Successful')
             except Exception as e:
-                print('Failed to upload: {}'.format(e))
+                logger.info('Failed to upload: {}'.format(e))
                 shutil.rmtree(working_dir)
                 return
 
-            print('Updating {} config'.format(project_name))
+            logger.info('Updating {} config'.format(project_name))
             try:
                 config_response = client.update_function_configuration(
                     FunctionName=project_name,
@@ -233,14 +236,14 @@ class BotDeployConsumer(SyncConsumer):
                     },
                     Runtime='python3.6'
                 )
-                print('Config Updated Successfully')
+                logger.info('Config Updated Successfully')
             except Exception as e:
-                print('Failed to update config: {}'.format(e))
+                logger.info('Failed to update config: {}'.format(e))
                 shutil.rmtree(working_dir)
                 return
 
             # we can create a CloudWatch Event and enable it
-            print('Updating Schedule')
+            logger.info('Updating Schedule')
             event_client = boto3.client(
                 'events',
                 config=Config(connect_timeout=120, read_timeout=120),
@@ -289,7 +292,7 @@ class BotDeployConsumer(SyncConsumer):
         bot.logs_group = '/aws/lambda/overwatch_bot_{}_{}'.format(bot.exchange, bot.name)
         bot.save()
 
-        print('Deployment of bot {} is complete'.format(bot))
+        logger.info('Deployment of bot {} is complete'.format(bot))
 
     def deactivate(self, event):
         bot_pk = event.get('bot_pk')
@@ -297,10 +300,10 @@ class BotDeployConsumer(SyncConsumer):
         try:
             bot = Bot.objects.get(pk=bot_pk)
         except Bot.DoesNotExist:
-            print('Could not find a Bot with pk {}'.format(bot_pk))
+            logger.info('Could not find a Bot with pk {}'.format(bot_pk))
             return
 
-        print('Deactivating bot {}'.format(bot))
+        logger.info('Deactivating bot {}'.format(bot))
         self.update_cloudwatch_event(bot)
 
     def activate(self, event):
@@ -309,10 +312,10 @@ class BotDeployConsumer(SyncConsumer):
         try:
             bot = Bot.objects.get(pk=bot_pk)
         except Bot.DoesNotExist:
-            print('Could not find a Bot with pk {}'.format(bot_pk))
+            logger.info('Could not find a Bot with pk {}'.format(bot_pk))
             return
 
-        print('Deactivating bot {}'.format(bot))
+        logger.info('Deactivating bot {}'.format(bot))
         self.update_cloudwatch_event(bot)
 
     @staticmethod
@@ -337,5 +340,5 @@ class BotDeployConsumer(SyncConsumer):
             )
             return change_rule
         except Exception as e:
-            print('Failed to update Cloudwatch Event: {}'.format(e))
+            logger.info('Failed to update Cloudwatch Event: {}'.format(e))
             return False
