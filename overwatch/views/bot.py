@@ -1,4 +1,7 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.forms import PasswordInput
+from django.shortcuts import redirect, get_object_or_404
 from math import ceil
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -29,8 +32,9 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     model = Bot
     fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'logs_group', 'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
-              'active']
+              'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
+              'active', 'exchange_api_key', 'exchange_api_secret', 'base_url', 'vigil_funds_alert_channel_id',
+              'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
     success_message = '%(name)s@%(exchange)s has been updated'
 
     def get_success_url(self):
@@ -38,7 +42,6 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
 
     def get_form(self, **kwargs):
         form = super(UpdateBotView, self).get_form(kwargs.get('form_class'))
-        form.fields['aws_secret_key'].widget = PasswordInput()
         return form
 
 
@@ -46,14 +49,14 @@ class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
     model = Bot
     fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'logs_group', 'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
-              'active', 'owner']
+              'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
+              'active', 'owner', 'exchange_api_key', 'exchange_api_secret', 'base_url', 'vigil_funds_alert_channel_id',
+              'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
     success_message = '%(name)s@%(exchange)s has been created'
     success_url = reverse_lazy('index')
 
     def get_form(self, **kwargs):
         form = super(CreateBotView, self).get_form(kwargs.get('form_class'))
-        form.fields['aws_secret_key'].widget = PasswordInput()
         return form
 
 
@@ -61,6 +64,53 @@ class DeleteBotView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     model = Bot
     success_message = '%(name)s has been deleted'
     success_url = reverse_lazy('index')
+
+
+class DeployBotView(LoginRequiredMixin, View):
+    @staticmethod
+    def get(request, pk):
+        async_to_sync(get_channel_layer().send)(
+            'bot-deploy',
+            {
+                "type": "deploy",
+                "bot_pk": pk
+            },
+        )
+        return redirect('bot_detail', pk=pk)
+
+
+class DeactivateBotView(LoginRequiredMixin, View):
+    @staticmethod
+    def get(request, pk):
+        bot = get_object_or_404(Bot, pk=pk)
+        bot.active = False
+        bot.save()
+
+        async_to_sync(get_channel_layer().send)(
+            'bot-deploy',
+            {
+                "type": "deactivate",
+                "bot_pk": pk
+            },
+        )
+        return redirect('bot_detail', pk=pk)
+
+
+class ActivateBotView(LoginRequiredMixin, View):
+    @staticmethod
+    def get(request, pk):
+        bot = get_object_or_404(Bot, pk=pk)
+        bot.active = True
+        bot.save()
+
+        async_to_sync(get_channel_layer().send)(
+            'bot-deploy',
+            {
+                "type": "activate",
+                "bot_pk": pk
+            },
+        )
+        return redirect('bot_detail', pk=pk)
 
 
 def generic_data_tables_view(request, object, bot_pk):

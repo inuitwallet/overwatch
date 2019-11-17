@@ -51,6 +51,10 @@ urlpatterns = [
         views.BotPlacedOrdersDataTablesView.as_view(),
         name='bot_placed_orders_datatables'
     ),
-    path('bot/<int:pk>/trades/datatables', views.BotTradesDataTablesView.as_view(), name='bot_trades_datatables')
+    path('bot/<int:pk>/trades/datatables', views.BotTradesDataTablesView.as_view(), name='bot_trades_datatables'),
+
+    path('bot/<int:pk>/deploy', views.DeployBotView.as_view(), name='deploy_bot'),
+    path('bot/<int:pk>/deactivate', views.DeactivateBotView.as_view(), name='deactivate_bot'),
+    path('bot/<int:pk>/activate', views.ActivateBotView.as_view(), name='activate_bot'),
 
 ]

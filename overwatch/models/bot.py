@@ -4,6 +4,7 @@ import uuid
 import datetime
 
 import pygal
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum
@@ -16,6 +17,7 @@ from encrypted_model_fields.fields import EncryptedCharField
 
 
 class Bot(models.Model):
+    # operational config options
     name = models.CharField(
         max_length=255,
         help_text='Name to identify this bot. Usually the name of the pair it operates on'
@@ -43,11 +45,11 @@ class Bot(models.Model):
     )
     track = models.CharField(
         max_length=255,
-        help_text='The currency to track. This determines if the pair is reversed or not'
+        help_text='The currency to track. If this is the same as Quote Currency, the bot is "reversed"'
     )
     peg = models.CharField(
         max_length=255,
-        help_text='The currency to peg to. The value of this currency will be used to calculate prices'
+        help_text='The currency to peg to. The value of this currency will be used to calculate the prices the bot uses'
     )
     tolerance = models.FloatField(
         help_text='How far from the price an order can be before it is cancelled and replaced at the correct price.'
@@ -83,6 +85,23 @@ class Bot(models.Model):
     quote_price_url = models.URLField(
         default='https://price-aggregator.crypto-daio.co.uk/price'
     )
+    aws_region = models.CharField(
+        max_length=255,
+        default='eu-west-1'
+    )
+    market_price = models.BooleanField(
+        default=False,
+        db_index=True
+    )
+    peg_decimal_places = models.IntegerField(default=6)
+    base_decimal_places = models.IntegerField(default=6)
+    quote_decimal_places = models.IntegerField(default=6)
+
+    # deployment config options
+    bot_type = models.CharField(
+        max_length=255,
+        choices=settings.BOT_TYPES
+    )
     logs_group = models.CharField(
         max_length=255,
         help_text='AWS Cloudwatch logs group name',
@@ -101,17 +120,54 @@ class Bot(models.Model):
         blank=True,
         null=True
     )
-    aws_region = models.CharField(
+    exchange_api_key = EncryptedCharField(
         max_length=255,
-        default='eu-west-1'
+        help_text='database encrypted and hidden from display',
+        blank=True,
+        null=True
     )
-    market_price = models.BooleanField(
-        default=False,
-        db_index=True
+    exchange_api_secret = EncryptedCharField(
+        max_length=255,
+        help_text='database encrypted and hidden from display',
+        blank=True,
+        null=True
     )
-    peg_decimal_places = models.IntegerField(default=6)
-    base_decimal_places = models.IntegerField(default=6)
-    quote_decimal_places = models.IntegerField(default=6)
+    base_url = models.URLField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text='The base url of the exchange api'
+    )
+    sleep_long = models.IntegerField(
+        default=5
+    )
+    sleep_medium = models.IntegerField(
+        default=3
+    )
+    sleep_short = models.IntegerField(
+        default=2
+    )
+    vigil_funds_alert_channel_id = EncryptedCharField(
+        max_length=255,
+        help_text='Use for reporting fund errors via Vigil.\nDatabase encrypted',
+        blank=True,
+        null=True,
+        default='ef77dfd5-4a38-43e4-9538-8490a6ef965a'
+    )
+    vigil_wrapper_error_channel_id = EncryptedCharField(
+        max_length=255,
+        help_text='Use for reporting bot errors via Vigil.\nDatabase encrypted',
+        blank=True,
+        null=True,
+        default='4762f58a-fbc8-43d1-8b40-d4378e7d7275'
+    )
+    timeout = models.IntegerField(
+        default=300
+    )
+    schedule = models.IntegerField(
+        default=2,
+        help_text='How often the bot should run (Minutes)'
+    )
 
     def __str__(self):
         return '{}@{}'.format(self.name, self.exchange)

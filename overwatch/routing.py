@@ -18,6 +18,7 @@ application = ProtocolTypeRouter({
         'bot-balance': BotBalanceConsumer,
         'bot-order': BotOrderConsumer,
         'bot-trade': BotTradeConsumer,
-        'cloudwatch-logs': CloudWatchLogsConsumer
+        'cloudwatch-logs': CloudWatchLogsConsumer,
+        'bot-deploy': BotDeployConsumer,
     }),
 })

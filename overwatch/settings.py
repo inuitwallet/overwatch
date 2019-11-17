@@ -178,6 +178,8 @@ LOGGING = {
 
 USE_THOUSAND_SEPARATOR = True
 
+BOT_TYPES = [(bot, bot.title()) for bot in os.listdir(os.path.join(BASE_DIR, 'overwatch', 'bots'))]
+
 # Load local_settings
 try:
     from overwatch.local_settings import *  # noqa

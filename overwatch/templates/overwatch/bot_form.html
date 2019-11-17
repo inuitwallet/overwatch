@@ -11,313 +11,447 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" class="form-horizontal">
-        <legend>
-            {% if form.instance.pk is not None %}
-                Edit the {{ object.name}}@{{ object.exchange }} Bot
-            {% else %}
-                Create a new Bot
-            {% endif %}
-        </legend>
-        {% csrf_token %}
-        {{ form.non_field_errors }}
+    <!--suppress XmlInvalidId -->
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs" id="configTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="operations-config-tab" data-toggle="tab" href="#operations-config" role="tab" aria-controls="operations-config" aria-selected="true">
+                        Operations
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="deployment-config-tab" data-toggle="tab" href="#deployment-config" role="tab" aria-controls="deployment-config" aria-selected="false">
+                        Deployment
+                    </a>
+                </li>
+            </ul>
+            <form action="" method="post" class="form-horizontal">
+                <legend>
+                    {% if form.instance.pk is not None %}
+                        Edit the {{ object.name}}@{{ object.exchange }} Bot
+                    {% else %}
+                        Create a new Bot
+                    {% endif %}
+                </legend>
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="tab-content" id="configTabsContent">
+                    <div class="tab-pane fade show active" id="operations-config" role="tabpanel" aria-labelledby="operations-config-tab">
+                        {% if form.instance.pk is not None %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="api-secret">API Secret</label>
+                                    <input type="text" readonly value="{{ object.api_secret }}" class="form-control" />
+                                    <small class="form-text">Bots should use this API key to communicate with Overwatch</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.name.id_for_label }}">Name</label>
+                                    {% if form.name.errors %}
+                                        {{ form.name|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.name|add_class:"form-control" }}
+                                    {% endif %}
+                                    <div class="invalid-feedback">
+                                        The bot requires a name
+                                    </div>
+                                    {% if form.name.help_text %}
+                                        <small class="form-text">{{ form.name.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.exchange.id_for_label }}">Exchange</label>
+                                    {% if form.exchange.errors %}
+                                        {{ form.exchange|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.exchange|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.exchange.help_text %}
+                                        <small class="form-text">{{ form.exchange.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.base.id_for_label }}">Base Currency</label>
+                                    {% if form.base.errors %}
+                                        {{ form.base|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.base|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.base.help_text %}
+                                        <small class="form-text">{{ form.base.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.quote.id_for_label }}">Quote Currency</label>
+                                    {% if form.quote.errors %}
+                                        {{ form.quote|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.quote|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.quote.help_text %}
+                                        <small class="form-text">{{ form.quote.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.track.id_for_label }}">Track Currency</label>
+                                    {% if form.track.errors %}
+                                        {{ form.track|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.track|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.track.help_text %}
+                                        <small class="form-text">{{ form.track.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.peg.id_for_label }}">Peg Currency</label>
+                                    {% if form.peg.errors %}
+                                        {{ form.peg|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.peg|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.peg.help_text %}
+                                        <small class="form-text">{{ form.peg.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.fee.id_for_label }}">Fee</label>
+                                    {% if form.fee.errors %}
+                                        {{ form.fee|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.fee|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.fee.help_text %}
+                                        <small class="form-text">{{ form.fee.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.bid_spread.id_for_label }}">Bid Spread</label>
+                                    {% if form.bid_spread.errors %}
+                                        {{ form.bid_spread|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.bid_spread|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.bid_spread.help_text %}
+                                        <small class="form-text">{{ form.bid_spread.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.ask_spread.id_for_label }}">Ask Spread</label>
+                                    {% if form.ask_spread.errors %}
+                                        {{ form.ask_spread|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.ask_spread|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.ask_spread.help_text %}
+                                        <small class="form-text">{{ form.ask_spread.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.order_amount.id_for_label }}">Order Amount</label>
+                                    {% if form.order_amount.errors %}
+                                        {{ form.order_amount|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.order_amount|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.order_amount.help_text %}
+                                        <small class="form-text">{{ form.order_amount.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.total_bid.id_for_label }}">Total Bid</label>
+                                    {% if form.total_bid.errors %}
+                                        {{ form.total_bid|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.total_bid|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.total_bid.help_text %}
+                                        <small class="form-text">{{ form.total_bid.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.total_ask.id_for_label }}">Total Ask</label>
+                                    {% if form.total_ask.errors %}
+                                        {{ form.total_ask|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.total_ask|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.total_ask.help_text %}
+                                        <small class="form-text">{{ form.total_ask.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.tolerance.id_for_label }}">Tolerance</label>
+                                    {% if form.tolerance.errors %}
+                                        {{ form.tolerance|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.tolerance|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.tolerance.help_text %}
+                                        <small class="form-text">{{ form.tolerance.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.base_price_url.id_for_label }}">Base Price URL</label>
+                                    {% if form.base_price_url.errors %}
+                                        {{ form.base_price_url|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.base_price_url|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.base_price_url.help_text %}
+                                        <small class="form-text">{{ form.base_price_url.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.quote_price_url.id_for_label }}">Quote Price URL</label>
+                                    {% if form.quote_price_url.errors %}
+                                        {{ form.quote_price_url|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.quote_price_url|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.quote_price_url.help_text %}
+                                        <small class="form-text">{{ form.quote_price_url.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group text-center">
+                                    <label for="{{ form.market_price.id_for_label }}">Use Market Price</label>
+                                    {% if form.market_price.errors %}
+                                        {{ form.market_price|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.market_price|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.market_price.help_text %}
+                                        <small class="form-text">{{ form.market_price.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group text-center">
+                                    <label for="{{ form.active.id_for_label }}">Active</label>
+                                    {% if form.active.errors %}
+                                        {{ form.active|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.active|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.active.help_text %}
+                                        <small class="form-text">{{ form.active.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
 
-        {% if form.instance.pk is not None %}
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="api-secret">API Secret</label>
-                    <input type="text" readonly value="{{ object.api_secret }}" class="form-control" />
-                    <small class="form-text">Bots should use this API key to communicate with Overwatch</small>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Name</label>
-                    {% if form.name.errors %}
-                        {{ form.name|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.name|add_class:"form-control" }}
-                    {% endif %}
-                    <div class="invalid-feedback">
-                        The bot requires a name
+
                     </div>
-                    {% if form.name.help_text %}
-                        <small class="form-text">{{ form.name.help_text|safe }}</small>
-                    {% endif %}
+                    <div class="tab-pane fade show active" id="deployment-config" role="tabpanel" aria-labelledby="deployment-config-tab">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.bot_type.id_for_label }}">Bot Type</label>
+                                    {% if form.bot_type.errors %}
+                                        {{ form.bot_type|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.bot_type|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.bot_type.help_text %}
+                                        <small class="form-text">{{ form.bot_type.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.aws_access_key.id_for_label }}">AWS Access Key</label>
+                                    {% if form.aws_access_key.errors %}
+                                        {{ form.aws_access_key|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.aws_access_key|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.aws_access_key.help_text %}
+                                        <small class="form-text">{{ form.aws_access_key.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.aws_secret_key.id_for_label }}">AWS Secret Key</label>
+                                    {% if form.aws_secret_key.errors %}
+                                        {{ form.aws_secret_key|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.aws_secret_key|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.aws_secret_key.help_text %}
+                                        <small class="form-text">{{ form.aws_secret_key.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.exchange_api_key.id_for_label }}">Exchange API Key</label>
+                                    {% if form.exchange_api_key.errors %}
+                                        {{ form.exchange_api_key|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.exchange_api_key|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.exchange_api_key.help_text %}
+                                        <small class="form-text">{{ form.exchange_api_key.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.exchange_api_secret.id_for_label }}">Exchange API Secret</label>
+                                    {% if form.exchange_api_secret.errors %}
+                                        {{ form.exchange_api_secret|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.exchange_api_secret|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.exchange_api_secret.help_text %}
+                                        <small class="form-text">{{ form.exchange_api_secret.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.base_url.id_for_label }}">Exchange Base URL</label>
+                                    {% if form.base_url.errors %}
+                                        {{ form.base_url|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.base_url|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.base_url.help_text %}
+                                        <small class="form-text">{{ form.base_url.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                 <div class="form-group">
+                                    <label for="{{ form.vigil_funds_alert_channel_id.id_for_label }}">Vigil Funds Alert ID</label>
+                                    {% if form.vigil_funds_alert_channel_id.errors %}
+                                        {{ form.vigil_funds_alert_channel_id|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.vigil_funds_alert_channel_id|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.vigil_funds_alert_channel_id.help_text %}
+                                        <small class="form-text">{{ form.vigil_funds_alert_channel_id.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.vigil_wrapper_error_channel_id.id_for_label }}">Vigil Bot Alert ID</label>
+                                    {% if form.vigil_wrapper_error_channel_id.errors %}
+                                        {{ form.vigil_wrapper_error_channel_id|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.vigil_wrapper_error_channel_id|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.vigil_wrapper_error_channel_id.help_text %}
+                                        <small class="form-text">{{ form.vigil_wrapper_error_channel_id.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.schedule.id_for_label }}">Schedule</label>
+                                    {% if form.schedule.errors %}
+                                        {{ form.schedule|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.schedule|add_class:"form-control" }}
+                                    {% endif %}
+                                    {% if form.schedule.help_text %}
+                                        <small class="form-text">{{ form.schedule.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.exchange.id_for_label }}">Exchange</label>
-                    {% if form.exchange.errors %}
-                        {{ form.exchange|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.exchange|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.exchange.help_text %}
-                        <small class="form-text">{{ form.exchange.help_text|safe }}</small>
-                    {% endif %}
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <input type="hidden" name="owner" value="{{ user.pk }}" />
+                            <button type="submit" class="btn btn-dark">Save</button>
+                            {% if form.instance.pk is not None %}
+                                <a href="{% url 'bot_detail' pk=object.pk %}" role="button" class="btn btn-secondary">Back</a>
+                            {% else %}
+                                   <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col text-right">
+                        {% if form.instance.pk is not None %}
+                            <a href="{% url 'deploy_bot' pk=form.instance.pk %}" class="btn btn-warning" role="button">Deploy</a>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.base.id_for_label }}">Base Currency</label>
-                    {% if form.base.errors %}
-                        {{ form.base|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.base|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.base.help_text %}
-                        <small class="form-text">{{ form.base.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.quote.id_for_label }}">Quote Currency</label>
-                    {% if form.quote.errors %}
-                        {{ form.quote|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.quote|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.quote.help_text %}
-                        <small class="form-text">{{ form.quote.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.track.id_for_label }}">Track Currency</label>
-                    {% if form.track.errors %}
-                        {{ form.track|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.track|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.track.help_text %}
-                        <small class="form-text">{{ form.track.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.peg.id_for_label }}">Peg Currency</label>
-                    {% if form.peg.errors %}
-                        {{ form.peg|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.peg|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.peg.help_text %}
-                        <small class="form-text">{{ form.peg.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.fee.id_for_label }}">Fee</label>
-                    {% if form.fee.errors %}
-                        {{ form.fee|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.fee|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.fee.help_text %}
-                        <small class="form-text">{{ form.fee.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.bid_spread.id_for_label }}">Bid Spread</label>
-                    {% if form.bid_spread.errors %}
-                        {{ form.bid_spread|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.bid_spread|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.bid_spread.help_text %}
-                        <small class="form-text">{{ form.bid_spread.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.ask_spread.id_for_label }}">Ask Spread</label>
-                    {% if form.ask_spread.errors %}
-                        {{ form.ask_spread|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.ask_spread|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.ask_spread.help_text %}
-                        <small class="form-text">{{ form.ask_spread.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.order_amount.id_for_label }}">Order Amount</label>
-                    {% if form.order_amount.errors %}
-                        {{ form.order_amount|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.order_amount|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.order_amount.help_text %}
-                        <small class="form-text">{{ form.order_amount.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.total_bid.id_for_label }}">Total Bid</label>
-                    {% if form.total_bid.errors %}
-                        {{ form.total_bid|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.total_bid|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.total_bid.help_text %}
-                        <small class="form-text">{{ form.total_bid.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.total_ask.id_for_label }}">Total Ask</label>
-                    {% if form.total_ask.errors %}
-                        {{ form.total_ask|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.total_ask|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.total_ask.help_text %}
-                        <small class="form-text">{{ form.total_ask.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.tolerance.id_for_label }}">Tolerance</label>
-                    {% if form.tolerance.errors %}
-                        {{ form.tolerance|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.tolerance|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.tolerance.help_text %}
-                        <small class="form-text">{{ form.tolerance.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.logs_group.id_for_label }}">Log Group</label>
-                    {% if form.logs_group.errors %}
-                        {{ form.logs_group|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.logs_group|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.logs_group.help_text %}
-                        <small class="form-text">{{ form.logs_group.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.aws_access_key.id_for_label }}">AWS Access Key</label>
-                    {% if form.aws_access_key.errors %}
-                        {{ form.aws_access_key|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.aws_access_key|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.aws_access_key.help_text %}
-                        <small class="form-text">{{ form.aws_access_key.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.aws_secret_key.id_for_label }}">AWS Secret Key</label>
-                    {% if form.aws_secret_key.errors %}
-                        {{ form.aws_secret_key|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.aws_secret_key|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.aws_secret_key.help_text %}
-                        <small class="form-text">{{ form.aws_secret_key.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.base_price_url.id_for_label }}">Base Price URL</label>
-                    {% if form.base_price_url.errors %}
-                        {{ form.base_price_url|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.base_price_url|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.base_price_url.help_text %}
-                        <small class="form-text">{{ form.base_price_url.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group">
-                    <label for="{{ form.quote_price_url.id_for_label }}">Quote Price URL</label>
-                    {% if form.quote_price_url.errors %}
-                        {{ form.quote_price_url|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.quote_price_url|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.quote_price_url.help_text %}
-                        <small class="form-text">{{ form.quote_price_url.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-group text-center">
-                    <label for="{{ form.market_price.id_for_label }}">Use Market Price</label>
-                    {% if form.market_price.errors %}
-                        {{ form.market_price|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.market_price|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.market_price.help_text %}
-                        <small class="form-text">{{ form.market_price.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-group text-center">
-                    <label for="{{ form.active.id_for_label }}">Active</label>
-                    {% if form.active.errors %}
-                        {{ form.active|add_class:"form-control"|add_class:"is-invalid" }}
-                    {% else %}
-                        {{ form.active|add_class:"form-control" }}
-                    {% endif %}
-                    {% if form.active.help_text %}
-                        <small class="form-text">{{ form.active.help_text|safe }}</small>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <input type="hidden" name="owner" value="{{ user.pk }}" />
-            <button type="submit" class="btn btn-dark">Save</button>
-            {% if form.instance.pk is not None %}
-                <a href="{% url 'bot_detail' pk=object.pk %}" role="button" class="btn btn-secondary">Back</a>
-            {% else %}
-                   <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
-            {% endif %}
-        </div>
-    </form>
+    </div>
+{% endblock %}
+
+{% block endbodyjs %}
+    <script>
+        $(document).ready(function() {
+            if (location.hash) {
+                $("a[href='" + location.hash + "']").tab("show");
+            }
+            $(document.body).on("click", "a[data-toggle]", function(event) {
+                location.hash = this.getAttribute("href");
+            });
+        });
+        $(window).on("popstate", function() {
+            var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
+            $("a[href='" + anchor + "']").tab("show");
+        });
+    </script>
 {% endblock %}
