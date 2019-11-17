@@ -40,7 +40,7 @@ class BotDeployConsumer(SyncConsumer):
         try:
             bot = Bot.objects.get(pk=bot_pk)
         except Bot.DoesNotExist:
-            logger.info('Could not find a Bot with pk {}'.format(bot_pk))
+            logger.error('Could not find a Bot with pk {}'.format(bot_pk))
             return
 
         logger.info('Deploying bot {}'.format(bot))
@@ -51,11 +51,11 @@ class BotDeployConsumer(SyncConsumer):
         for field in ['name', 'exchange', 'bot_type', 'aws_access_key', 'aws_secret_key', 'exchange_api_key',
                       'exchange_api_secret', 'base_url', 'schedule', 'aws_region']:
             if not getattr(bot, field):
-                logger.info('Bot does not have a valid {} field'.format(field))
+                logger.error('Bot does not have a valid {} field'.format(field))
                 missing_fields = True
 
         if missing_fields:
-            logger.info('Aborting deploy due to missing fields')
+            logger.error('Aborting deploy due to missing fields')
             return
 
         # we should move the chosen bot code to a temp directory ready for building
@@ -92,11 +92,9 @@ class BotDeployConsumer(SyncConsumer):
             )
 
         except Exception as e:
-            logger.info('Error installing requirements: {}'.format(e))
+            logger.error('Error installing requirements: {}'.format(e))
             shutil.rmtree(working_dir)
             return
-
-        return
 
         logger.info('Creating Zappa settings file')
         project_name = 'overwatch_bot_{}_{}'.format(bot.exchange, bot.name)
@@ -134,7 +132,7 @@ class BotDeployConsumer(SyncConsumer):
             )
 
         except Exception as e:
-            logger.info('Error Zipping with Zappa: {}'.format(e))
+            logger.error('Error Zipping with Zappa: {}'.format(e))
             shutil.rmtree(working_dir)
             return
 
@@ -209,7 +207,7 @@ class BotDeployConsumer(SyncConsumer):
                     )
                 logger.info('Upload Successful')
             except Exception as e:
-                logger.info('Failed to upload: {}'.format(e))
+                logger.error('Failed to upload: {}'.format(e))
                 shutil.rmtree(working_dir)
                 return
 
@@ -238,7 +236,7 @@ class BotDeployConsumer(SyncConsumer):
                 )
                 logger.info('Config Updated Successfully')
             except Exception as e:
-                logger.info('Failed to update config: {}'.format(e))
+                logger.error('Failed to update config: {}'.format(e))
                 shutil.rmtree(working_dir)
                 return
 
@@ -338,7 +336,6 @@ class BotDeployConsumer(SyncConsumer):
                 State='ENABLED' if bot.active else 'DISABLED',
                 Description='Event timer for {}'.format(project_name),
             )
-            return change_rule
         except Exception as e:
-            logger.info('Failed to update Cloudwatch Event: {}'.format(e))
+            logger.error('Failed to update Cloudwatch Event: {}'.format(e))
             return False
