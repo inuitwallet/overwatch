@@ -329,14 +329,12 @@ class BotDeployConsumer(SyncConsumer):
             )
 
         try:
-            print('ENABLED' if bot.active else 'DISABLED')
-            change_rule = event_client.put_rule(
+            return event_client.put_rule(
                 Name=project_name,
                 ScheduleExpression='rate({} minutes)'.format(bot.schedule),
                 State='ENABLED' if bot.active else 'DISABLED',
                 Description='Event timer for {}'.format(project_name),
             )
-            print(change_rule)
             return change_rule
         except Exception as e:
             print('Failed to update Cloudwatch Event: {}'.format(e))
