@@ -152,14 +152,12 @@ class Bot(models.Model):
         help_text='Use for reporting fund errors via Vigil.\nDatabase encrypted',
         blank=True,
         null=True,
-        default='ef77dfd5-4a38-43e4-9538-8490a6ef965a'
     )
     vigil_wrapper_error_channel_id = EncryptedCharField(
         max_length=255,
         help_text='Use for reporting bot errors via Vigil.\nDatabase encrypted',
         blank=True,
         null=True,
-        default='4762f58a-fbc8-43d1-8b40-d4378e7d7275'
     )
     timeout = models.IntegerField(
         default=300
@@ -171,6 +169,9 @@ class Bot(models.Model):
 
     def __str__(self):
         return '{}@{}'.format(self.name, self.exchange)
+
+    class Meta:
+        ordering = ['name', 'exchange', 'active']
 
     def serialize(self):
         return {

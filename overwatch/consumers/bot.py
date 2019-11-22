@@ -60,6 +60,27 @@ class BotConsumer(JsonWebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)('cloudwatch_logs_{}'.format(self.bot.pk), self.channel_name)
         self.close()
 
+    def receive_json(self, content, **kwargs):
+        message_type = content.get('message_type')
+
+        if message_type == 'deploy':
+            async_to_sync(get_channel_layer().send)(
+                'bot-deploy',
+                {
+                    "type": "deploy",
+                    "bot_pk": content.get('bot')
+                },
+            )
+
+        if message_type == 'update':
+            async_to_sync(get_channel_layer().send)(
+                'bot-deploy',
+                {
+                    "type": "update",
+                    "bot_pk": content.get('bot')
+                },
+            )
+
     def clear(self, event):
         """
         Instruct the javascript on the bot_detail page to clear the bot data holders
@@ -104,7 +125,7 @@ class BotConsumer(JsonWebsocketConsumer):
 
     def get_price_info(self, event):
         """
-        calculate latest price infor and send to front end
+        calculate latest price info and send to front end
         """
         self.send(
             json.dumps(
@@ -169,6 +190,20 @@ class BotConsumer(JsonWebsocketConsumer):
                     'message_type': 'cloudwatch_logs_add_line',
                     'time': event.get('time'),
                     'message': event.get('message')
+                }
+            )
+        )
+
+    def send_ui_notification(self, event):
+        """
+        send a message notification to the front end
+        """
+        self.send(
+            json.dumps(
+                {
+                    'message_type': 'toast_notification',
+                    'target': event.get('target'),
+                    'text': event.get('text')
                 }
             )
         )

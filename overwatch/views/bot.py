@@ -20,8 +20,8 @@ from overwatch.models import Bot, BotError, BotPlacedOrder, BotTrade
 class ListBotView(LoginRequiredMixin, ListView):
     model = Bot
 
-    def get_queryset(self):
-        return Bot.objects.filter(active=True)
+    # def get_queryset(self):
+    #     return Bot.objects.filter(active=True)
 
 
 class DetailBotView(LoginRequiredMixin, DetailView):
@@ -35,7 +35,7 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
               'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
               'active', 'exchange_api_key', 'exchange_api_secret', 'base_url', 'vigil_funds_alert_channel_id',
               'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
-    success_message = '%(name)s@%(exchange)s has been updated'
+    success_message = '%(name)s@%(exchange)s has been updated. Click the Update button to update the lambda function'
 
     def get_success_url(self):
         return reverse_lazy('bot_detail', kwargs={'pk': self.object.pk})

@@ -285,10 +285,8 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
-                    <div class="tab-pane fade show active" id="deployment-config" role="tabpanel" aria-labelledby="deployment-config-tab">
+                    <div class="tab-pane fade" id="deployment-config" role="tabpanel" aria-labelledby="deployment-config-tab">
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
@@ -427,11 +425,6 @@
                                    <a href="{% url 'index' %}" role="button" class="btn btn-secondary">Back</a>
                             {% endif %}
                         </div>
-                    </div>
-                    <div class="col text-right">
-                        {% if form.instance.pk is not None %}
-                            <a href="{% url 'deploy_bot' pk=form.instance.pk %}" class="btn btn-warning" role="button">Deploy</a>
-                        {% endif %}
                     </div>
                 </div>
             </form>

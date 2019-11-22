@@ -24,11 +24,12 @@
                 </div>
                 <div class="col text-right">
                     {% if object.active %}
-                        <a href="{% url 'deactivate_bot' pk=object.pk %}" class="btn btn-danger" role="button">Deactivate</a>
+                        <a href="{% url 'deactivate_bot' pk=object.pk %}" class="btn btn-danger" role="button" id="deactivate-button" data-toggle="tooltip" data-placement="bottom" title="Deactivate this Bot">Deactivate</a>
                     {% else %}
-                        <a href="{% url 'activate_bot' pk=object.pk %}" class="btn btn-success" role="button">Activate</a>
+                        <a href="{% url 'activate_bot' pk=object.pk %}" class="btn btn-success" role="button" id="activate-button" data-toggle="tooltip" data-placement="bottom" title="Activate this Bot">Activate</a>
                     {% endif %}
-                    <a href="{% url 'deploy_bot' pk=object.pk %}" class="btn btn-warning" role="button">Deploy</a>
+                    <a href="javascript:update()" class="btn btn-info" role="button" id="update-button" data-toggle="tooltip" data-placement="bottom" title="Update this Bot">Update</a>
+                    <a href="javascript:deploy()" class="btn btn-warning" role="button" id="deploy-button" data-toggle="tooltip" data-placement="bottom" title="Deploy this Bot">Deploy</a>
                 </div>
             </div>
             <div class="row">
@@ -92,6 +93,7 @@
 {% endblock %}
 
 {% block endbodyjs %}
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script type="text/javascript" src="{% static '/channels/js/websocketbridge.js' %}"></script>
     <script>
         $(document).ready(function() {
@@ -167,6 +169,25 @@
     <script>
         const botWebSocketBridge = new channels.WebSocketBridge();
         botWebSocketBridge.connect('/bot/{{ object.pk }}/');
+
+        function deploy() {
+            botWebSocketBridge.send(
+                {
+                    "message_type": "deploy",
+                    "bot": {{ object.pk }}
+                }
+            );
+        }
+
+        function update() {
+            botWebSocketBridge.send(
+                {
+                    "message_type": "update",
+                    "bot": {{ object.pk }}
+                }
+            );
+        }
+
         botWebSocketBridge.listen(function(action, stream) {
             message_type = action['message_type'];
 
@@ -239,6 +260,11 @@
                 $('.logs').append(log_line);
                 var logsDiv = $('.logs')[0];
                 logsDiv.scrollTop = logsDiv.scrollHeight;
+            }
+            if (message_type === "toast_notification") {
+                $('#' + action['target'] + '-button').tooltip('hide');
+                $('#' + action['target'] + '-button').attr('data-original-title', action['text']);
+                $('#' + action['target'] + '-button').tooltip('show');
             }
         });
     </script>

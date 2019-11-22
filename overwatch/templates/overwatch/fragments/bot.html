@@ -3,7 +3,7 @@
 <tr id="{{ bot.pk }}">
     <td class="text-center">
         <a href="{% url 'bot_detail' pk=bot.pk %}" class="bot-link">
-            <img src="{% static 'overwatch/img/svg/gear.svg' %}" class="settings-icon" /> {{ bot.name }}
+            <img src="{% static 'overwatch/img/svg/gear.svg' %}" class="settings-icon" /> <span class="{% if not bot.active %}disabled{% endif %}">{{ bot.name }}</span>
         </a>
     </td>
     <td class="text-center">{{ bot.exchange }}</td>
