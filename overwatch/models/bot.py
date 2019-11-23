@@ -6,6 +6,7 @@ import datetime
 import pygal
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Sum
 from django.template import Template, Context
@@ -16,11 +17,17 @@ from overwatch.utils.price_aggregator import get_price_movement
 from encrypted_model_fields.fields import EncryptedCharField
 
 
+def no_slash(value):
+    if '/' in value:
+        raise ValidationError('Name cannot contain the "/" character')
+
+
 class Bot(models.Model):
     # operational config options
     name = models.CharField(
         max_length=255,
-        help_text='Name to identify this bot. Usually the name of the pair it operates on'
+        help_text='Name to identify this bot. Usually the name of the pair it operates on',
+        validators=[no_slash]
     )
     exchange = models.CharField(
         max_length=255,

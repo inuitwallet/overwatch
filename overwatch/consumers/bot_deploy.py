@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import subprocess
+import time
 from tempfile import mkdtemp
 from venv import create
 
@@ -372,6 +373,8 @@ class BotDeployConsumer(SyncConsumer):
                             Description='Lambda execution role for {}'.format(project_name)
                         )
                         role_arn = role_response['Role']['Arn']
+                        # sleep to allow the role to become active
+                        time.sleep(30)
 
                     iam_client.attach_role_policy(
                         RoleName=project_name,

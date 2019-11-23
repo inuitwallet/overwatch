@@ -35,7 +35,7 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
               'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
               'active', 'exchange_api_key', 'exchange_api_secret', 'base_url', 'vigil_funds_alert_channel_id',
               'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
-    success_message = '%(name)s@%(exchange)s has been updated. Click the Update button to update the lambda function'
+    success_message = '%(name)s@%(exchange)s has been updated. Remember to Deploy or Update the Lambda function'
 
     def get_success_url(self):
         return reverse_lazy('bot_detail', kwargs={'pk': self.object.pk})
@@ -52,7 +52,7 @@ class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
               'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
               'active', 'owner', 'exchange_api_key', 'exchange_api_secret', 'base_url', 'vigil_funds_alert_channel_id',
               'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
-    success_message = '%(name)s@%(exchange)s has been created'
+    success_message = '%(name)s@%(exchange)s has been created. Remember to Deploy the Lambda function'
     success_url = reverse_lazy('index')
 
     def get_form(self, **kwargs):
