@@ -59,7 +59,7 @@
                                         {{ form.name|add_class:"form-control" }}
                                     {% endif %}
                                     <div class="invalid-feedback">
-                                        The bot requires a name
+                                        {{ form.name.errors }}
                                     </div>
                                     {% if form.name.help_text %}
                                         <small class="form-text">{{ form.name.help_text|safe }}</small>
