@@ -1,557 +1,630 @@
 import datetime
-import json
 import math
 import os
+import sys
 import time
 import random
+import ccxt
+import logging
 
 from price_manager import PriceManager
 from vigil import vigil_alert
 from overwatch import Overwatch
-import exchange_wrappers
 
 
-EXCHANGE = os.environ['EXCHANGE']
-wrapper = exchange_wrappers.get_wrapper(EXCHANGE)
+class Bot(object):
+    def __init__(self, name, exchange):
+        # get a decent logger#
+        self.logger = self.setup_logging()
 
-overwatch = Overwatch(
-    api_secret=os.environ['OVERWATCH_API_SECRET'],
-    name=os.environ['BOT_NAME'],
-    exchange=EXCHANGE
-)
+        # set the bot name and exchange
+        self.name = name
+        self.exchange = exchange
 
-SLEEP_SHORT = int(os.environ['SLEEP_SHORT'])
-SLEEP_MEDIUM = int(os.environ['SLEEP_MEDIUM'])
-SLEEP_LONG = int(os.environ['SLEEP_LONG'])
+        # instantiate the Overwatch connection
+        self.overwatch = None
+        self.get_overwatch_wrapper()
 
+        # get the bot config from Overwatch
+        self.config = self.overwatch.get_config()
 
-def reset_order(order_id, pair, order_type, price, reverse, min_order_amount):
-    """
-    Cancel the order given by order_id
-    Place an new order at price
-    """
-    print('Resetting order {}'.format(order_id))
-    # cancel the order
-    success = wrapper.cancel_order(order_id)
+        if not self.config:
+            self.logger.error('Failed to get Overwatch config')
+            sys.exit(1)
 
-    # check we've cancelled the order
-    if not success:
-        print('Unable to cancel order {}'.format(order_id))
-        return
+        # calculate the symbol required by ccxt
+        self.symbol = '{}/{}'.format(self.config.get('quote'), self.config.get('base'))
 
-    time.sleep(SLEEP_SHORT)
+        # instantiate the ccxt wrapper for this bots exchange
+        self.wrapper = None
+        self.market = None
+        self.get_exchange_wrapper()
 
-    jitter = random.triangular(0, pair.get('tolerance')) * price
+        # need to know if the bot is reversed or not
+        self.reverse = False
+        self.calculate_reverse()
 
-    if reverse:
-        jittered_price = (
-            (price + jitter) if order_type == 'buy' else (price - jitter)
+        # set the sleep values
+        self.sleep_short = int(os.environ.get('SLEEP_SHORT', 2))
+        self.sleep_medium = int(os.environ.get('SLEEP_MEDIUM', 3))
+        self.sleep_long = int(os.environ.get('SLEEP_LONG', 5))
+
+        self.logger.info('Working on {}@{}'.format(self.symbol, self.exchange))
+        self.logger.info('{}'.format(datetime.datetime.now()))
+        self.logger.info('Reversed Pair = {}'.format(self.reverse))
+
+        # get the prices
+        self.price = 0
+        self.buy_price = 0
+        self.sell_price = 0
+        self.get_prices()
+
+    @staticmethod
+    def setup_logging():
+        logger = logging.getLogger()
+        for h in logger.handlers:
+            logger.removeHandler(h)
+
+        h = logging.StreamHandler(sys.stdout)
+        h.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+
+        logger.addHandler(h)
+        logger.setLevel(logging.INFO)
+
+        return logger
+
+    def get_exchange_wrapper(self):
+        """
+        Instantiate the CCXT exchange wrapper
+        """
+        wrapper_class = getattr(ccxt, self.exchange.lower())
+        self.wrapper = wrapper_class(
+            {
+                'apiKey': os.environ['API_KEY'],
+                'secret': os.environ['API_SECRET'],
+                'nonce': ccxt.Exchange.milliseconds
+            }
         )
-    else:
-        jittered_price = (
-            (price + jitter) if order_type == 'sell' else (price - jitter)
+        self.market = next(m for m in self.wrapper.fetch_markets() if m.get('symbol') == self.symbol)
+
+    def get_overwatch_wrapper(self):
+        """
+        Instantiate the Overwatch Wrapper
+        """
+        self.overwatch = Overwatch(
+            api_secret=os.environ['OVERWATCH_API_SECRET'],
+            name=self.name,
+            exchange=self.exchange
         )
 
-    amount = pair.get('order_amount') / price if reverse else pair.get('order_amount')
+    def calculate_reverse(self):
+        self.reverse = (self.config.get('quote') == self.config.get('track'))
 
+    def get_prices(self):
+        """
+        Get the current sell and buy prices
+        :return: 
+        """
+        self.logger.info('###########')
+        self.logger.info('Getting Price')
+        market_price = self.wrapper.fetch_ticker(self.symbol).get('last')
 
-    # place the new order
-    place = wrapper.place_order(
-        base=pair.get('base'),
-        quote=pair.get('quote'),
-        order_type=order_type,
-        price=jittered_price,
-        amount=pair.get('order_amount') / price if reverse else pair.get('order_amount')  # noqa
-    )
+        if self.config.get('market_price'):
+            self.logger.info('Using Market Price')
+            price = float(market_price)
+        else:
+            pm = PriceManager(self.config.get('track_url'), self.config.get('peg_url'))
+            price = pm.get_price(self.config.get('track'), self.config.get('peg'), self.reverse)
 
-    if place:
-        overwatch.record_placed_order(
-            pair.get('base'),
-            pair.get('quote'),
-            order_type,
-            jittered_price,
-            pair.get('order_amount') / price if reverse else pair.get('order_amount')  # noqa
+        if price is None:
+            self.logger.warning('No Price Available!')
+            self.cancel_all_orders()
+            self.report_balances(price)
+            return
+
+        self.price = price
+        self.buy_price = float(price) - (float(self.config.get('fee') + self.config.get('bid_spread')) * float(price))
+        self.sell_price = float(price) + (float(self.config.get('fee') + self.config.get('ask_spread')) * float(price))
+
+        self.logger.info('Buy Price set to {:.8f}'.format(self.buy_price))
+        self.logger.info('Sell Price set to {:.8f}'.format(self.sell_price))
+
+        # send prices to Overwatch
+        self.overwatch.record_price(
+            price=price,
+            bid_price=self.buy_price,
+            ask_price=self.sell_price,
+            market_price=market_price
+        )
+        
+    def get_open_orders(self):
+        """
+        get the currently open orders
+        """
+        return self.wrapper.fetch_open_orders(self.symbol)
+
+    def get_base(self) -> str:
+        """
+        return the base currency based on if the bot is reversed or not
+        """
+        return self.config.get('base') if not self.reverse else self.config.get('quote')
+
+    def get_quote(self) -> str:
+        """
+        return the quote currency based on if the bot is reversed or not
+        """
+        return self.config.get('quote') if not self.reverse else self.config.get('base')
+
+    def get_jittered_price(self, price, order_type):
+        """
+        Use the tolerance to calculate a random price +/- the given price
+        """
+        jitter = random.triangular(0, self.config.get('tolerance')) * price
+
+        if self.reverse:
+            jittered_price = (
+                (price + jitter) if order_type == 'buy' else (price - jitter)
+            )
+        else:
+            jittered_price = (
+                (price + jitter) if order_type == 'sell' else (price - jitter)
+            )
+
+        return jittered_price
+
+    def check_amount(self, amount):
+        amount_min = self.market.get('limits', {}).get('amount', {}).get('min')
+        amount_max = self.market.get('limits', {}).get('amount', {}).get('max')
+        
+        if amount_min:
+            if amount < amount_min:
+                self.logger.warning('Minimum order amount not reached: {} < {}'.format(amount, amount_min))
+                return False
+            
+        if amount_max:
+            if amount > amount_max:
+                self.logger.warning('Maximum order amount breached: {} > {}'.format(amount, amount_max))
+                return False
+            
+        return True
+
+    def check_price(self, price):
+        price_min = self.market.get('limits', {}).get('price', {}).get('min')
+        price_max = self.market.get('limits', {}).get('price', {}).get('max')
+
+        if price_min:
+            if price < price_min:
+                self.logger.warning('Minimum order price not reached: {} < {}'.format(price, price_min))
+                return False
+
+        if price_max:
+            if price > price_max:
+                self.logger.warning('Maximum order price breached: {} > {}'.format(price, price_max))
+                return False
+
+        return True
+    
+    def check_cost(self, amount, price):
+        cost = amount * price
+        
+        cost_min = self.market.get('limits', {}).get('cost', {}).get('min')
+        cost_max = self.market.get('limits', {}).get('cost', {}).get('max')
+
+        if cost_min:
+            if cost < cost_min:
+                self.logger.warning('Minimum order cost not reached: {} < {}'.format(cost, cost_min))
+                return False
+
+        if cost_max:
+            if cost > cost_max:
+                self.logger.warning('Maximum order cost breached: {} > {}'.format(cost, cost_max))
+                return False
+
+        return True
+
+    def place_order(self, order_type, price, amount):
+        """
+        place an order based on the order_type
+        """
+        if not self.check_amount(amount):
+            return
+        
+        if not self.check_price(price):
+            return
+
+        if not self.check_cost(amount, price):
+            return
+
+        if order_type == 'buy':
+            place = self.wrapper.create_limit_buy_order(self.symbol, amount, price)
+        else:
+            place = self.wrapper.create_limit_sell_order(self.symbol, amount, price)
+
+        if place:
+            self.overwatch.record_placed_order(
+                self.config.get('base'),
+                self.config.get('quote'),
+                order_type,
+                price,
+                self.config.get('order_amount') / price if self.reverse else self.config.get('order_amount')
+            )
+
+        # TODO: if order placing fails. alert to vigil
+        self.logger.info('Order Placed: {}'.format(place))
+
+    def reset_order(self, order_id, order_type, price):
+        """
+        Cancel the order given by order_id
+        Place an new order at price
+        """
+        self.logger.info('Resetting order {}'.format(order_id))
+
+        # cancel the order
+        success = self.wrapper.cancel_order(order_id)
+
+        # check we've cancelled the order
+        if not success:
+            self.logger.error('Unable to cancel order {}'.format(order_id))
+            return
+
+        time.sleep(self.sleep_short)
+
+        jittered_price = self.get_jittered_price(price, order_type)
+        amount = self.config.get('order_amount') / price if self.reverse else self.config.get('order_amount')
+
+        self.place_order(order_type, jittered_price, amount)
+
+    def get_order_total(self):
+        """
+        Get orders from exchange wrapper.
+        Return the total amount on each side
+        """
+        total = {'sell': 0, 'buy': 0}
+
+        for order in self.get_open_orders():
+            if order.get('side') == 'buy':
+                total['buy'] += order.get('amount')
+            else:
+                total['sell'] += order.get('amount')
+
+        return total
+
+    def get_available_balance(self, currency):
+        """
+        Return the available balance for the given currency
+        """
+        balances = self.wrapper.fetch_balance()
+
+        for cur in balances:
+            if cur == currency.upper():
+                return balances.get(cur).get('free', 0.0)
+
+        return 0.0
+
+    def check_existing_orders(self):
+        orders = self.get_open_orders()
+        self.check_existing_side_orders(orders, 'buy', self.buy_price)
+        self.check_existing_side_orders(orders, 'sell', self.sell_price)
+
+    def check_existing_side_orders(self, orders, order_type, price):
+        """
+        Check that existing order prices lie within the pair tolerance
+        """
+        self.logger.info('Checking Existing {} Orders'.format(order_type.title()))
+
+        for order in orders:
+            if order.get('side') != order_type:
+                continue
+
+            self.logger.info(
+                'Checking {} {} order {}'.format(
+                    self.config.get('track'),
+                    order_type.title(),
+                    order.get('id')
+                )
+            )
+
+            order_tolerance = (max(order.get('price'), price) - min(order.get('price'), price)) / price
+
+            self.logger.info('Got an order tolerance of {} against {}'.format(order_tolerance, price))
+
+            # if the order price is outside of the allowed tolerance
+            if order_tolerance > self.config.get('tolerance'):
+                self.reset_order(
+                    order.get('id'),
+                    order_type.lower(),
+                    price
+                )
+                time.sleep(self.sleep_medium)
+
+    def report_balances(self):
+        """
+        Calculate the balances available and on order and report them to Overwatch
+        """
+        self.logger.info('Reporting Balances')
+
+        totals_on_order = self.get_order_total()
+
+        buy_balance = self.get_available_balance(self.get_base())
+        sell_balance = self.get_available_balance(self.get_quote())
+
+        if not self.reverse:
+            buy_balance /= float(self.price)
+
+        if self.reverse:
+            sell_balance *= float(self.price)
+
+            # totals on order will be in quote currency
+            for side in totals_on_order:
+                totals_on_order[side] *= float(self.price)
+
+        self.overwatch.record_balances(
+            unit=self.config.get('quote'),
+            bid_available=buy_balance,
+            ask_available=sell_balance,
+            bid_on_order=totals_on_order['buy'],
+            ask_on_order=totals_on_order['sell']
         )
 
-    # TODO: if order placing fails. alert to vigil
+    def check_total_is_reached(self):
+        self.check_side_total_is_reached('buy', self.config['total_bid'], self.buy_price)
+        self.check_side_total_is_reached('sell', self.config['total_ask'], self.sell_price)
 
-    print('Order Placed: {}'.format(place))
+    def check_side_total_is_reached(self, side, side_total, price):
+        """
+        Check that the combined amount on order is equal to or more than the target
+        If the combined amount comes up short,
+        place a number of orders to reach the target.
+        (We don't worry too much if the target isn't reached completely,
+        the bot should place the missing order in 60 seconds time.
+        We also don't worry if the target is slightly over)
+        """
+        self.logger.info('Checking {} Wall Height'.format(side.title()))
 
+        total = self.get_order_total()[side]
 
-def get_order_total(base, quote):
-    """
-    Get orders from exchange wrapper.
-    Return the total amount on each side
-    """
-    orders = wrapper.get_open_orders(base, quote)
+        target = (side_total / price) if self.reverse else side_total
+        step = (
+            (self.config.get('order_amount') / price)
+            if self.reverse else
+            self.config.get('order_amount')
+        )
 
-    if orders is None:
-        return {'ask': None, 'bid': None}
+        # TODO - Calculate Total and Target in terms of the currency they refer to
 
-    total = {'ask': 0, 'bid': 0}
-
-    for order in orders['ask']:
-        if total['ask'] is None:
-            total['ask'] = order.get('amount')
-            continue
-        total['ask'] += order.get('amount')
-
-    for order in orders['bid']:
-        if total['bid'] is None:
-            total['bid'] = order.get('amount')
-            continue
-        total['bid'] += order.get('amount')
-
-    return total
-
-
-def check_existing_orders(orders, pair, order_type, price, reverse, min_order_amount):
-    """
-    Check that existing order prices lie within the pair tolerance
-    """
-    print('')
-    print('###########')
-    print('#  Checking Existing {} Orders'.format(order_type.title()))
-    print('')
-
-    for order in orders:
-        print(
-            'Checking {} {} order {}'.format(
-                pair.get('track'),
-                order_type.title(),
-                order
+        self.logger.info(
+            '{}: Total = {}, Target = {}, step = {}'.format(
+                side.title(),
+                total,
+                target,
+                step
             )
         )
 
-        order_tolerance = (
-            max(order.get('price'), price) - min(order.get('price'), price)
-        ) / price
+        if total < target:
+            # calculate the difference between current total and the target
+            difference = target - total
+            # get the balance Available
+            check_currency = self.config.get('base') if side == 'buy' else self.config.get('quote')
+            balance = self.get_available_balance(check_currency)
 
-        print('Got order tolerance of {} against {}'.format(
-            order_tolerance,
+            if side == 'buy' and not self.reverse:
+                balance /= float(price)
+
+            if side == 'sell' and self.reverse:
+                balance *= float(price)
+
+            self.logger.info('Got available balance of {}'.format(balance))
+
+            # we can only place orders up to the value of 'balance'
+            if balance < difference:
+                # then warn
+                self.logger.warning('Not enough funds available to reach target')
+                self.logger.warning(
+                    'Need {} to reach target of {} '
+                    'but only {:.4f} available'.format(
+                        difference,
+                        target,
+                        balance
+                    )
+                )
+                vigil_alert(
+                    alert_channel_id=os.environ['VIGIL_FUNDS_ALERT_CHANNEL_ID'],
+                    data={
+                        'bot_name': self.name,
+                        'currency': self.config.get('base') if side == 'buy' else self.config.get('quote'),
+                        'exchange': self.exchange.title(),
+                        'target_amount': target,
+                        'amount_on_order': total,
+                        'amount_available': balance
+                    }
+                )
+                # set difference to == balance
+                difference = balance
+
+            # calculate the number of orders we need to make the total
+            # use balance instead of step amount if not enough is available
+            if balance < step:
+                self.logger.warning('Not enough funds to place an order')
+                # setting step to balance exactly can cause api errors
+                step = balance * 0.9
+
+            number_of_orders = 0
+
+            if step > 0:
+                number_of_orders = math.ceil(difference/step)
+
+            # place the orders needed
+            if number_of_orders > 0:
+                self.logger.info('Placing {} orders to reach {} target {} from {}'.format(
+                    number_of_orders,
+                    side,
+                    target,
+                    total
+                ))
+                for x in range(number_of_orders):
+                    jittered_price = self.get_jittered_price(price, side)
+                    self.place_order(side, jittered_price, step)
+                    time.sleep(self.sleep_short)
+
+    def check_order_prices(self):
+        orders = self.get_open_orders()
+        self.check_order_side_prices(orders, 'buy', self.buy_price)
+        self.check_order_side_prices(orders, 'sell', self.sell_price)
+
+    def check_order_side_prices(self, orders, side, price):
+        """
+        For each order, check that the price it is placed at is correct.
+        Cancel the order if it isn't
+        """
+        self.logger.info('Checking Existing {} Order Prices Against {} price {:.8f}'.format(
+            side.title(),
+            'sell' if side == 'buy' else 'buy',
             price
         ))
 
-        # if the order price is outside of the allowed tolerance
-        if order_tolerance > pair.get('tolerance'):
-            reset_order(
-                order.get('id'),
-                pair,
-                order_type.lower(),
-                price,
-                reverse,
-                min_order_amount
-            )
-            time.sleep(SLEEP_MEDIUM)
+        for order in orders:
+            if order.get('side') != side:
+                continue
 
+            if side == 'buy':
+                cancel = float(order['price']) > price
+            else:
+                cancel = float(order['price']) < price
 
-def report_balances(pair, price, reverse):
-    """
-    Calculate the balances available and on order and report them to Overwatch
-    """
-    print('')
-    print('###########')
-    print('#  Reporting Balances')
-    print('')
-
-    totals_on_order = get_order_total(pair.get('base'), pair.get('quote'))
-
-    if totals_on_order is None:
-        print('failed to get totals on order when reporting balances')
-        return
-
-    bid_balance = wrapper.get_balance(pair.get('base'))
-
-    if bid_balance is None:
-        print('Failed to get bid_balance for {}'.format(pair.get('base')))
-        bid_balance = 0
-
-    bid_balance = float(bid_balance)
-
-    ask_balance = wrapper.get_balance(pair.get('quote'))
-
-    if ask_balance is None:
-        print('Failed to get ask_balance for {}'.format(pair.get('quote')))
-        ask_balance = 0
-
-    ask_balance = float(ask_balance)
-
-    # we should convert other currency to Nu currency for display
-    if not reverse:
-        # base currency is non-Nu
-        bid_balance /= float(price)
-
-    if reverse:
-        # quote currency is non-Nu
-        ask_balance *= float(price)
-        # totals on order will be in quote currency (non-Nu in a reversed pair)
-        for side in totals_on_order:
-            totals_on_order[side] *= float(price)
-
-    overwatch.record_balances(
-        unit=pair.get('quote'),
-        bid_available=bid_balance,
-        ask_available=ask_balance,
-        bid_on_order=totals_on_order['bid'],
-        ask_on_order=totals_on_order['ask']
-    )
-
-def check_total_is_reached(pair, side, side_total, price, reverse, min_order_amount):
-    """
-    Check that the combined amount on order is equal to or more than the target
-    If the combined amount comes up short,
-    place a number of orders to reach the target.
-    (We don't worry too much if the target isn't reached completely,
-    the bot should place the missing order in 60 seconds time.
-    We also don't worry if the target is slightly over)
-    """
-    print('')
-    print('###########')
-    print('#  Checking {} Wall Height'.format(side.title()))
-    print('')
-
-    total = get_order_total(pair.get('base'), pair.get('quote'))[side]
-
-    if total is None:
-        print('failed to get {} total'.format(side))
-        return
-
-    target = (side_total / price) if reverse else side_total
-    step = (
-        (pair.get('order_amount') / price)
-        if reverse else
-        pair.get('order_amount')
-    )
-
-    # TODO - Calculate Total and Target in terms of the currency they refer to
-
-    print(
-        '{}: Total = {}, Target = {}, step = {}'.format(
-            side.title(),
-            total,
-            target,
-            step
-        )
-    )
-
-    if total < target:
-        # calculate the difference between current total and the target
-        difference = target - total
-        # get the balance Available
-        balance = wrapper.get_balance(
-            pair.get('base') if side == 'bid' else pair.get('quote')
-        )
-
-        if balance is None:
-            print(
-                'Failed to get balance for {}'.format(
-                    pair.get('base') if side == 'bid' else pair.get('quote')
+            if cancel:
+                self.logger.info(
+                    'Cancelling {} {} Order {}'.format(
+                        self.config.get('track'),
+                        side.title(),
+                        order
+                    )
                 )
+                self.wrapper.cancel_order(order.get('id'))
+
+    def check_orders_over_target(self):
+        orders = self.get_open_orders()
+        self.check_orders_over_target_side(orders, 'buy', self.config.get('total_bid'), self.buy_price)
+        self.check_orders_over_target_side(orders, 'sell', self.config.get('total_ask'), self.sell_price)
+
+    def check_orders_over_target_side(self, orders, side, side_total, price):
+        """
+        Cancel any orders that take the side total to greater than the target
+        """
+        self.logger.info('Checking For {} Orders Over Target'.format(side.title()))
+
+        total = self.get_order_total()[side]
+
+        target = (
+            (side_total + self.config.get('order_amount')) / price
+            if self.reverse else
+            side_total + self.config.get('order_amount')
+        )
+        order_amount = (
+            self.config.get('order_amount') / price
+            if self.reverse else
+            self.config.get('order_amount')
+        )
+
+        self.logger.info('{}: Total = {}, Target = {}'.format(side.title(), total, target))
+
+        if total > target:
+            # total on side is too high so remove bottom orders
+            difference = total - target
+            num = math.floor(difference / order_amount )
+            self.logger.info('Got Diff of {}. Removing {} orders'.format(difference, num))
+
+            remove_orders = sorted(
+                [o for o in orders if o.get('side') == side],
+                key=lambda x: x['price'],
+                reverse=(side == 'sell')
             )
+
+            self.logger.info('Remove {} Orders'.format(len(remove_orders[:num])))
+
+            for order in remove_orders[:num]:
+                self.logger.info(
+                    'Cancelling {} {} Order {}'.format(
+                        self.config.get('track'),
+                        side.title(),
+                        order.get('id')
+                    )
+                )
+                self.wrapper.cancel_order(order.get('id'))
+
+    def cancel_all_orders(self):
+        """
+        In an emergency, cancel all the orders
+        """
+        for order in self.wrapper.fetch_open_orders(self.symbol):
+            self.wrapper.cancel_order(order.get('id'))
+            time.sleep(self.sleep_short)
+
+    def get_trades(self):
+        """
+        Get any new trades and report them to Overwatch
+        """
+        self.logger.info('Getting Trades')
+
+        last_trade_id = self.overwatch.get_last_trade_id()
+
+        for trade in self.wrapper.fetch_my_trades(self.symbol):
+            if trade.get('id') == last_trade_id:
+                break
+
+            self.overwatch.record_trade(
+                trade.get('datetime'),
+                trade.get('id'),
+                trade.get('side'),
+                trade.get('price'),
+                trade.get('amount'),
+                trade.get('cost'),
+                0
+            )
+
+    def run(self):
+        start_time = time.time()
+
+        if self.config.get('stop'):
+            # we should cancel all the orders
+            self.logger.warning('STOP SIGNAL RECEIVED')
+            self.cancel_all_orders()
             return
 
-        balance = float(balance)
+        # cancel orders with prices which overlap the calculated price
+        self.check_order_prices()
+        time.sleep(self.sleep_short)
 
-        # calculate non Nu balance as Nu value using price
-        if side == 'bid' and not reverse:
-            balance /= float(price)
+        # cancel orders placed over side target
+        self.check_orders_over_target()
+        time.sleep(self.sleep_short)
 
-        if side == 'ask' and reverse:
-            balance *= float(price)
+        # check that existing orders are placed within the price tolerance
+        self.check_existing_orders()
+        time.sleep(self.sleep_short)
 
-        print('Got available balance of {}'.format(balance))
+        # check that side targets are reached
+        self.check_total_is_reached()
+        time.sleep(self.sleep_short)
 
-        # send alerts if balance is insufficient
-        if balance < difference:
-            print('!!! Not enough funds available to reach target !!!')
-            print(
-                '!!! Need {} to reach target of {} '
-                'but only {:.4f} available !!!'.format(
-                    difference,
-                    target,
-                    balance
-                )
-            )
-            vigil_alert(
-                alert_channel_id=os.environ['VIGIL_FUNDS_ALERT_CHANNEL_ID'],
-                data={
-                    'bot_name': os.environ['BOT_NAME'],
-                    'currency': pair.get('base') if side == 'bid' else pair.get('quote'),
-                    'exchange': EXCHANGE.title(),
-                    'target_amount': target,
-                    'amount_on_order': total,
-                    'amount_available': balance
-                }
-            )
-            # set difference to == balance
-            difference = balance
+        # report balances to Overwatch
+        self.report_balances()
+        time.sleep(self.sleep_long)
 
-        # calculate the number of orders we need to make the total
-        # use balance instead of step amount if not enough is available
-        if balance < step:
-            print('!!! Not enough funds to place an order !!!')
-            step = balance * 0.9
+        # report new trades to Overwatch
+        self.get_trades()
 
-        number_of_orders = 0
-
-        if step < min_order_amount:
-            print('!!! Minimum Order Amount not Reached !!!')
-            print('{} < {}'.format(step, min_order_amount))
-            return
-
-        if step > 0:
-            number_of_orders = math.ceil(difference/step)
-
-        # place the orders needed
-        if number_of_orders > 0:
-            print('Placing {} orders to reach {} target {} from {}'.format(
-                number_of_orders,
-                side,
-                target,
-                total
-            ))
-            for x in range(number_of_orders):
-
-                # Add some jitter to the order
-                jitter = random.triangular(0, pair.get('tolerance')) * float(price)
-
-                if reverse:
-                    jittered_price = (
-                        (price + jitter) if side == 'bid' else (price - jitter)
-                    )
-                else:
-                    jittered_price = (
-                        (price + jitter) if side == 'ask' else (price - jitter)
-                    )
-
-                place = wrapper.place_order(
-                    base=pair.get('base'),
-                    quote=pair.get('quote'),
-                    order_type='buy' if side == 'bid' else 'sell',
-                    price=jittered_price,
-                    amount=step
-                )
-
-                if place:
-                    overwatch.record_placed_order(
-                        pair.get('base'),
-                        pair.get('quote'),
-                        'buy' if side == 'bid' else 'sell',
-                        jittered_price,
-                        pair.get('order_amount') / price if reverse else pair.get('order_amount')  # noqa
-                    )
-
-                print('Order Placed: {}'.format(place))
-                time.sleep(SLEEP_SHORT)
-
-
-def check_order_prices(pair, orders, price, side):
-    print('')
-    print('###########')
-    print('#  Checking Existing {} Order Prices Against {} price {:.8f}'.format(
-        side.title(),
-        'Ask' if side == 'bid' else 'Bid',
-        price
-    ))
-    print('')
-
-    for order in orders:
-        if side == 'bid':
-            cancel = order['price'] > price
-        else:
-            cancel = order['price'] < price
-
-        if cancel:
-            print(
-                'Cancelling {} {} Order {}'.format(
-                    pair['track'],
-                    side.title(),
-                    order
-                )
-            )
-            wrapper.cancel_order(order.get('id'))
-
-
-def check_orders_over_target(pair, side, side_total, price, orders, reverse):
-    print('')
-    print('###########')
-    print('#  Checking For {} Orders Over Target'.format(side.title()))
-    print('')
-
-    total = get_order_total(pair.get('base'), pair.get('quote'))[side]
-
-    if total is None:
-        print('failed to get {} total'.format(side))
-        return
-
-    target = (
-        (side_total + pair.get('order_amount')) / price
-        if reverse else
-        side_total + pair.get('order_amount')
-    )
-    order_amount = (
-        pair.get('order_amount') / price
-        if reverse else
-        pair.get('order_amount')
-    )
-
-    print('{}: Total = {}, Target = {}'.format(side.title(), total, target))
-
-    if total > target:
-        # total on side is too high so remove bottom orders
-        difference = total - target
-        num = math.floor(difference / order_amount )
-        print('Got Diff of {}. Removing {} orders'.format(difference, num))
-
-        remove_orders = sorted(
-            orders,
-            key=lambda x: x['price'],
-            reverse=(side == 'ask')
-        )
-
-        print('Remove Orders {}'.format(remove_orders[:num]))
-
-        for order in remove_orders[:num]:
-            print(
-                'Cancelling {} {} Order {}'.format(
-                    pair['track'],
-                    side.title(),
-                    order
-                )
-            )
-            wrapper.cancel_order(order.get('id'))
+        self.logger.info('COMPLETE IN {} Seconds'.format(time.time() - start_time))
 
 
 def main(event, context):
-    start_time = time.time()
-    pair = overwatch.get_config()
+    Bot(
+        os.environ.get('BOT_NAME'),
+        os.environ.get('EXCHANGE'),
+    ).run()
 
-    if pair.get('stop'):
-        print('STOP SIGNAL RECEIVED')
-        wrapper.cancel_all_orders(pair)
-        return
+    return 'Complete'
 
-    print('###########')
-    print('#  Working on {}_{}'.format(pair.get('base'), pair.get('quote')))
-    print('# {}'.format(datetime.datetime.now()))
-    print('###########')
-    # later maths relies on whether the pair is reversed or not
-    reverse = (pair.get('quote') == pair.get('track'))
-    print('Reversed Pair = {}'.format(reverse))
-    # Get price
-    print('###########')
-    print('#  Getting Prices')
 
-    market_price = wrapper.get_last_price(pair)
-
-    if pair.get('market_price'):
-        print('Using Market Price')
-        price = market_price
-    else:
-        pm = PriceManager(pair.get('track_url'), pair.get('peg_url'))
-        price = pm.get_price(pair.get('track'), pair.get('peg'), reverse)
-
-    if price is None:
-        print('No Price Available!')
-        wrapper.cancel_all_orders(pair)
-        report_balances(pair, price, reverse)
-        return
-
-    bid_price = float(price) - (float(pair.get('fee') + pair.get('bid_spread')) * float(price))
-    ask_price = float(price) + (float(pair.get('fee') + pair.get('ask_spread')) * float(price))
-
-    print('Bid Price set to {:.8f}'.format(bid_price))
-    print('Ask Price set to {:.8f}'.format(ask_price))
-
-    # send prices to Overwatch
-    overwatch.record_price(
-        price=price,
-        bid_price=bid_price,
-        ask_price=ask_price,
-        market_price=market_price
-    )
-
-    time.sleep(SLEEP_SHORT)
-
-    # cancel orders with overlapping prices
-    orders = wrapper.get_open_orders(pair.get('base'), pair.get('quote'))
-
-    if orders is None:
-        print('failed to get open orders before checking prices')
-        wrapper.cancel_all_orders(pair)
-        report_balances(pair, price, reverse)
-        return
-
-    check_order_prices(pair, orders['bid'], ask_price, 'bid')
-    check_order_prices(pair, orders['ask'], bid_price, 'ask')
-
-    time.sleep(SLEEP_SHORT)
-
-    # cancel orders placed over side target
-    orders = wrapper.get_open_orders(pair.get('base'), pair.get('quote'))
-
-    if orders is None:
-        print('failed to get open orders before checking breached target')
-        wrapper.cancel_all_orders(pair)
-        report_balances(pair, price, reverse)
-        return
-
-    check_orders_over_target(pair, 'bid', pair.get('total_bid'), bid_price, orders['bid'], reverse)  # noqa
-    check_orders_over_target(pair, 'ask', pair.get('total_ask'), ask_price, orders['ask'], reverse)  # noqa
-
-    time.sleep(SLEEP_SHORT)
-
-    # check that existing orders are placed within the pair price tolerance
-    orders = wrapper.get_open_orders(pair.get('base'), pair.get('quote'))
-
-    if orders is None:
-        print('failed to get open orders before checking existing orders')
-        wrapper.cancel_all_orders(pair)
-        report_balances(pair, price, reverse)
-        return
-
-    # get the minimum order amount
-    min_order_amount = wrapper.get_min_trade_size(pair.get('base'), pair.get('quote'))
-
-    check_existing_orders(orders['bid'], pair, 'buy', bid_price, reverse, min_order_amount)
-    check_existing_orders(orders['ask'], pair, 'sell', ask_price, reverse, min_order_amount)
-
-    time.sleep(SLEEP_SHORT)
-
-    # check that side targets are reached
-    check_total_is_reached(pair, 'bid', pair.get('total_bid'), bid_price, reverse, min_order_amount)  # noqa
-    check_total_is_reached(pair, 'ask', pair.get('total_ask'), ask_price, reverse, min_order_amount)  # noqa
-
-    print('')
-
-    # report balances to Overwatch
-    report_balances(pair, price, reverse)
-
-    time.sleep(SLEEP_LONG)
-
-    print('###########')
-    print('#  Getting Trades')
-
-    last_trade_id = overwatch.get_last_trade_id()
-
-    for trade in wrapper.get_trades(pair):
-        if trade.get('trade_id') == last_trade_id:
-            break
-
-        overwatch.record_trade(
-            trade.get('trade_time'),
-            trade.get('trade_id'),
-            trade.get('trade_type'),
-            trade.get('price'),
-            trade.get('amount'),
-            trade.get('total'),
-            trade.get('age')
-        )
-
-    print('')
-    print('###########')
-    print(' COMPLETE IN {} Seconds'.format(time.time() - start_time))
-    print('{}'.format(datetime.datetime.now()))
-    print('###########')
-
-    return 'All Done'
+if __name__ == '__main__':
+    main(None, None)

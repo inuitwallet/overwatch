@@ -1,5 +1,7 @@
 import hashlib
 import hmac
+import logging
+import sys
 import time
 import uuid
 
@@ -11,6 +13,21 @@ class Overwatch(object):
         self.api_secret = api_secret
         self.name = name
         self.exchange = exchange
+        self.logger = self.setup_logging()
+
+    @staticmethod
+    def setup_logging():
+        logger = logging.getLogger()
+        for h in logger.handlers:
+            logger.removeHandler(h)
+
+        h = logging.StreamHandler(sys.stdout)
+        h.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+
+        logger.addHandler(h)
+        logger.setLevel(logging.INFO)
+
+        return logger
 
     def generate_hash(self):
         nonce = int(time.time() * 1000)
@@ -25,20 +42,19 @@ class Overwatch(object):
             hashlib.sha256
         ).hexdigest()
 
-    @staticmethod
-    def handle_response(r):
+    def handle_response(self, r):
         if r.status_code != requests.codes.ok:
-            print('overwatch gave a bad response code: {}'.format(r.status_code))
+            self.logger.error('overwatch gave a bad response code: {}'.format(r.status_code))
             return False
 
         try:
             response = r.json()
         except ValueError:
-            print('overwatch did not return valid JSON: {}'.format(r.text))
+            self.logger.error('overwatch did not return valid JSON: {}'.format(r.text))
             return False
 
         if not response.get('success', True):
-            print('overwatch reported a failure: {}'.format(response))
+            self.logger.error('overwatch reported a failure: {}'.format(response))
             return False
 
         return response
@@ -58,7 +74,7 @@ class Overwatch(object):
         )
 
         if not config:
-            print('unable to get config for {}@{}'.format(self.name, self.exchange))
+            self.logger.error('unable to get config for {}@{}'.format(self.name, self.exchange))
             return False
 
         return config
