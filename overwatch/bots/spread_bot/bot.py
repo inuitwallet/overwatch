@@ -496,9 +496,9 @@ class Bot(object):
                 continue
 
             if side == 'buy':
-                cancel = float(order['price']) > price
+                cancel = (float(order['price']) > price) if not self.reverse else (float(order['price']) < price)
             else:
-                cancel = float(order['price']) < price
+                cancel = (float(order['price']) < price) if not self.reverse else (float(order['price']) > price)
 
             if cancel:
                 self.logger.info(
