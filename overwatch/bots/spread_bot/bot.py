@@ -332,7 +332,10 @@ class Bot(object):
                 )
             )
 
-            order_tolerance = (max(order.get('price'), price) - min(order.get('price'), price)) / price
+            if self.reverse:
+                order_tolerance = (min(order.get('price'), price) - max(order.get('price'), price)) / price
+            else:
+                order_tolerance = (max(order.get('price'), price) - min(order.get('price'), price)) / price
 
             self.logger.info('Got an order tolerance of {} against {}'.format(order_tolerance, price))
 
