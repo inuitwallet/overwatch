@@ -236,9 +236,17 @@ class Bot(object):
             return
 
         if order_type == 'buy':
-            place = self.wrapper.create_limit_buy_order(self.symbol, amount, price)
+            try:
+                place = self.wrapper.create_limit_buy_order(self.symbol, amount, price)
+            except Exception as e:
+                self.logger.error('Placing limit buy order failed: {}'.format(e))
+                return
         else:
-            place = self.wrapper.create_limit_sell_order(self.symbol, amount, price)
+            try:
+                place = self.wrapper.create_limit_sell_order(self.symbol, amount, price)
+            except Exception as e:
+                self.logger.error('Placing limit sell order failed: {}'.format(e))
+                return
 
         if place:
             self.overwatch.record_placed_order(
@@ -445,7 +453,7 @@ class Bot(object):
             # calculate the number of orders we need to make the total
             # use balance instead of step amount if not enough is available
             if balance < step:
-                self.logger.warning('Not enough funds to place an order')
+                self.logger.warning('Not enough funds to place a full order. Attempting to place available balance')
                 # setting step to balance exactly can cause api errors
                 step = balance * 0.9
 
@@ -564,6 +572,10 @@ class Bot(object):
         """
         Get any new trades and report them to Overwatch
         """
+        if not self.wrapper.has['fetchMyTrades']:
+            self.logger.warning('fetchMyTrades is not implemented on this exchange')
+            return
+
         self.logger.info('Getting Trades')
 
         last_trade_id = self.overwatch.get_last_trade_id()

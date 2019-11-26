@@ -6,8 +6,22 @@ from overwatch.models import Bot
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-e',
+            '--exchange',
+            help='Exchange to restrict bots to',
+            dest='exchange',
+            default=None
+        )
+
     def handle(self, *args, **options):
-        for bot in Bot.objects.all():
+        if options['exchange']:
+            bots = Bot.objects.filter(exchange__iequals=options['exchange'])
+        else:
+            bots = Bot.objects.all()
+
+        for bot in bots:
             async_to_sync(get_channel_layer().send)(
                 'bot-deploy',
                 {
