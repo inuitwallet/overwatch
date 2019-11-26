@@ -258,7 +258,7 @@ class Bot(object):
             )
 
         # TODO: if order placing fails. alert to vigil
-        self.logger.info('Order Placed: {}'.format(place))
+        self.logger.info('Order Placed: {}'.format(place.get('id')))
 
     def reset_order(self, order_id, order_type, price):
         """
@@ -502,10 +502,11 @@ class Bot(object):
 
             if cancel:
                 self.logger.info(
-                    'Cancelling {} {} Order {}'.format(
+                    'Cancelling {} {} Order {} @ {}'.format(
                         self.config.get('track'),
                         side.title(),
-                        order
+                        order['id'],
+                        order['price']
                     )
                 )
                 self.wrapper.cancel_order(order.get('id'))
