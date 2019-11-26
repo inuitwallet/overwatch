@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['exchange']:
-            bots = Bot.objects.filter(exchange__iequals=options['exchange'])
+            bots = Bot.objects.filter(exchange__iexact=options['exchange'])
         else:
             bots = Bot.objects.all()
 
