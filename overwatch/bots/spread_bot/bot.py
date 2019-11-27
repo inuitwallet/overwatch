@@ -586,7 +586,7 @@ class Bot(object):
 
         last_trade_id = self.overwatch.get_last_trade_id()
 
-        for trade in self.wrapper.fetch_my_trades(self.symbol):
+        for trade in sorted(self.wrapper.fetch_my_trades(self.symbol), key=lambda x: x['datetime'], reverse=True):
             if trade.get('id') == last_trade_id:
                 break
 
