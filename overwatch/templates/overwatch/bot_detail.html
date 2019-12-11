@@ -7,7 +7,7 @@
 {% load static %}
 
 {% block title %}
-    {{ bot.name }}@{{ bot.exchange }}
+    {{ bot.name }}@{{ bot.exchange.get_exchange_display }}
 {% endblock %}
 
 {% block content %}
