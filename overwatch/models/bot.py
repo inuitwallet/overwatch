@@ -354,8 +354,8 @@ class Bot(models.Model):
             dp = str(4)
             currency = 'USD'
         else:
-            dp = str(self.quote_decimal_places)
-            currency = self.quote
+            dp = str(self.base_decimal_places)
+            currency = self.base
 
         if on_order:
             if usd:
