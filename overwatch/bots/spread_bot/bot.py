@@ -32,8 +32,7 @@ class Bot(object):
             self.logger.error('Failed to get Overwatch config')
             sys.exit(1)
 
-        # calculate the symbol required by ccxt
-        self.symbol = '{}/{}'.format(self.config.get('quote'), self.config.get('base'))
+        self.symbol = self.config.get('market')
 
         # instantiate the ccxt wrapper for this bots exchange
         self.wrapper = None
