@@ -7,7 +7,7 @@
 {% load static %}
 
 {% block title %}
-    {{ object.name }}@{{ object.exchange }}
+    {{ bot.name }}@{{ bot.exchange }}
 {% endblock %}
 
 {% block content %}
@@ -20,13 +20,13 @@
         <div class="col-10">
             <div class="row">
                 <div class="col">
-                    <h1>The "{{ object.name }}@{{ object.exchange }}" Bot</h1>
+                    <h1>The "{{ bot.name }}@{{ bot.exchange_account.get_exchange_display }}" Bot</h1>
                 </div>
                 <div class="col text-right">
-                    {% if object.active %}
-                        <a href="{% url 'deactivate_bot' pk=object.pk %}" class="btn btn-danger" role="button" id="deactivate-button" data-toggle="tooltip" data-placement="bottom" title="Deactivate this Bot">Deactivate</a>
+                    {% if bot.active %}
+                        <a href="{% url 'deactivate_bot' pk=bot.pk %}" class="btn btn-danger" role="button" id="deactivate-button" data-toggle="tooltip" data-placement="bottom" title="Deactivate this Bot">Deactivate</a>
                     {% else %}
-                        <a href="{% url 'activate_bot' pk=object.pk %}" class="btn btn-success" role="button" id="activate-button" data-toggle="tooltip" data-placement="bottom" title="Activate this Bot">Activate</a>
+                        <a href="{% url 'activate_bot' pk=bot.pk %}" class="btn btn-success" role="button" id="activate-button" data-toggle="tooltip" data-placement="bottom" title="Activate this Bot">Activate</a>
                     {% endif %}
                     <a href="javascript:update()" class="btn btn-info" role="button" id="update-button" data-toggle="tooltip" data-placement="bottom" title="Update this Bot">Update</a>
                     <a href="javascript:deploy()" class="btn btn-warning" role="button" id="deploy-button" data-toggle="tooltip" data-placement="bottom" title="Deploy this Bot">Deploy</a>
@@ -115,7 +115,7 @@
                 {
                     "pagingType": "full",
                     "serverSide": true,
-                    "ajax": "{% url 'bot_error_datatables' pk=object.pk %}",
+                    "ajax": "{% url 'bot_error_datatables' pk=bot.pk %}",
                     "columns": [
                         { "name": "time", width: "20%" },
                         { "name": "title", width: "30%" },
@@ -132,7 +132,7 @@
                 {
                     "pagingType": "full",
                     "serverSide": true,
-                    "ajax": "{% url 'bot_placed_orders_datatables' pk=object.pk %}",
+                    "ajax": "{% url 'bot_placed_orders_datatables' pk=bot.pk %}",
                     "columns": [
                         { "name": "time", width: "20%" },
                         { "name": "order_type", width: "20%" },
@@ -151,7 +151,7 @@
                 {
                     "pagingType": "full",
                     "serverSide": true,
-                    "ajax": "{% url 'bot_trades_datatables' pk=object.pk %}",
+                    "ajax": "{% url 'bot_trades_datatables' pk=bot.pk %}",
                     "columns": [
                         { "name": "time", width: "20%" },
                         { "name": "trade_id", width: "20%" },
@@ -168,13 +168,13 @@
     </script>
     <script>
         const botWebSocketBridge = new channels.WebSocketBridge();
-        botWebSocketBridge.connect('/bot/{{ object.pk }}/');
+        botWebSocketBridge.connect('/bot/{{ bot.pk }}/');
 
         function deploy() {
             botWebSocketBridge.send(
                 {
                     "message_type": "deploy",
-                    "bot": {{ object.pk }}
+                    "bot": {{ bot.pk }}
                 }
             );
         }
@@ -183,7 +183,7 @@
             botWebSocketBridge.send(
                 {
                     "message_type": "update",
-                    "bot": {{ object.pk }}
+                    "bot": {{ bot.pk }}
                 }
             );
         }
