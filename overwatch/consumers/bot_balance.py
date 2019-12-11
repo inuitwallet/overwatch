@@ -30,33 +30,49 @@ class BotBalanceConsumer(SyncConsumer):
         logger.info('Getting usd values for BotBalance: {} {}'.format(bot_balance.pk, bot_balance))
 
         # get the spot price at the time closest to the botbalance
-        price_data = get_price_data(
-            bot_balance.bot.base_price_url,
+        quote_price_data = get_price_data(
+            bot_balance.bot.quote_price_url,
             bot_balance.bot.quote,
             bot_balance.time
         )
 
-        if price_data is None:
-            logger.error('No Price Data')
+        if quote_price_data is None:
+            logger.error('No Quote Price Data')
             return
 
-        price_30_ma = price_data.get('moving_averages', {}).get('30_minute')
+        quote_price_30_ma = quote_price_data.get('moving_averages', {}).get('30_minute')
 
-        if price_30_ma is None:
+        if quote_price_30_ma is None:
+            logger.error('No 30 min MA found')
+            return
+
+        base_price_data = get_price_data(
+            bot_balance.bot.base_price_url,
+            bot_balance.bot.base,
+            bot_balance.time
+        )
+
+        if base_price_data is None:
+            logger.error('No Quote Price Data')
+            return
+
+        base_price_30_ma = base_price_data.get('moving_averages', {}).get('30_minute')
+
+        if base_price_30_ma is None:
             logger.error('No 30 min MA found')
             return
 
         if bot_balance.bid_available is not None:
-            bot_balance.bid_available_usd = bot_balance.bid_available * price_30_ma
+            bot_balance.bid_available_usd = bot_balance.bid_available * base_price_30_ma
 
         if bot_balance.bid_on_order is not None:
-            bot_balance.bid_on_order_usd = bot_balance.bid_on_order * price_30_ma
+            bot_balance.bid_on_order_usd = bot_balance.bid_on_order * base_price_30_ma
 
         if bot_balance.ask_available is not None:
-            bot_balance.ask_available_usd = bot_balance.ask_available * price_30_ma
+            bot_balance.ask_available_usd = bot_balance.ask_available * quote_price_30_ma
 
         if bot_balance.ask_on_order is not None:
-            bot_balance.ask_on_order_usd = bot_balance.ask_on_order * price_30_ma
+            bot_balance.ask_on_order_usd = bot_balance.ask_on_order * quote_price_30_ma
 
         bot_balance.updated = True
 
