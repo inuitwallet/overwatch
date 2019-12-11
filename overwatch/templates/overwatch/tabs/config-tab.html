@@ -3,32 +3,31 @@
 <div class="row tab-content">
     <div class="col">
         <div class="form-group">
-            <label for="base" class="control-label">Base Currency</label>
-            <input id="base" class="form-control" readonly value="{{ object.base }}" />
-            <small>{% model_field_help_text from object.base %}</small>
+            <label for="base" class="control-label">Market</label>
+            <input id="base" class="form-control" readonly value="{{ bot.market }}" />
+            <small>{% model_field_help_text from bot.market %}</small>
+        </div>
+    </div>
+    {% if bot.use_market_price %}
+    <div class="col text-center">
+        <p class="lead">Using market price</p>
+    </div>
+    {% else %}
+    <div class="col">
+        <div class="form-group">
+            <label for="peg-side" class="control-label">Peg Side</label>
+            <input id="peg-side" class="form-control" type="text" readonly value="{{ bot.get_peg_side_display }}" />
+            <small>{% model_field_help_text from bot.peg_side %}</small>
         </div>
     </div>
     <div class="col">
         <div class="form-group">
-            <label for="quote" class="control-label">Quote Currency</label>
-            <input id="quote" class="form-control" type="text" readonly value="{{ object.quote }}" />
-            <small>{% model_field_help_text from object.quote %}</small>
+            <label for="peg-currency" class="control-label">Peg Currency</label>
+            <input id="peg-currency" class="form-control" type="text" readonly value="{{ bot.peg_currency }}" />
+            <small>{% model_field_help_text from bot.peg_currency %}</small>
         </div>
     </div>
-    <div class="col">
-        <div class="form-group">
-            <label for="track" class="control-label">Track Currency</label>
-            <input id="track" class="form-control" type="text" readonly value="{{ object.track }}" />
-            <small>{% model_field_help_text from object.track %}</small>
-        </div>
-    </div>
-    <div class="col">
-        <div class="form-group">
-            <label for="peg" class="control-label">Peg Currency</label>
-            <input id="peg" class="form-control" type="text" readonly value="{{ object.peg }}" />
-            <small>{% model_field_help_text from object.peg %}</small>
-        </div>
-    </div>
+    {% endif %}
 </div>
 <div class="row">
     <div class="col">

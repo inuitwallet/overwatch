@@ -1,3 +1,4 @@
+from .accounts import AWSAccount, ExchangeAccount
 from .bot import (
     ListBotView,
     DetailBotView,
@@ -23,6 +24,8 @@ from .bot_user_api import (
 )
 
 __all__ = [
+    'AWSAccount',
+    'ExchangeAccount',
     'ListBotView',
     'DetailBotView',
     'UpdateBotView',

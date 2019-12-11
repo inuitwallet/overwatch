@@ -29,10 +29,11 @@ class Bot(models.Model):
         help_text='Name to identify this bot. Usually the name of the pair it operates on',
         validators=[no_slash]
     )
-    exchange = models.CharField(
-        max_length=255,
-        help_text='The exchange the bot operates on. '
-                  'Together with the name this forms a unique identifier for this bot'
+    exchange_account = models.ForeignKey(
+        'Exchange',
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text='The exchange account to use',
     )
     owner = models.ForeignKey(
         User,
@@ -42,21 +43,28 @@ class Bot(models.Model):
         default=True,
         db_index=True
     )
-    base = models.CharField(
+    market = models.CharField(
         max_length=255,
-        help_text='The base currency of the pair to operate on'
+        help_text='The Market to operate on',
+        choices=[]
     )
-    quote = models.CharField(
-        max_length=255,
-        help_text='The quote currency of the pair to operate on'
+    use_market_price = models.BooleanField(
+        default=False,
+        db_index=True
     )
-    track = models.CharField(
+    peg_currency = models.CharField(
         max_length=255,
-        help_text='The currency to track. If this is the same as Quote Currency, the bot is "reversed"'
-    )
-    peg = models.CharField(
-        max_length=255,
+        blank=True,
         help_text='The currency to peg to. The value of this currency will be used to calculate the prices the bot uses'
+    )
+    peg_side = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Which side of the market pair the peg applies to',
+        choices=[
+            ('base', 'Base'),
+            ('quote', 'Quote')
+        ]
     )
     tolerance = models.FloatField(
         help_text='How far from the price an order can be before it is cancelled and replaced at the correct price.'
@@ -72,13 +80,13 @@ class Bot(models.Model):
         help_text='The spread to add to the fee on the Sell side'
     )
     order_amount = models.FloatField(
-        help_text='The amount each order should be'
+        help_text='The amount in USD that each order should be'
     )
     total_bid = models.FloatField(
-        help_text='The total amount of funds allowed on the Buy side'
+        help_text='The total amount of funds allowed on the Buy side in USD'
     )
     total_ask = models.FloatField(
-        help_text='The total amount of funds allowed on the Sell side'
+        help_text='The total amount of funds allowed on the Sell side in USD'
     )
     api_secret = models.UUIDField(
         default=uuid.uuid4
@@ -92,19 +100,21 @@ class Bot(models.Model):
     quote_price_url = models.URLField(
         default='https://price-aggregator.crypto-daio.co.uk/price'
     )
-    aws_region = models.CharField(
-        max_length=255,
-        default='eu-west-1'
+    peg_price_url = models.URLField(
+        default='https://price-aggregator.crypto-daio.co.uk/price'
     )
-    market_price = models.BooleanField(
-        default=False,
-        db_index=True
-    )
+
     peg_decimal_places = models.IntegerField(default=6)
     base_decimal_places = models.IntegerField(default=6)
     quote_decimal_places = models.IntegerField(default=6)
 
     # deployment config options
+    aws_account = models.ForeignKey(
+        'AWS',
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text=''
+    )
     bot_type = models.CharField(
         max_length=255,
         choices=settings.BOT_TYPES
@@ -114,36 +124,6 @@ class Bot(models.Model):
         help_text='AWS Cloudwatch logs group name',
         blank=True,
         null=True
-    )
-    aws_access_key = EncryptedCharField(
-        max_length=255,
-        help_text='database encrypted',
-        blank=True,
-        null=True
-    )
-    aws_secret_key = EncryptedCharField(
-        max_length=255,
-        help_text='database encrypted and hidden from display',
-        blank=True,
-        null=True
-    )
-    exchange_api_key = EncryptedCharField(
-        max_length=255,
-        help_text='database encrypted and hidden from display',
-        blank=True,
-        null=True
-    )
-    exchange_api_secret = EncryptedCharField(
-        max_length=255,
-        help_text='database encrypted and hidden from display',
-        blank=True,
-        null=True
-    )
-    base_url = models.URLField(
-        max_length=255,
-        blank=True,
-        null=True,
-        help_text='The base url of the exchange api'
     )
     sleep_long = models.IntegerField(
         default=5
@@ -175,19 +155,19 @@ class Bot(models.Model):
     )
 
     def __str__(self):
-        return '{}@{}'.format(self.name, self.exchange)
+        return '{}@{}'.format(self.name, self.exchange_account.exchange.title() if self.exchange_account else '')
 
     class Meta:
-        ordering = ['name', 'exchange', 'active']
+        ordering = ['name', 'exchange_account__identifier', 'active']
 
     def serialize(self):
         return {
             'name': self.name,
-            'exchange': self.exchange,
-            'base': self.base,
-            'quote': self.quote,
-            'track': self.track,
-            'peg': self.peg,
+            'exchange': self.exchange_account.exchange,
+            'market': self.market,
+            'use_market_price': self.use_market_price,
+            'peg_currency': self.peg_currency,
+            'peg_side': self.peg_side,
             'tolerance': self.tolerance / 100,
             'fee': self.fee / 100,
             'bid_spread': self.bid_spread / 100,
@@ -195,9 +175,9 @@ class Bot(models.Model):
             'order_amount': self.order_amount,
             'total_bid': self.total_bid,
             'total_ask': self.total_ask,
-            'track_url': self.base_price_url,
-            'peg_url': self.quote_price_url,
-            'market_price': self.market_price
+            'base_price_url': self.base_price_url,
+            'quote_price_url': self.quote_price_url,
+            'peg_price_url': self.peg_price_url
         }
 
     def auth(self, supplied_hash, name, exchange, nonce):
@@ -232,6 +212,14 @@ class Bot(models.Model):
         return True, 'authenticated'
 
     @property
+    def base(self):
+        return self.market.split('/')[0] if self.market else None
+
+    @property
+    def quote(self):
+        return self.market.split('/')[1] if self.market else None
+
+    @property
     def latest_heartbeat(self):
         latest_heartbeat = self.botheartbeat_set.first()
 
@@ -256,10 +244,6 @@ class Bot(models.Model):
     @property
     def last_balance(self):
         return self.botbalance_set.first()
-
-    @property
-    def reversed(self):
-        return self.quote == self.track
 
     @property
     def spread(self):
@@ -357,7 +341,7 @@ class Bot(models.Model):
         return render_to_string(
             'overwatch/fragments/bot_list/market-price.html',
             {
-                'market_price': self.market_price,
+                'market_price': self.use_market_price,
                 'market_price_value': market_price_value
             }
         )
@@ -367,8 +351,8 @@ class Bot(models.Model):
             dp = str(4)
             currency = 'USD'
         else:
-            dp = str(self.quote_decimal_places) if self.reversed else str(self.base_decimal_places)
-            currency = self.base if self.reversed else self.quote
+            dp = str(self.base_decimal_places)
+            currency = self.base
 
         if on_order:
             if usd:
@@ -397,8 +381,8 @@ class Bot(models.Model):
             dp = str(4)
             currency = 'USD'
         else:
-            dp = str(self.base_decimal_places) if self.reversed else str(self.quote_decimal_places)
-            currency = self.base if self.reversed else self.quote
+            dp = str(self.quote_decimal_places)
+            currency = self.quote
 
         if on_order:
             if usd:
@@ -493,9 +477,12 @@ class Bot(models.Model):
         chart.x_labels = days
         profits = {'buy': [], 'sell': []}
 
+        if not self.base:
+            return chart.render_data_uri()
+
         movements = get_price_movement(
-            self.quote_price_url if self.reversed else self.base_price_url,
-            self.quote if self.reversed else self.base
+            self.base_price_url,
+            self.base
         )
 
         for side in ['buy', 'sell']:
@@ -559,10 +546,10 @@ class Bot(models.Model):
             next_time = next_time + datetime.timedelta(hours=6)
 
         line = pygal.Line(
-            y_title='Amount in {}'.format(self.base if self.reversed else self.quote),
+            y_title='Amount in {}'.format(self.quote),
             truncate_label=-1,
             legend_at_bottom=True,
-            value_formatter=lambda x: '{} {:.4f}'.format(self.base if self.reversed else self.quote, x),
+            value_formatter=lambda x: '{} {:.4f}'.format(self.quote, x),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
             ),
@@ -570,4 +557,3 @@ class Bot(models.Model):
         line.add("Bid Available", bid_balances, stroke_style={'width': 5}, dot_size=1)
         line.add("Ask Available", ask_balances, stroke_style={'width': 5}, dot_size=1)
         return line.render_data_uri()
-

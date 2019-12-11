@@ -17,6 +17,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
+from django.views.decorators.http import require_POST, require_GET
+
 from . import views
 
 urlpatterns = [
@@ -57,4 +59,8 @@ urlpatterns = [
     path('bot/<int:pk>/deactivate', views.DeactivateBotView.as_view(), name='deactivate_bot'),
     path('bot/<int:pk>/activate', views.ActivateBotView.as_view(), name='activate_bot'),
 
+    path('account/aws/create', require_POST(views.AWSAccount.as_view()), name='aws_account_create'),
+    path('account/aws/delete/<int:pk>', require_GET(views.AWSAccount.as_view()), name='aws_account_delete'),
+    path('account/exchange/create', require_POST(views.ExchangeAccount.as_view()), name='exchange_account_create'),
+    path('account/exchange/delete/<int:pk>', require_GET(views.ExchangeAccount.as_view()), name='exchange_account_delete'),  # noqa
 ]

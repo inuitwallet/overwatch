@@ -1,40 +1,49 @@
-from asgiref.sync import async_to_sync
+import logging
+
 from channels.consumer import SyncConsumer
 
 from overwatch.models import BotBalance
 from overwatch.utils.price_aggregator import get_price_data
 
+logger = logging.getLogger(__name__)
+
 
 class BotBalanceConsumer(SyncConsumer):
-    def calculate_usd_values(self, message):
+    @staticmethod
+    def calculate_usd_values(message):
         """
         This method is called when a bot_balance is saved.
         It fetches the price closest to the time recorded for the bot_balance and updates the bot_balance instance
         """
+        logger.info('Trying to get usd values for BotBalance {}'.format(message.get('bot_balance')))
+
         try:
             bot_balance = BotBalance.objects.get(pk=message.get('bot_balance'))
         except BotBalance.DoesNotExist:
+            logger.error('No BotBalance object found')
             return
 
         if bot_balance.updated:
+            logger.warning('BotBalance already updated')
             return
 
-        print('Getting usd values for BotBalance: {} {}'.format(bot_balance.pk, bot_balance))
-
-        # which currency to use?
-        # we use quote if the bot is standard or base if it is reversed
-        currency = bot_balance.bot.base if bot_balance.bot.reversed else bot_balance.bot.quote
-        url = bot_balance.bot.quote_price_url if bot_balance.bot.reversed else bot_balance.bot.base_price_url
+        logger.info('Getting usd values for BotBalance: {} {}'.format(bot_balance.pk, bot_balance))
 
         # get the spot price at the time closest to the botbalance
-        price_data = get_price_data(url, currency, bot_balance.time)
+        price_data = get_price_data(
+            bot_balance.bot.base_price_url,
+            bot_balance.bot.quote,
+            bot_balance.time
+        )
 
         if price_data is None:
+            logger.error('No Price Data')
             return
 
         price_30_ma = price_data.get('moving_averages', {}).get('30_minute')
 
         if price_30_ma is None:
+            logger.error('No 30 min MA found')
             return
 
         if bot_balance.bid_available is not None:
@@ -53,16 +62,4 @@ class BotBalanceConsumer(SyncConsumer):
 
         bot_balance.save()
 
-        print('updated bot_balance')
-
-        # we should scan any other prices that happen to be missing usd prices
-        # for bad_bot_balance in BotBalance.objects.filter(updated=False):
-        #     async_to_sync(self.channel_layer.send)(
-        #         'bot-balance',
-        #         {
-        #             "type": "calculate.usd.values",
-        #             "bot_balance": bad_bot_balance.pk,
-        #         },
-        #     )
-
-
+        logger.info('updated bot_balance')

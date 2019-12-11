@@ -5,7 +5,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from channels.layers import get_channel_layer
 from django.template.loader import render_to_string
 
-from overwatch.models import Bot, BotPlacedOrder, BotTrade
+from overwatch.models import Bot
 
 
 class BotConsumer(JsonWebsocketConsumer):

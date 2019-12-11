@@ -40,10 +40,6 @@ class Bot(object):
         self.market = None
         self.get_exchange_wrapper()
 
-        # need to know if the bot is reversed or not
-        self.reverse = False
-        self.calculate_reverse()
-
         # set the sleep values
         self.sleep_short = int(os.environ.get('SLEEP_SHORT', 2))
         self.sleep_medium = int(os.environ.get('SLEEP_MEDIUM', 3))
@@ -51,13 +47,21 @@ class Bot(object):
 
         self.logger.info('Working on {}@{}'.format(self.symbol, self.exchange))
         self.logger.info('{}'.format(datetime.datetime.now()))
-        self.logger.info('Reversed Pair = {}'.format(self.reverse))
 
         # get the prices
         self.price = 0
         self.buy_price = 0
         self.sell_price = 0
+        self.quote_price = None
+        self.base_price = None
+        self.peg_price = None
         self.get_prices()
+
+        # calculate the limits in base currency
+        self.order_amount = 0
+        self.total_bid = 0
+        self.total_ask = 0
+        self.get_limits()
 
     @staticmethod
     def setup_logging():
@@ -97,9 +101,6 @@ class Bot(object):
             exchange=self.exchange
         )
 
-    def calculate_reverse(self):
-        self.reverse = (self.config.get('quote') == self.config.get('track'))
-
     def get_prices(self):
         """
         Get the current sell and buy prices
@@ -108,18 +109,68 @@ class Bot(object):
         self.logger.info('###########')
         self.logger.info('Getting Price')
         market_price = self.wrapper.fetch_ticker(self.symbol).get('last')
+        known_config = False
 
-        if self.config.get('market_price'):
+        if self.config.get('use_market_price'):
+            # just opperate using the market price
             self.logger.info('Using Market Price')
             price = float(market_price)
+            known_config = True
         else:
-            pm = PriceManager(self.config.get('track_url'), self.config.get('peg_url'))
-            price = pm.get_price(self.config.get('track'), self.config.get('peg'), self.reverse)
+            # otherwise there are 4 PEG options.
+            # 1. The peg currency is the quote currency: Price = 1/(Quote Price/Base Price)
+            # 2. The peg currency is the base currency: Price = Base Price / Quote Price
+            # 3. The peg currency is neither and the quote is being pegged to it: Price = Base Price / Peg Price
+            # 4. The peg currency is neither and the base is being pegged to it: Price = Peg Price / Quote Price
+            pm = PriceManager()
+            self.quote_price = pm.get_price(self.market.get('quote'), self.config.get('quote_price_url'))
+            self.base_price = pm.get_price(self.market.get('base'), self.config.get('base_price_url'))
+            self.peg_price = pm.get_price(self.config.get('peg_currency').upper(), self.config.get('peg_price_url'))
+
+            price = None
+
+            if self.config.get('peg_currency', 'peg').upper() == self.market.get('quote', 'quote').upper():
+                known_config = True
+                # this is option 1
+
+                if self.quote_price is not None and self.base_price is not None:
+                    price = 1/(self.quote_price/self.base_price)
+
+            if self.config.get('peg_currency', 'peg').upper() == self.market.get('base', 'base').upper():
+                known_config = True
+                # this is option 2
+
+                if self.quote_price is not None and self.base_price is not None:
+                    price = self.base_price / self.quote_price
+
+            if (
+                    self.config.get('peg_currency', '').upper() != self.market.get('base', '').upper()
+                    and self.config.get('peg_currency', '').upper() != self.market.get('quote', '').upper()
+            ):
+                if self.config.get('peg_side', '').lower() == 'quote':
+                    known_config = True
+                    # this is option 3
+
+                    if self.base_price is not None and self.peg_price is not None:
+                        price = self.base_price / self.peg_price
+
+                if self.config.get('peg_side', '').lower() == 'base':
+                    known_config = True
+                    # this is option 4
+
+                    if self.quote_price is not None and self.peg_price is not None:
+                        price = self.peg_price / self.quote_price
+
+        if not known_config:
+            self.logger.warning('Not a known Bot Config!')
+            self.cancel_all_orders()
+            self.report_balances()
+            return
 
         if price is None:
             self.logger.warning('No Price Available!')
             self.cancel_all_orders()
-            self.report_balances(price)
+            self.report_balances()
             return
 
         self.price = price
@@ -136,6 +187,15 @@ class Bot(object):
             ask_price=self.sell_price,
             market_price=market_price
         )
+
+    def get_limits(self):
+        """
+        Order amount, Total Ask and total Bid come to the Bot in USD. We need them in 'Base' currency
+        """
+        if self.base_price is not None:
+            self.order_amount = self.config.get('order_amount', 0) / self.base_price
+            self.total_ask = self.config.get('total_ask', 0) / self.base_price
+            self.total_bid = self.config.get('total_bid', 0) / self.base_price
         
     def get_open_orders(self):
         """
@@ -147,30 +207,20 @@ class Bot(object):
         """
         return the base currency based on if the bot is reversed or not
         """
-        return self.config.get('base') if not self.reverse else self.config.get('quote')
+        return self.market.get('base')
 
     def get_quote(self) -> str:
         """
         return the quote currency based on if the bot is reversed or not
         """
-        return self.config.get('quote') if not self.reverse else self.config.get('base')
+        return self.market.get('quote')
 
     def get_jittered_price(self, price, order_type):
         """
         Use the tolerance to calculate a random price +/- the given price
         """
         jitter = random.triangular(0, self.config.get('tolerance')) * price
-
-        if self.reverse:
-            jittered_price = (
-                (price + jitter) if order_type == 'buy' else (price - jitter)
-            )
-        else:
-            jittered_price = (
-                (price + jitter) if order_type == 'sell' else (price - jitter)
-            )
-
-        return jittered_price
+        return (price + jitter) if order_type == 'sell' else (price - jitter)
 
     def check_amount(self, amount):
         amount_min = self.market.get('limits', {}).get('amount', {}).get('min')
@@ -235,26 +285,31 @@ class Bot(object):
         if not self.check_cost(amount, price):
             return
 
+        place = None
+
         if order_type == 'buy':
             try:
-                place = self.wrapper.create_limit_buy_order(self.symbol, amount, price)
+                # place = self.wrapper.create_limit_buy_order(self.symbol, amount, price)
+                self.logger.info('Placing Buy order of {} @ {}'.format(amount, price))
             except Exception as e:
                 self.logger.error('Placing limit buy order failed: {}'.format(e))
                 return
         else:
             try:
-                place = self.wrapper.create_limit_sell_order(self.symbol, amount, price)
+                # place = self.wrapper.create_limit_sell_order(self.symbol, amount, price)
+                self.logger.info('Placing Sell order of {} @ {}'.format(amount, price))
             except Exception as e:
                 self.logger.error('Placing limit sell order failed: {}'.format(e))
                 return
 
         if place:
+            # TODO - order_amount, buy_limit and sell_limit are in USD now. need to convert to base
             self.overwatch.record_placed_order(
                 self.config.get('base'),
                 self.config.get('quote'),
                 order_type,
                 price,
-                self.config.get('order_amount') / price if self.reverse else self.config.get('order_amount')
+                self.order_amount
             )
 
         # TODO: if order placing fails. alert to vigil
@@ -278,7 +333,7 @@ class Bot(object):
         time.sleep(self.sleep_short)
 
         jittered_price = self.get_jittered_price(price, order_type)
-        amount = self.config.get('order_amount') / price if self.reverse else self.config.get('order_amount')
+        amount = self.order_amount
 
         self.place_order(order_type, jittered_price, amount)
 
@@ -361,18 +416,8 @@ class Bot(object):
         buy_balance = self.get_available_balance(self.get_base())
         sell_balance = self.get_available_balance(self.get_quote())
 
-        if not self.reverse:
-            buy_balance /= float(self.price)
-
-        if self.reverse:
-            sell_balance *= float(self.price)
-
-            # totals on order will be in quote currency
-            for side in totals_on_order:
-                totals_on_order[side] *= float(self.price)
-
         self.overwatch.record_balances(
-            unit=self.config.get('quote'),
+            unit=self.get_base(),
             bid_available=buy_balance,
             ask_available=sell_balance,
             bid_on_order=totals_on_order['buy'],
@@ -380,8 +425,8 @@ class Bot(object):
         )
 
     def check_total_is_reached(self):
-        self.check_side_total_is_reached('buy', self.config['total_bid'], self.buy_price)
-        self.check_side_total_is_reached('sell', self.config['total_ask'], self.sell_price)
+        self.check_side_total_is_reached('buy', self.total_bid, self.buy_price)
+        self.check_side_total_is_reached('sell', self.total_ask, self.sell_price)
 
     def check_side_total_is_reached(self, side, side_total, price):
         """
@@ -396,14 +441,8 @@ class Bot(object):
 
         total = self.get_order_total()[side]
 
-        target = (side_total / price) if self.reverse else side_total
-        step = (
-            (self.config.get('order_amount') / price)
-            if self.reverse else
-            self.config.get('order_amount')
-        )
-
-        # TODO - Calculate Total and Target in terms of the currency they refer to
+        target = side_total
+        step = self.order_amount
 
         self.logger.info(
             '{}: Total = {}, Target = {}, step = {}'.format(
@@ -420,12 +459,6 @@ class Bot(object):
             # get the balance Available
             check_currency = self.config.get('base') if side == 'buy' else self.config.get('quote')
             balance = self.get_available_balance(check_currency)
-
-            if side == 'buy' and not self.reverse:
-                balance /= float(price)
-
-            if side == 'sell' and self.reverse:
-                balance *= float(price)
 
             self.logger.info('Got available balance of {}'.format(balance))
 
@@ -501,9 +534,9 @@ class Bot(object):
                 continue
 
             if side == 'buy':
-                cancel = (float(order['price']) > price) if not self.reverse else (float(order['price']) < price)
+                cancel = (float(order['price']) > price)
             else:
-                cancel = (float(order['price']) < price) if not self.reverse else (float(order['price']) > price)
+                cancel = (float(order['price']) < price)
 
             if cancel:
                 self.logger.info(
@@ -518,8 +551,8 @@ class Bot(object):
 
     def check_orders_over_target(self):
         orders = self.get_open_orders()
-        self.check_orders_over_target_side(orders, 'buy', self.config.get('total_bid'), self.buy_price)
-        self.check_orders_over_target_side(orders, 'sell', self.config.get('total_ask'), self.sell_price)
+        self.check_orders_over_target_side(orders, 'buy', self.total_bid, self.buy_price)
+        self.check_orders_over_target_side(orders, 'sell', self.total_ask, self.sell_price)
 
     def check_orders_over_target_side(self, orders, side, side_total, price):
         """
@@ -529,23 +562,14 @@ class Bot(object):
 
         total = self.get_order_total()[side]
 
-        target = (
-            (side_total + self.config.get('order_amount')) / price
-            if self.reverse else
-            side_total + self.config.get('order_amount')
-        )
-        order_amount = (
-            self.config.get('order_amount') / price
-            if self.reverse else
-            self.config.get('order_amount')
-        )
+        target = side_total + self.order_amount
 
         self.logger.info('{}: Total = {}, Target = {}'.format(side.title(), total, target))
 
         if total > target:
             # total on side is too high so remove bottom orders
             difference = total - target
-            num = math.floor(difference / order_amount )
+            num = math.floor(difference / self.order_amount)
             self.logger.info('Got Diff of {}. Removing {} orders'.format(difference, num))
 
             remove_orders = sorted(
@@ -586,7 +610,7 @@ class Bot(object):
 
         last_trade_id = self.overwatch.get_last_trade_id()
 
-        for trade in sorted(self.wrapper.fetch_my_trades(self.symbol), key=lambda x: x['datetime'], reverse=True):
+        for trade in self.wrapper.fetch_my_trades(self.symbol):
             if trade.get('id') == last_trade_id:
                 break
 

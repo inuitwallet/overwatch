@@ -6,7 +6,7 @@
             <img src="{% static 'overwatch/img/svg/gear.svg' %}" class="settings-icon" /> <span class="{% if not bot.active %}disabled{% endif %}">{{ bot.name }}</span>
         </a>
     </td>
-    <td class="text-center">{{ bot.exchange }}</td>
+    <td class="text-center">{{ bot.exchange_account.exchange | title }}</td>
     <td class="market_price text-center"></td>
     <td class="activity text-center"></td>
     <td class="price text-center"></td>

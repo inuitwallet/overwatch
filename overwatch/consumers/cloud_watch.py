@@ -1,4 +1,5 @@
 import datetime
+import logging
 import time
 
 import boto3
@@ -7,6 +8,8 @@ from channels.consumer import SyncConsumer
 from channels.layers import get_channel_layer
 
 from overwatch.models import Bot
+
+logger = logging.getLogger(__name__)
 
 
 class CloudWatchLogsConsumer(SyncConsumer):
@@ -22,7 +25,7 @@ class CloudWatchLogsConsumer(SyncConsumer):
         if 'sleep' in event:
             time.sleep(float(event['sleep']))
 
-        print('getting logs for Bot {}'.format(bot))
+        logger.info('getting logs for Bot {}'.format(bot))
 
         async_to_sync(get_channel_layer().group_send)(
             'cloudwatch_logs_{}'.format(bot.pk),
@@ -33,9 +36,9 @@ class CloudWatchLogsConsumer(SyncConsumer):
 
         logs_client = boto3.client(
             'logs',
-            region_name=bot.aws_region,
-            aws_access_key_id=bot.aws_access_key,
-            aws_secret_access_key=bot.aws_secret_key,
+            region_name=bot.aws_account.region,
+            aws_access_key_id=bot.aws_account.access_key,
+            aws_secret_access_key=bot.aws_account.secret_key,
         )
 
         streams = logs_client.describe_log_streams(

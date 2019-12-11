@@ -1,6 +1,6 @@
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from django.forms import PasswordInput
+from django.forms import PasswordInput, Select
 from django.shortcuts import redirect, get_object_or_404
 from math import ceil
 
@@ -14,14 +14,20 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 
-from overwatch.models import Bot, BotError, BotPlacedOrder, BotTrade
+from overwatch.forms import ExchangeForm, AWSForm
+from overwatch.models import Bot, BotError, BotPlacedOrder, BotTrade, Exchange, AWS
 
 
 class ListBotView(LoginRequiredMixin, ListView):
     model = Bot
 
-    # def get_queryset(self):
-    #     return Bot.objects.filter(active=True)
+    def get_context_data(self, *args, object_list=None, **kwargs):
+        context = super(ListBotView, self).get_context_data(*args, **kwargs)
+        context['exchange_accounts'] = Exchange.objects.filter(owner=self.request.user)
+        context['aws_accounts'] = AWS.objects.filter(owner=self.request.user)
+        context['exchange_form'] = ExchangeForm()
+        context['aws_form'] = AWSForm()
+        return context
 
 
 class DetailBotView(LoginRequiredMixin, DetailView):
@@ -30,29 +36,33 @@ class DetailBotView(LoginRequiredMixin, DetailView):
 
 class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     model = Bot
-    fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
+    fields = ['name', 'exchange_account', 'market', 'use_market_price', 'peg_currency', 'peg_side', 'aws_account',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
-              'active', 'exchange_api_key', 'exchange_api_secret', 'base_url', 'vigil_funds_alert_channel_id',
+              'base_price_url', 'quote_price_url', 'peg_price_url', 'active', 'vigil_funds_alert_channel_id',
               'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
-    success_message = '%(name)s@%(exchange)s has been updated. Remember to Deploy or Update the Lambda function'
 
     def get_success_url(self):
         return reverse_lazy('bot_detail', kwargs={'pk': self.object.pk})
 
+    def get_success_message(self, cleaned_data):
+        return '{}@{} has been updated. Remember to Deploy or Update the Lambda function'.format(
+            self.object.name,
+            self.object.exchange_account.exchange
+        )
+
     def get_form(self, **kwargs):
         form = super(UpdateBotView, self).get_form(kwargs.get('form_class'))
+        form.fields['market'].widget = Select()
         return form
 
 
 class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
     model = Bot
-    fields = ['name', 'exchange', 'base', 'quote', 'track', 'peg',
+    fields = ['name', 'exchange_account', 'market', 'use_market_price', 'peg_currency', 'peg_side', 'aws_account',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'aws_access_key', 'aws_secret_key', 'base_price_url', 'quote_price_url', 'market_price',
-              'active', 'owner', 'exchange_api_key', 'exchange_api_secret', 'base_url', 'vigil_funds_alert_channel_id',
+              'base_price_url', 'quote_price_url', 'peg_price_url', 'active', 'owner', 'vigil_funds_alert_channel_id',
               'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
-    success_message = '%(name)s@%(exchange)s has been created. Remember to Deploy the Lambda function'
+    success_message = '%(name)s@%(exchange_account__exchange)s has been created. Remember to Deploy the Lambda function'
     success_url = reverse_lazy('index')
 
     def get_form(self, **kwargs):
@@ -235,7 +245,7 @@ class BotTradesDataTablesView(LoginRequiredMixin, View):
                         trade.trade_type.title(),
                         round(trade.target_price_usd, 8) if trade.target_price_usd else 'Calculating',
                         round(trade.trade_price_usd, 8) if trade.trade_price_usd else 'Calculating',
-                        trade.total if trade.bot.reversed else trade.amount,
+                        trade.total,
                         round(trade.profit_usd, 2) if trade.profit_usd else 'Calculating'
                     ] for trade in data['data']
                 ]

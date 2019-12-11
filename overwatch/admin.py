@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 # Register your models here.
-from overwatch.models import ApiProfile, Bot, BotHeartBeat, BotError, BotPlacedOrder, BotPrice, BotBalance, BotTrade
+from overwatch.models import ApiProfile, Bot, BotHeartBeat, BotError, BotPlacedOrder, BotPrice, BotBalance, BotTrade, \
+    Exchange, AWS
 
 
 @admin.register(ApiProfile)
@@ -12,8 +13,8 @@ class ApiProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Bot)
 class BotAdmin(admin.ModelAdmin):
-    list_display = ['name', 'exchange', 'api_secret', 'logs_group']
-    list_filter = ['name', 'exchange']
+    list_display = ['name', 'exchange_account', 'api_secret', 'logs_group']
+    list_filter = ['name', 'exchange_account']
 
 
 @admin.register(BotHeartBeat)
@@ -57,3 +58,13 @@ class BotTradeAdmin(admin.ModelAdmin):
     list_editable = ['updated']
     raw_id_fields = ['bot']
     list_filter = ['bot', 'trade_type']
+
+
+@admin.register(Exchange)
+class ExchangeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(AWS)
+class AWSAdmin(admin.ModelAdmin):
+    pass

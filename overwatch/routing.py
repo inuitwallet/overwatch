@@ -10,6 +10,7 @@ application = ProtocolTypeRouter({
     'websocket': AuthMiddlewareStack(
         URLRouter([
             url(r'^bot/(?P<pk>[^/]+)/$', BotConsumer),
+            url(r'^bot_form/(?P<pk>[^/]+)/$', BotFormConsumer),
             url(r'^bot_list/$', BotListConsumer),
         ])
     ),

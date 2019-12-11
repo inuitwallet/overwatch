@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% load widget_tweaks %}
+{% load static %}
 
 {% block title %}
     {% if form.instance.pk is not None %}
@@ -68,68 +69,100 @@
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="{{ form.exchange.id_for_label }}">Exchange</label>
-                                    {% if form.exchange.errors %}
-                                        {{ form.exchange|add_class:"form-control"|add_class:"is-invalid" }}
+                                    <label for="{{ form.exchange_account.id_for_label }}">Exchange Account</label>
+                                    {% if form.exchange_account.errors %}
+                                        {{ form.exchange_account|add_class:"form-control"|add_class:"is-invalid"|attr:"onchange:get_markets()" }}
                                     {% else %}
-                                        {{ form.exchange|add_class:"form-control" }}
+                                        {{ form.exchange_account|add_class:"form-control"|attr:"onchange:get_markets()" }}
                                     {% endif %}
-                                    {% if form.exchange.help_text %}
-                                        <small class="form-text">{{ form.exchange.help_text|safe }}</small>
+                                    <div class="invalid-feedback">
+                                        {{ form.exchange_account.errors }}
+                                    </div>
+                                    {% if form.exchange_account.help_text %}
+                                        <small class="form-text">{{ form.exchange_account.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.market.id_for_label }}">Market</label>
+                                    {% if form.market.errors %}
+                                        {{ form.market|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.market|add_class:"form-control" }}
+                                    {% endif %}
+                                    <div class="invalid-feedback">
+                                        {{ form.market.errors }}
+                                    </div>
+                                    {% if form.market.help_text %}
+                                        <small class="form-text">{{ form.market.help_text|safe }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="{{ form.aws_account.id_for_label }}">AWS Account</label>
+                                    {% if form.aws_account.errors %}
+                                        {{ form.aws_account|add_class:"form-control"|add_class:"is-invalid" }}
+                                    {% else %}
+                                        {{ form.aws_account|add_class:"form-control" }}
+                                    {% endif %}
+                                    <div class="invalid-feedback">
+                                        {{ form.aws_account.errors }}
+                                    </div>
+                                    {% if form.aws_account.help_text %}
+                                        <small class="form-text">{{ form.aws_account.help_text|safe }}</small>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col">
-                                <div class="form-group">
-                                    <label for="{{ form.base.id_for_label }}">Base Currency</label>
-                                    {% if form.base.errors %}
-                                        {{ form.base|add_class:"form-control"|add_class:"is-invalid" }}
+                                <div class="form-check text-center">
+                                    <label for="{{ form.use_market_price.id_for_label }}">Use Market Price</label>
+                                    <br />
+                                    {% if form.use_market_price.errors %}
+                                        {{ form.use_market_price|add_class:"form-check-input"|add_class:"is-invalid"|attr:"onchange:check_using_market_price()" }}
                                     {% else %}
-                                        {{ form.base|add_class:"form-control" }}
+                                        {{ form.use_market_price|add_class:"form-check-input"|attr:"onchange:check_using_market_price()" }}
                                     {% endif %}
-                                    {% if form.base.help_text %}
-                                        <small class="form-text">{{ form.base.help_text|safe }}</small>
+                                    <div class="invalid-feedback">
+                                        {{ form.use_market_price.errors }}
+                                    </div>
+                                    {% if form.use_market_price.help_text %}
+                                        <small class="form-text">{{ form.use_market_price.help_text|safe }}</small>
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="{{ form.quote.id_for_label }}">Quote Currency</label>
-                                    {% if form.quote.errors %}
-                                        {{ form.quote|add_class:"form-control"|add_class:"is-invalid" }}
+                                    <label for="{{ form.peg_currency.id_for_label }}">Peg Currency</label>
+                                    {% if form.peg_currency.errors %}
+                                        {{ form.peg_currency|add_class:"form-control"|add_class:"is-invalid" }}
                                     {% else %}
-                                        {{ form.quote|add_class:"form-control" }}
+                                        {{ form.peg_currency|add_class:"form-control" }}
                                     {% endif %}
-                                    {% if form.quote.help_text %}
-                                        <small class="form-text">{{ form.quote.help_text|safe }}</small>
+                                    <div class="invalid-feedback">
+                                        {{ form.peg_currency.errors }}
+                                    </div>
+                                    {% if form.peg_currency.help_text %}
+                                        <small class="form-text">{{ form.peg_currency.help_text|safe }}</small>
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="{{ form.track.id_for_label }}">Track Currency</label>
-                                    {% if form.track.errors %}
-                                        {{ form.track|add_class:"form-control"|add_class:"is-invalid" }}
+                                    <label for="{{ form.peg_side.id_for_label }}">Peg Side</label>
+                                    {% if form.peg_side.errors %}
+                                        {{ form.peg_side|add_class:"form-control"|add_class:"is-invalid" }}
                                     {% else %}
-                                        {{ form.track|add_class:"form-control" }}
+                                        {{ form.peg_side|add_class:"form-control" }}
                                     {% endif %}
-                                    {% if form.track.help_text %}
-                                        <small class="form-text">{{ form.track.help_text|safe }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="{{ form.peg.id_for_label }}">Peg Currency</label>
-                                    {% if form.peg.errors %}
-                                        {{ form.peg|add_class:"form-control"|add_class:"is-invalid" }}
-                                    {% else %}
-                                        {{ form.peg|add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if form.peg.help_text %}
-                                        <small class="form-text">{{ form.peg.help_text|safe }}</small>
+                                    <div class="invalid-feedback">
+                                        {{ form.peg_side.errors }}
+                                    </div>
+                                    {% if form.peg_side.help_text %}
+                                        <small class="form-text">{{ form.peg_side.help_text|safe }}</small>
                                     {% endif %}
                                 </div>
                             </div>
@@ -256,31 +289,16 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col">
-                                <div class="form-group text-center">
-                                    <label for="{{ form.market_price.id_for_label }}">Use Market Price</label>
-                                    {% if form.market_price.errors %}
-                                        {{ form.market_price|add_class:"form-control"|add_class:"is-invalid" }}
+                                <div class="form-group">
+                                    <label for="{{ form.peg_price_url.id_for_label }}">Peg Price URL</label>
+                                    {% if form.peg_price_url.errors %}
+                                        {{ form.peg_price_url|add_class:"form-control"|add_class:"is-invalid" }}
                                     {% else %}
-                                        {{ form.market_price|add_class:"form-control" }}
+                                        {{ form.peg_price_url|add_class:"form-control" }}
                                     {% endif %}
-                                    {% if form.market_price.help_text %}
-                                        <small class="form-text">{{ form.market_price.help_text|safe }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group text-center">
-                                    <label for="{{ form.active.id_for_label }}">Active</label>
-                                    {% if form.active.errors %}
-                                        {{ form.active|add_class:"form-control"|add_class:"is-invalid" }}
-                                    {% else %}
-                                        {{ form.active|add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if form.active.help_text %}
-                                        <small class="form-text">{{ form.active.help_text|safe }}</small>
+                                    {% if form.peg_price_url.help_text %}
+                                        <small class="form-text">{{ form.peg_price_url.help_text|safe }}</small>
                                     {% endif %}
                                 </div>
                             </div>
@@ -301,77 +319,19 @@
                                     {% endif %}
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="{{ form.aws_access_key.id_for_label }}">AWS Access Key</label>
-                                    {% if form.aws_access_key.errors %}
-                                        {{ form.aws_access_key|add_class:"form-control"|add_class:"is-invalid" }}
+                                    <label for="{{ form.schedule.id_for_label }}">Schedule</label>
+                                    {% if form.schedule.errors %}
+                                        {{ form.schedule|add_class:"form-control"|add_class:"is-invalid" }}
                                     {% else %}
-                                        {{ form.aws_access_key|add_class:"form-control" }}
+                                        {{ form.schedule|add_class:"form-control" }}
                                     {% endif %}
-                                    {% if form.aws_access_key.help_text %}
-                                        <small class="form-text">{{ form.aws_access_key.help_text|safe }}</small>
+                                    {% if form.schedule.help_text %}
+                                        <small class="form-text">{{ form.schedule.help_text|safe }}</small>
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="{{ form.aws_secret_key.id_for_label }}">AWS Secret Key</label>
-                                    {% if form.aws_secret_key.errors %}
-                                        {{ form.aws_secret_key|add_class:"form-control"|add_class:"is-invalid" }}
-                                    {% else %}
-                                        {{ form.aws_secret_key|add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if form.aws_secret_key.help_text %}
-                                        <small class="form-text">{{ form.aws_secret_key.help_text|safe }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="{{ form.exchange_api_key.id_for_label }}">Exchange API Key</label>
-                                    {% if form.exchange_api_key.errors %}
-                                        {{ form.exchange_api_key|add_class:"form-control"|add_class:"is-invalid" }}
-                                    {% else %}
-                                        {{ form.exchange_api_key|add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if form.exchange_api_key.help_text %}
-                                        <small class="form-text">{{ form.exchange_api_key.help_text|safe }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="{{ form.exchange_api_secret.id_for_label }}">Exchange API Secret</label>
-                                    {% if form.exchange_api_secret.errors %}
-                                        {{ form.exchange_api_secret|add_class:"form-control"|add_class:"is-invalid" }}
-                                    {% else %}
-                                        {{ form.exchange_api_secret|add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if form.exchange_api_secret.help_text %}
-                                        <small class="form-text">{{ form.exchange_api_secret.help_text|safe }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="{{ form.base_url.id_for_label }}">Exchange Base URL</label>
-                                    {% if form.base_url.errors %}
-                                        {{ form.base_url|add_class:"form-control"|add_class:"is-invalid" }}
-                                    {% else %}
-                                        {{ form.base_url|add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if form.base_url.help_text %}
-                                        <small class="form-text">{{ form.base_url.help_text|safe }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="col">
                                  <div class="form-group">
                                     <label for="{{ form.vigil_funds_alert_channel_id.id_for_label }}">Vigil Funds Alert ID</label>
@@ -395,19 +355,6 @@
                                     {% endif %}
                                     {% if form.vigil_wrapper_error_channel_id.help_text %}
                                         <small class="form-text">{{ form.vigil_wrapper_error_channel_id.help_text|safe }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="{{ form.schedule.id_for_label }}">Schedule</label>
-                                    {% if form.schedule.errors %}
-                                        {{ form.schedule|add_class:"form-control"|add_class:"is-invalid" }}
-                                    {% else %}
-                                        {{ form.schedule|add_class:"form-control" }}
-                                    {% endif %}
-                                    {% if form.schedule.help_text %}
-                                        <small class="form-text">{{ form.schedule.help_text|safe }}</small>
                                     {% endif %}
                                 </div>
                             </div>
@@ -438,13 +385,58 @@
             if (location.hash) {
                 $("a[href='" + location.hash + "']").tab("show");
             }
+
             $(document.body).on("click", "a[data-toggle]", function(event) {
                 location.hash = this.getAttribute("href");
             });
+            check_using_market_price();
         });
         $(window).on("popstate", function() {
             var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
             $("a[href='" + anchor + "']").tab("show");
+        });
+        function check_using_market_price() {
+            $("#{{ form.peg_currency.id_for_label }}").prop('disabled', $("#{{ form.use_market_price.id_for_label }}").is(":checked"));
+            $("#{{ form.peg_side.id_for_label }}").prop('disabled', $("#{{ form.use_market_price.id_for_label }}").is(":checked"));
+        }
+    </script>
+    <script type="text/javascript" src="{% static '/channels/js/websocketbridge.js' %}"></script>
+    <script>
+        const botFormWebSocketBridge = new channels.WebSocketBridge();
+        botFormWebSocketBridge.connect('/bot_form/{{ object.pk }}/');
+
+        function get_markets() {
+            exchange_account_pk = $("#{{ form.exchange_account.id_for_label }}").val();
+            botFormWebSocketBridge.send(
+                {
+                    "message_type": "get_markets",
+                    "exchange_account_pk": exchange_account_pk
+                }
+            );
+        }
+
+        botFormWebSocketBridge.socket.addEventListener('open', function() {
+            // pre-populate the markets
+            get_markets();
+        })
+
+        botFormWebSocketBridge.listen(function(action, stream) {
+            message_type = action['message_type'];
+
+            if (message_type === "clear_markets") {
+                $('#{{ form.market.id_for_label }}').find('option').remove();
+            }
+
+            if (message_type === "new_market") {
+                $('#{{ form.market.id_for_label }}').append($('<option/>', {
+                    value: action['text'],
+                    text : action['text']
+                }));
+            };
+
+            if (message_type === "selected_market") {
+                $("#{{ form.market.id_for_label }}").val(action['text']);
+            }
         });
     </script>
 {% endblock %}

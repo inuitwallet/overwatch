@@ -58,11 +58,10 @@ class BotDeployConsumer(SyncConsumer):
                 Timeout=bot.timeout,
                 Environment={
                     "Variables": {
-                        "API_KEY": bot.exchange_api_key,
-                        "API_SECRET": bot.exchange_api_secret,
-                        "BASE_URL": bot.base_url,
+                        "API_KEY": bot.exchange_account.key,
+                        "API_SECRET": bot.exchange_account.secret,
                         "BOT_NAME": bot.name,
-                        "EXCHANGE": bot.exchange.lower(),
+                        "EXCHANGE": bot.exchange_account.exchange.lower(),
                         "OVERWATCH_API_SECRET": '{}'.format(bot.api_secret),
                         "SLEEP_LONG": '{}'.format(bot.sleep_long),
                         "SLEEP_MEDIUM": '{}'.format(bot.sleep_medium),
@@ -124,15 +123,15 @@ class BotDeployConsumer(SyncConsumer):
         return True
 
     def _update_cloudwatch_event(self, bot, target, event_client=None):
-        project_name = '{}overwatch_bot_{}_{}'.format(settings.BOT_PREFIX, bot.exchange, bot.name)
+        project_name = '{}overwatch_bot_{}_{}'.format(settings.BOT_PREFIX, bot.exchange_account.exchange, bot.name)
 
         if event_client is None:
             event_client = boto3.client(
                 'events',
                 config=Config(connect_timeout=120, read_timeout=120),
-                aws_access_key_id=bot.aws_access_key,
-                aws_secret_access_key=bot.aws_secret_key,
-                region_name=bot.aws_region
+                aws_access_key_id=bot.aws_account.access_key,
+                aws_secret_access_key=bot.aws_account.secret_key,
+                region_name=bot.aws_account.region
             )
 
         try:
@@ -163,12 +162,12 @@ class BotDeployConsumer(SyncConsumer):
         client = boto3.client(
             'lambda',
             config=config,
-            aws_access_key_id=bot.aws_access_key,
-            aws_secret_access_key=bot.aws_secret_key,
-            region_name=bot.aws_region
+            aws_access_key_id=bot.aws_account.access_key,
+            aws_secret_access_key=bot.aws_account.secret_key,
+            region_name=bot.aws_account.region
         )
 
-        project_name = '{}overwatch_bot_{}_{}'.format(settings.BOT_PREFIX, bot.exchange, bot.name)
+        project_name = '{}overwatch_bot_{}_{}'.format(settings.BOT_PREFIX, bot.exchange_account.exchange, bot.name)
 
         self._update_config(bot, project_name, client, 'update')
 
@@ -184,7 +183,7 @@ class BotDeployConsumer(SyncConsumer):
             return
 
         self._notify_ui(bot_pk, 'Deactivating bot {}'.format(bot), 'deactivate')
-        self._update_cloudwatch_event(bot)
+        self._update_cloudwatch_event(bot, 'deactivate')
 
     def activate(self, event):
         bot_pk = event.get('bot_pk')
@@ -196,7 +195,7 @@ class BotDeployConsumer(SyncConsumer):
             return
 
         self._notify_ui(bot_pk, 'Activating bot {}'.format(bot), 'activate')
-        self._update_cloudwatch_event(bot)
+        self._update_cloudwatch_event(bot, 'activate')
 
     def deploy(self, event):
         bot_pk = event.get('bot_pk')
@@ -210,16 +209,20 @@ class BotDeployConsumer(SyncConsumer):
         self._notify_ui(bot_pk, 'Deploying Bot {}'.format(bot), 'deploy')
 
         # Ensure the bot has the fields needed
-        missing_fields = False
+        missing_fields = []
 
-        for field in ['name', 'exchange', 'bot_type', 'aws_access_key', 'aws_secret_key', 'exchange_api_key',
-                      'exchange_api_secret', 'base_url', 'schedule', 'aws_region']:
+        for field in ['name', 'exchange_account', 'bot_type', 'aws_account', 'schedule']:
             if not getattr(bot, field):
-                self._notify_ui(bot_pk, 'Error: Bot does not have a valid {} field'.format(field), 'deploy')
-                missing_fields = True
+                missing_fields.append(field)
 
         if missing_fields:
-            self._notify_ui(bot_pk, 'Error: Aborting deploy due to missing fields', 'deploy')
+            self._notify_ui(
+                bot_pk,
+                'Error: Aborting deploy due to missing fields: {}'.format(
+                    ', '.join(f for f in missing_fields)
+                ),
+                'deploy'
+            )
             return
 
         # we should move the chosen bot code to a temp directory ready for building
@@ -261,12 +264,12 @@ class BotDeployConsumer(SyncConsumer):
             return
 
         self._notify_ui(bot_pk, 'Creating Zappa settings file', 'deploy')
-        project_name = '{}overwatch_bot_{}_{}'.format(settings.BOT_PREFIX, bot.exchange, bot.name)
+        project_name = '{}overwatch_bot_{}_{}'.format(settings.BOT_PREFIX, bot.exchange_account.exchange, bot.name)
         json.dump(
             {
                 'prod': {
                     'app_function': 'bot.main',
-                    'aws_region': '{}'.format(bot.aws_region),
+                    'aws_region': '{}'.format(bot.aws_account.region),
                     'profile_name': 'default',
                     'project_name': project_name,
                     'runtime': 'python3.7',
@@ -306,9 +309,9 @@ class BotDeployConsumer(SyncConsumer):
         client = boto3.client(
             'lambda',
             config=config,
-            aws_access_key_id=bot.aws_access_key,
-            aws_secret_access_key=bot.aws_secret_key,
-            region_name=bot.aws_region
+            aws_access_key_id=bot.aws_account.access_key,
+            aws_secret_access_key=bot.aws_account.secret_key,
+            region_name=bot.aws_account.region
         )
 
         # se if the named function already exists
@@ -334,9 +337,9 @@ class BotDeployConsumer(SyncConsumer):
                     iam_client = boto3.client(
                         'iam',
                         config=config,
-                        aws_access_key_id=bot.aws_access_key,
-                        aws_secret_access_key=bot.aws_secret_key,
-                        region_name=bot.aws_region
+                        aws_access_key_id=bot.aws_account.access_key,
+                        aws_secret_access_key=bot.aws_account.secret_key,
+                        region_name=bot.aws_account.region
                     )
 
                     # first check if the role already exists
@@ -347,9 +350,8 @@ class BotDeployConsumer(SyncConsumer):
                     role_arn = None
 
                     for role in check_role_response.get('Roles', []):
-                        if role.get('RoleName') == project_name:
+                        if role.get('RoleName').lower() == project_name.lower():
                             role_arn = role.get('Arn')
-                            print(role)
 
                     if not role_arn:
                         role_response = iam_client.create_role(

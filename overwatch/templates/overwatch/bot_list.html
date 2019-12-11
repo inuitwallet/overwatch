@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}Configured Bots{% endblock %}
 
 {% block content %}
+    <!--suppress ALL -->
     <div class="row messages">
         <div class="col">
             {% include 'overwatch/fragments/messages.html' %}
@@ -15,30 +17,154 @@
     </div>
     <div class="row">
         <div class="col">
-            <table id="configured-bots" class="table table-striped table-hover table-bordered table-dark">
-                <caption>All Configured Bots</caption>
-                <thead class="thead-dark bg-dark">
-                    <tr>
-                        <td>Name</td>
-                        <td>Exchange</td>
-                        <td>Market Price</td>
-                        <td>Last Activity</td>
-                        <td>Last Price</td>
-                        <td>Amount on Order</td>
-                        <td>24 Hour Profit</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for bot in object_list %}
-                        {% include 'overwatch/fragments/bot.html' %}
-                    {% endfor %}
-                </tbody>
-           </table>
+            <ul class="nav nav-tabs" id="Tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="bot-list-tab" data-toggle="tab" href="#bot-list" role="tab" aria-controls="bot-list" aria-selected="true">Bot List</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="accounts-tab" data-toggle="tab" href="#accounts" role="tab" aria-controls="accounts" aria-selected="true">Accounts</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="TabsContent">
+                <div class="tab-pane fade show active" id="bot-list" role="tabpanel" aria-labelledby="bot-list-tab">
+                    <table id="configured-bots" class="table table-striped table-hover table-bordered table-dark">
+                        <caption>All Configured Bots</caption>
+                        <thead class="thead-dark bg-dark">
+                            <tr>
+                                <td>Name</td>
+                                <td>Exchange</td>
+                                <td>Market Price</td>
+                                <td>Last Activity</td>
+                                <td>Last Price</td>
+                                <td>Amount on Order</td>
+                                <td>24 Hour Profit</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bot in object_list %}
+                                {% include 'overwatch/fragments/bot.html' %}
+                            {% endfor %}
+                        </tbody>
+                   </table>
+                </div>
+                <div class="tab-pane fade" id="accounts" role="tabpanel" aria-labelledby="accounts-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="row">
+                                <div class="col text-center">
+                                    <p class="lead">
+                                        Exchange Account
+                                    </p>
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-info dropdown-toggle" type="button" id="new-exchange-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">New</button>
+                                        <div class="dropdown-menu">
+                                            <form class="new-exchange-dropdown-form p-4" action="{% url 'exchange_account_create' %}" method="post">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="{{ exchange_form.identity.id_for_label }}">Identifier</label>
+                                                    {{ exchange_form.identifier|add_class:"form-control" }}
+                                                    <label for="{{ exchange_form.exchange.id_for_label }}">Exchange</label>
+                                                    {{ exchange_form.exchange|add_class:"form-control" }}
+                                                    <label for="{{ exchange_form.key.id_for_label }}">API Key</label>
+                                                    {{ exchange_form.key|add_class:"form-control" }}
+                                                    <label for="{{ exchange_form.secret.id_for_label }}">API Secret</label>
+                                                    {{ exchange_form.secret|add_class:"form-control" }}
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary">Create</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row p-4">
+                                <div class="col text-center">
+                                    {% for exchange_account in exchange_accounts %}
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ exchange_account.identifier }}</h5>
+                                            <p class="card-text">
+                                                <p>Exchange: {{ exchange_account.exchange | title }}</p>
+                                                <p>API Key: {{ exchange_account.key | truncatechars:12 }}</p>
+                                                <p>API Secret: {{ exchange_account.secret | truncatechars:12 }}</p>
+                                            </p>
+                                            <a href="{% url 'exchange_account_delete' pk=exchange_account.pk %}" class="btn btn-danger">Delete</a>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="row">
+                                <div class="col text-center">
+                                    <p class="lead">
+                                        AWS Accounts
+                                    </p>
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-info dropdown-toggle" type="button" id="new-aws-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">New</button>
+                                        <div class="dropdown-menu">
+                                            <form class="new-aws-dropdown-form p-4" action="{% url 'aws_account_create' %}" method="post">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="{{ aws_form.identity.id_for_label }}">Identifier</label>
+                                                    {{ aws_form.identifier|add_class:"form-control" }}
+                                                    <label for="{{ aws_form.access_key.id_for_label }}">Access Key</label>
+                                                    {{ aws_form.access_key|add_class:"form-control" }}
+                                                    <label for="{{ aws_form.secret_key.id_for_label }}">Secret Key</label>
+                                                    {{ aws_form.secret_key|add_class:"form-control" }}
+                                                    <label for="{{ aws_form.region.id_for_label }}">Region</label>
+                                                    {{ aws_form.region|add_class:"form-control" }}
+                                                </div>
+                                                <div class="form-group">
+                                                    <button type="submit" class="btn btn-primary">Create</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row p-4">
+                                <div class="col text-center">
+                                    {% for aws_account in aws_accounts %}
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ aws_account.identifier }}</h5>
+                                            <p class="card-text">
+                                                <p>Access Key: {{ aws_account.access_key | truncatechars:12 }}</p>
+                                                <p>Secret Key: {{ aws_account.secret_key | truncatechars:12 }}</p>
+                                                <p>Region: {{ aws_account.region }}</p>
+                                            </p>
+                                            <a href="{% url 'aws_account_delete' pk=aws_account.pk %}" class="btn btn-danger">Delete</a>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
 
 {% block endbodyjs %}
+    <script>
+        $(document).ready(function() {
+            if (location.hash) {
+                $("a[href='" + location.hash + "']").tab("show");
+            }
+            $(document.body).on("click", "a[data-toggle]", function(event) {
+                location.hash = this.getAttribute("href");
+            });
+        });
+        $(window).on("popstate", function() {
+            var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
+            $("a[href='" + anchor + "']").tab("show");
+        });
+    </script>
     <script>
         $(document).ready(function() {
             $('#configured-bots').DataTable(
