@@ -82,9 +82,9 @@ class BotDeployConsumer(SyncConsumer):
         event_client = boto3.client(
             'events',
             config=Config(connect_timeout=120, read_timeout=120),
-            aws_access_key_id=bot.aws_access_key,
-            aws_secret_access_key=bot.aws_secret_key,
-            region_name=bot.aws_region
+            aws_access_key_id=bot.aws_account.access_key,
+            aws_secret_access_key=bot.aws_account.secret_key,
+            region_name=bot.aws_account.region
         )
 
         rule_response = self._update_cloudwatch_event(bot, target, event_client)

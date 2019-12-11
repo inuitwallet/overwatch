@@ -155,7 +155,10 @@ class Bot(models.Model):
     )
 
     def __str__(self):
-        return '{}@{}'.format(self.name, self.exchange_account.exchange.title() if self.exchange_account else '')
+        return '{}{}'.format(
+            self.name,
+            '@{}'.format(self.exchange_account.exchange.title()) if self.exchange_account else ''
+        )
 
     class Meta:
         ordering = ['name', 'exchange_account__identifier', 'active']
