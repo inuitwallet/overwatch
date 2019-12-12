@@ -549,10 +549,10 @@ class Bot(models.Model):
             next_time = next_time + datetime.timedelta(hours=6)
 
         line = pygal.Line(
-            y_title='Amount in {}'.format(self.quote),
+            y_title='Amount in {}'.format(self.base),
             truncate_label=-1,
             legend_at_bottom=True,
-            value_formatter=lambda x: '{} {:.4f}'.format(self.quote, x),
+            value_formatter=lambda x: '{} {:.4f}'.format(self.base, x),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
             ),
