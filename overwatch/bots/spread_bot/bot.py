@@ -117,7 +117,7 @@ class Bot(object):
         known_config = False
 
         if self.config.get('use_market_price'):
-            # just opperate using the market price
+            # just operate using the market price
             self.logger.info('Using Market Price')
             price = float(market_price)
             known_config = True
@@ -127,8 +127,6 @@ class Bot(object):
             # 2. The peg currency is the base currency: Price = Base Price / Quote Price
             # 3. The peg currency is neither and the quote is being pegged to it: Price = Base Price / Peg Price
             # 4. The peg currency is neither and the base is being pegged to it: Price = Peg Price / Quote Price
-            self.peg_price = pm.get_price(self.config.get('peg_currency').upper(), self.config.get('peg_price_url'))
-
             if self.config.get('peg_currency', 'peg').upper() == self.market.get('quote', 'quote').upper():
                 known_config = True
                 # this is option 1
@@ -147,6 +145,8 @@ class Bot(object):
                     self.config.get('peg_currency', '').upper() != self.market.get('base', '').upper()
                     and self.config.get('peg_currency', '').upper() != self.market.get('quote', '').upper()
             ):
+                self.peg_price = pm.get_price(self.config.get('peg_currency').upper(), self.config.get('peg_price_url'))
+
                 if self.config.get('peg_side', '').lower() == 'quote':
                     known_config = True
                     # this is option 3
@@ -303,7 +303,6 @@ class Bot(object):
                 return
 
         if place:
-            # TODO - order_amount, buy_limit and sell_limit are in USD now. need to convert to base
             self.overwatch.record_placed_order(
                 self.config.get('base'),
                 self.config.get('quote'),
@@ -311,11 +310,10 @@ class Bot(object):
                 price,
                 self.order_amount
             )
-
-            # TODO: if order placing fails. alert to vigil
             self.logger.info('Order Placed: {}'.format(place.get('id')))
 
         else:
+            # TODO: if order placing fails. alert to vigil
             self.logger.error('Failed to place order')
 
     def reset_order(self, order_id, order_type, price):
@@ -463,7 +461,14 @@ class Bot(object):
             check_currency = self.market.get('base') if side == 'buy' else self.market.get('quote')
             balance = self.get_available_balance(check_currency)
 
-            self.logger.info('Got available balance of {}'.format(balance))
+            self.logger.info('Got available balance of {} {}'.format(balance, check_currency))
+
+            if side == "sell":
+                # if we are looking at the sell wall the balance will be in 'quote' currency
+                # we need to work out how many 'base' currency that is
+                balance = 1 / balance
+
+            self.logger.info('Got working balance of {} {}'.format(balance, self.market.get('base')))
 
             # we can only place orders up to the value of 'balance'
             if balance < difference:
