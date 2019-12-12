@@ -108,6 +108,12 @@ class Bot(object):
         self.logger.info('###########')
         self.logger.info('Getting Price')
         market_price = self.wrapper.fetch_ticker(self.symbol).get('last')
+
+        pm = PriceManager()
+        self.quote_price = pm.get_price(self.market.get('quote'), self.config.get('quote_price_url'))
+        self.base_price = pm.get_price(self.market.get('base'), self.config.get('base_price_url'))
+
+        price = None
         known_config = False
 
         if self.config.get('use_market_price'):
@@ -121,12 +127,7 @@ class Bot(object):
             # 2. The peg currency is the base currency: Price = Base Price / Quote Price
             # 3. The peg currency is neither and the quote is being pegged to it: Price = Base Price / Peg Price
             # 4. The peg currency is neither and the base is being pegged to it: Price = Peg Price / Quote Price
-            pm = PriceManager()
-            self.quote_price = pm.get_price(self.market.get('quote'), self.config.get('quote_price_url'))
-            self.base_price = pm.get_price(self.market.get('base'), self.config.get('base_price_url'))
             self.peg_price = pm.get_price(self.config.get('peg_currency').upper(), self.config.get('peg_price_url'))
-
-            price = None
 
             if self.config.get('peg_currency', 'peg').upper() == self.market.get('quote', 'quote').upper():
                 known_config = True
