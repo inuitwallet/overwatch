@@ -461,7 +461,7 @@ class Bot(object):
             # calculate the difference between current total and the target
             difference = target - total
             # get the balance Available
-            check_currency = self.config.get('base') if side == 'buy' else self.config.get('quote')
+            check_currency = self.market.get('base') if side == 'buy' else self.market.get('quote')
             balance = self.get_available_balance(check_currency)
 
             self.logger.info('Got available balance of {}'.format(balance))
