@@ -312,8 +312,11 @@ class Bot(object):
                 self.order_amount
             )
 
-        # TODO: if order placing fails. alert to vigil
-        self.logger.info('Order Placed: {}'.format(place.get('id')))
+            # TODO: if order placing fails. alert to vigil
+            self.logger.info('Order Placed: {}'.format(place.get('id')))
+
+        else:
+            self.logger.error('Failed to place order')
 
     def reset_order(self, order_id, order_type, price):
         """
