@@ -379,8 +379,7 @@ class Bot(object):
                 continue
 
             self.logger.info(
-                'Checking {} {} order {}'.format(
-                    self.config.get('track'),
+                'Checking {} order {}'.format(
                     order_type.title(),
                     order.get('id')
                 )
@@ -461,7 +460,7 @@ class Bot(object):
 
             self.logger.info('Got available balance of {} {}'.format(balance, check_currency))
 
-            if side == "buy":
+            if side == "sell":
                 # if we are looking at the sell wall the balance will be in 'quote' currency
                 # we need to work out how many 'base' currency that is
                 balance = balance / self.price
