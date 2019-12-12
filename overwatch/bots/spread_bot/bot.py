@@ -285,19 +285,17 @@ class Bot(object):
         if not self.check_cost(amount, price):
             return
 
-        place = None
-
         if order_type == 'buy':
             try:
-                # place = self.wrapper.create_limit_buy_order(self.symbol, amount, price)
                 self.logger.info('Placing Buy order of {} @ {}'.format(amount, price))
+                place = self.wrapper.create_limit_buy_order(self.symbol, amount, price)
             except Exception as e:
                 self.logger.error('Placing limit buy order failed: {}'.format(e))
                 return
         else:
             try:
-                # place = self.wrapper.create_limit_sell_order(self.symbol, amount, price)
                 self.logger.info('Placing Sell order of {} @ {}'.format(amount, price))
+                place = self.wrapper.create_limit_sell_order(self.symbol, amount, price)
             except Exception as e:
                 self.logger.error('Placing limit sell order failed: {}'.format(e))
                 return
