@@ -412,8 +412,8 @@ class Bot(object):
 
         totals_on_order = self.get_order_total()
 
-        buy_balance = self.get_available_balance(self.get_base())
-        sell_balance = self.get_available_balance(self.get_quote())
+        buy_balance = self.get_available_balance(self.get_quote())
+        sell_balance = self.get_available_balance(self.get_base())
 
         self.overwatch.record_balances(
             unit=self.get_base(),
