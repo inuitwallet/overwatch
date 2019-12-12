@@ -14,7 +14,6 @@ from django.template.loader import render_to_string
 from django.utils.timezone import now
 from pygal.style import CleanStyle
 
-from overwatch.models import BotPrice
 from overwatch.utils.price_aggregator import get_price_movement
 from encrypted_model_fields.fields import EncryptedCharField
 
