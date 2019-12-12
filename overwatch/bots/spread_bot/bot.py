@@ -189,12 +189,16 @@ class Bot(object):
 
     def get_limits(self):
         """
-        Order amount, Total Ask and total Bid come to the Bot in USD. We need them in 'Base' currency
+        Order amount, Total Ask and total Bid come to the Bot in USD. We need them in 'Quote' currency
         """
-        if self.base_price is not None:
-            self.order_amount = self.config.get('order_amount', 0) / self.base_price
-            self.total_ask = self.config.get('total_ask', 0) / self.base_price
-            self.total_bid = self.config.get('total_bid', 0) / self.base_price
+        print('getting limits')
+        if self.quote_price is not None:
+            self.order_amount = self.config.get('order_amount', 0) / self.quote_price
+            self.total_ask = self.config.get('total_ask', 0) / self.quote_price
+            self.total_bid = self.config.get('total_bid', 0) / self.quote_price
+            print('order amount: {}'.format(self.order_amount))
+            print('total ask: {}'.format(self.total_ask))
+            print('total bid: {}'.format(self.total_bid))
         
     def get_open_orders(self):
         """
