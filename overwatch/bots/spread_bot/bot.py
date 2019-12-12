@@ -302,8 +302,8 @@ class Bot(object):
 
         if place:
             self.overwatch.record_placed_order(
-                self.config.get('base'),
-                self.config.get('quote'),
+                self.market.get('base'),
+                self.market.get('quote'),
                 order_type,
                 price,
                 self.order_amount
@@ -483,7 +483,7 @@ class Bot(object):
                     alert_channel_id=os.environ['VIGIL_FUNDS_ALERT_CHANNEL_ID'],
                     data={
                         'bot_name': self.name,
-                        'currency': self.config.get('base') if side == 'buy' else self.config.get('quote'),
+                        'currency': self.market.get('base') if side == 'buy' else self.market.get('quote'),
                         'exchange': self.exchange.title(),
                         'target_amount': target,
                         'amount_on_order': total,
