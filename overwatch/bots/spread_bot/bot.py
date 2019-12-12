@@ -466,7 +466,7 @@ class Bot(object):
             if side == "sell":
                 # if we are looking at the sell wall the balance will be in 'quote' currency
                 # we need to work out how many 'base' currency that is
-                balance = balance / self.quote_price
+                balance = balance / self.price
 
             self.logger.info('Got working balance of {} {}'.format(balance, self.market.get('base')))
 
