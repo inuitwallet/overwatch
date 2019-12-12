@@ -424,8 +424,8 @@ class Bot(object):
         )
 
     def check_total_is_reached(self):
-        self.check_side_total_is_reached('buy', self.total_bid, self.buy_price)
-        self.check_side_total_is_reached('sell', self.total_ask, self.sell_price)
+        self.check_side_total_is_reached('buy', self.total_ask, self.sell_price)
+        self.check_side_total_is_reached('sell', self.total_bid, self.buy_price)
 
     def check_side_total_is_reached(self, side, side_total, price):
         """
@@ -461,7 +461,7 @@ class Bot(object):
 
             self.logger.info('Got available balance of {} {}'.format(balance, check_currency))
 
-            if side == "sell":
+            if side == "buy":
                 # if we are looking at the sell wall the balance will be in 'quote' currency
                 # we need to work out how many 'base' currency that is
                 balance = balance / self.price
