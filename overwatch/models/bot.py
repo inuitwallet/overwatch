@@ -13,6 +13,8 @@ from django.template import Template, Context
 from django.template.loader import render_to_string
 from django.utils.timezone import now
 from pygal.style import CleanStyle
+
+from overwatch.models import BotPrice
 from overwatch.utils.price_aggregator import get_price_movement
 from encrypted_model_fields.fields import EncryptedCharField
 
@@ -535,8 +537,8 @@ class Bot(models.Model):
         if earliest is None:
             return ''
 
-        bid_balances.append(earliest.bid_available + earliest.bid_on_order)
-        ask_balances.append(earliest.ask_available + earliest.ask_on_order)
+        bid_balances.append(earliest.bid_available_usd + earliest.bid_on_order_usd)
+        ask_balances.append(earliest.ask_available_usd + earliest.ask_on_order_usd)
 
         next_time = earliest.time + datetime.timedelta(hours=6)
 
@@ -544,15 +546,15 @@ class Bot(models.Model):
             if balance.time < next_time:
                 continue
 
-            bid_balances.append(balance.bid_available + balance.bid_on_order)
-            ask_balances.append(balance.ask_available + balance.ask_on_order)
+            bid_balances.append(balance.bid_available_usd + balance.bid_on_order_usd)
+            ask_balances.append(balance.ask_available_usd + balance.ask_on_order_usd)
             next_time = next_time + datetime.timedelta(hours=6)
 
         line = pygal.Line(
-            y_title='Amount in {}'.format(self.base),
+            y_title='Amount in USD',
             truncate_label=-1,
             legend_at_bottom=True,
-            value_formatter=lambda x: '{} {:.4f}'.format(self.base, x),
+            value_formatter=lambda value: 'USD {:.4f}'.format(value),
             style=CleanStyle(
                 font_family='googlefont:Raleway',
             ),
