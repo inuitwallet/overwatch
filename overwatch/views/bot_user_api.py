@@ -54,7 +54,7 @@ def handle_bot_user_api_auth(request, additional_keys=None):
     exchange = request.POST.get('exchange')
 
     try:
-        bot = Bot.objects.get(name__iexact=name, exchange__iexact=exchange)
+        bot = Bot.objects.get(name__iexact=name, exchange_account__exchange__iexact=exchange)
     except Bot.DoesNotExist:
         return False, HttpResponseNotFound(
             json.dumps(
