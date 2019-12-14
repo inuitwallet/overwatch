@@ -221,6 +221,7 @@ class BotBalance(models.Model):
         db_index=True
     )
     bid_available = models.FloatField()
+    bid_available_as_base = models.FloatField(null=True, blank=True)
     ask_available = models.FloatField()
     bid_on_order = models.FloatField()
     ask_on_order = models.FloatField()

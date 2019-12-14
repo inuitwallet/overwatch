@@ -355,8 +355,8 @@ class Bot(models.Model):
             dp = str(4)
             currency = 'USD'
         else:
-            dp = str(self.quote_decimal_places)
-            currency = self.quote
+            dp = str(self.base_decimal_places)
+            currency = self.base
 
         if on_order:
             if usd:
@@ -367,7 +367,7 @@ class Bot(models.Model):
             if usd:
                 template = '{{ last_balance.bid_available_usd|floatformat:' + dp + ' }} {{ currency }}'
             else:
-                template = '{{ last_balance.bid_available|floatformat:' + dp + ' }} {{ currency }}'
+                template = '{{ last_balance.bid_available_as_base|floatformat:' + dp + ' }} {{ currency }}'
 
         return Template(
             template

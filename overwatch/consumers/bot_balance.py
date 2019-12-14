@@ -65,8 +65,12 @@ class BotBalanceConsumer(SyncConsumer):
         if bot_balance.bid_available is not None:
             bot_balance.bid_available_usd = bot_balance.bid_available * quote_price_30_ma
 
+        if bot_balance.bid_available is not None:
+            bot_balance.bid_available_as_base = bot_balance.bid_available / quote_price_30_ma
+
         if bot_balance.bid_on_order is not None:
-            bot_balance.bid_on_order_usd = bot_balance.bid_on_order * quote_price_30_ma
+            # bid_balance_on_order will be denominated in the 'base' currency
+            bot_balance.bid_on_order_usd = bot_balance.bid_on_order * base_price_30_ma
 
         if bot_balance.ask_available is not None:
             bot_balance.ask_available_usd = bot_balance.ask_available * base_price_30_ma
