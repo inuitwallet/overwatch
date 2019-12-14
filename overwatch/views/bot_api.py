@@ -194,7 +194,7 @@ class BotApiTradeView(View):
             BotTrade.objects.get(bot=bot, trade_id=request.POST.get('trade_id'))
             print('Got existing order with id {}'.format(request.POST.get('trade_id')))
         except BotTrade.DoesNotExist:
-            BotTrade.objects.create(
+            trade = BotTrade.objects.create(
                 bot=bot,
                 time=request.POST.get('trade_time'),
                 trade_id=request.POST.get('trade_id'),
@@ -204,6 +204,7 @@ class BotApiTradeView(View):
                 total=request.POST.get('total'),
                 age=datetime.timedelta(seconds=int(request.POST.get('age'))),
             )
+            print('Created trade {}'.format(trade))
 
         return JsonResponse({'success': True})
 

@@ -15,7 +15,7 @@ class BotTradeConsumer(SyncConsumer):
         This method is called when a bot_trade is saved.
         It fetches the price closest to the time recorded for the bot_trade and updates the bot_trade instance
         """
-        logger.info('Trying to get USD values fof BotTrade {}'.format(message.get('bot_trade')))
+        logger.info('Trying to get USD values of BotTrade {}'.format(message.get('bot_trade')))
 
         try:
             bot_trade = BotTrade.objects.get(pk=message.get('bot_trade'))
