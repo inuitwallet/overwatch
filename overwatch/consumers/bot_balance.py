@@ -2,7 +2,7 @@ import logging
 
 from channels.consumer import SyncConsumer
 
-from overwatch.models import BotBalance
+from overwatch.models import BotBalance, BotPrice
 from overwatch.utils.price_aggregator import get_price_data
 
 logger = logging.getLogger(__name__)
@@ -66,7 +66,9 @@ class BotBalanceConsumer(SyncConsumer):
             bot_balance.bid_available_usd = bot_balance.bid_available * quote_price_30_ma
 
         if bot_balance.bid_available is not None:
-            bot_balance.bid_available_as_base = bot_balance.bid_available / quote_price_30_ma
+            nearest_price = BotPrice.objects.get_closest_to(bot_balance.bot, bot_balance.time)
+            if nearest_price:
+                bot_balance.bid_available_as_base = bot_balance.bid_available / nearest_price.price
 
         if bot_balance.bid_on_order is not None:
             # bid_balance_on_order will be denominated in the 'base' currency
