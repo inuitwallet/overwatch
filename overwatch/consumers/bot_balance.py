@@ -67,6 +67,7 @@ class BotBalanceConsumer(SyncConsumer):
 
         if bot_balance.bid_available is not None:
             nearest_price = BotPrice.objects.get_closest_to(bot_balance.bot, bot_balance.time)
+
             if nearest_price:
                 bot_balance.bid_available_as_base = bot_balance.bid_available / nearest_price.price
 
