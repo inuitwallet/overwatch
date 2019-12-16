@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -7,7 +8,10 @@ from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidde
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
+
 from overwatch.models import BotHeartBeat, Bot, BotPlacedOrder, BotPrice, BotBalance, BotTrade
+
+logger = logging.getLogger(__name__)
 
 """
 These classes represent API views that use direct bot authentication. 
@@ -191,8 +195,8 @@ class BotApiTradeView(View):
             return bot
 
         try:
-            BotTrade.objects.get(bot=bot, trade_id=request.POST.get('trade_id'))
-            print('Got existing order with id {}'.format(request.POST.get('trade_id')))
+            trade = BotTrade.objects.get(bot=bot, trade_id=request.POST.get('trade_id'))
+            logger.warning('Got existing order with id {}: {}'.format(request.POST.get('trade_id'), trade.pk))
         except BotTrade.DoesNotExist:
             trade = BotTrade.objects.create(
                 bot=bot,
@@ -204,7 +208,7 @@ class BotApiTradeView(View):
                 total=request.POST.get('total'),
                 age=datetime.timedelta(seconds=int(request.POST.get('age'))),
             )
-            print('Created trade {}'.format(trade))
+            logger.info('Created trade {}'.format(trade))
 
         return JsonResponse({'success': True})
 
