@@ -28,8 +28,8 @@
                     {% else %}
                         <a href="{% url 'activate_bot' pk=bot.pk %}" class="btn btn-success" role="button" id="activate-button" data-toggle="tooltip" data-placement="bottom" title="Activate this Bot">Activate</a>
                     {% endif %}
-                    <button class="btn btn-info" role="button" id="update-button" data-toggle="tooltip" data-placement="bottom" title="Update this Bot">Update</button>
-                    <button class="btn btn-warning" role="button" id="deploy-button" data-toggle="tooltip" data-placement="bottom" title="Deploy this Bot">Deploy</button>
+                    <a href="javascript:update()" class="btn btn-info" role="button" id="update-button" data-toggle="tooltip" data-placement="bottom" title="Update this Bot">Update</a>
+                    <a href="javascript:deploy()" class="btn btn-warning" role="button" id="deploy-button" data-toggle="tooltip" data-placement="bottom" title="Deploy this Bot">Deploy</a>
                 </div>
             </div>
             <div class="row">
@@ -102,9 +102,6 @@
             }
             $(document.body).on("click", "a[data-toggle]", function(event) {
                 location.hash = this.getAttribute("href");
-            });
-            $("#update-button").click(function() {
-                console.log('yo');
             });
         });
         $(window).on("popstate", function() {
