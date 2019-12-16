@@ -3,8 +3,15 @@
 <div class="row tab-content">
     <div class="col">
         <div class="form-group">
-            <label for="base" class="control-label">Market</label>
-            <input id="base" class="form-control" readonly value="{{ bot.market }}" />
+            <label for="exchange-account" class="control-label">Exchange Account</label>
+            <input id="exchange-account" class="form-control" readonly value="{{ bot.exchange_account }}" />
+            <small>{% model_field_help_text from bot.exchange_account %}</small>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-group">
+            <label for="market" class="control-label">Market</label>
+            <input id="market" class="form-control" readonly value="{{ bot.market }}" />
             <small>{% model_field_help_text from bot.market %}</small>
         </div>
     </div>
@@ -15,16 +22,16 @@
     {% else %}
     <div class="col">
         <div class="form-group">
-            <label for="peg-side" class="control-label">Peg Side</label>
-            <input id="peg-side" class="form-control" type="text" readonly value="{{ bot.get_peg_side_display }}" />
-            <small>{% model_field_help_text from bot.peg_side %}</small>
+            <label for="peg-currency" class="control-label">Peg Currency</label>
+            <input id="peg-currency" class="form-control" type="text" readonly value="{{ bot.peg_currency }}" />
+            <small>{% model_field_help_text from bot.peg_currency %}</small>
         </div>
     </div>
     <div class="col">
         <div class="form-group">
-            <label for="peg-currency" class="control-label">Peg Currency</label>
-            <input id="peg-currency" class="form-control" type="text" readonly value="{{ bot.peg_currency }}" />
-            <small>{% model_field_help_text from bot.peg_currency %}</small>
+            <label for="peg-side" class="control-label">Peg Side</label>
+            <input id="peg-side" class="form-control" type="text" readonly value="{{ bot.get_peg_side_display }}" />
+            <small>{% model_field_help_text from bot.peg_side %}</small>
         </div>
     </div>
     {% endif %}
