@@ -98,7 +98,7 @@ class Overwatch(object):
             )
         )
 
-    def record_price(self, price, bid_price, ask_price, market_price):
+    def record_price(self, price, bid_price, ask_price, market_price, base_price, quote_price):
         nonce, generated_hash = self.generate_hash()
         self.handle_response(
             requests.post(
@@ -111,7 +111,9 @@ class Overwatch(object):
                     'price': price,
                     'bid_price': bid_price,
                     'ask_price': ask_price,
-                    'market_price': market_price
+                    'market_price': market_price,
+                    'base_price': base_price,
+                    'quote_price': quote_price
                 }
             )
         )

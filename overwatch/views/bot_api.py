@@ -111,7 +111,10 @@ class BotApiPricesView(View):
     """
     @staticmethod
     def post(request):
-        success, bot = handle_bot_api_auth(request.POST, ['price', 'bid_price', 'ask_price', 'market_price'])
+        success, bot = handle_bot_api_auth(
+            request.POST,
+            ['price', 'bid_price', 'ask_price', 'market_price', 'base_price', 'quote_price']
+        )
 
         if not success:
             # if the function returns False, then bot is set to a Response instance
@@ -122,7 +125,9 @@ class BotApiPricesView(View):
             price=request.POST.get('price'),
             ask_price=request.POST.get('ask_price'),
             bid_price=request.POST.get('bid_price'),
-            market_price=request.POST.get('market_price')
+            market_price=request.POST.get('market_price'),
+            base_price=request.POST.get('base_price'),
+            quote_price=request.POST.get('quote_price')
         )
 
         async_to_sync(get_channel_layer().group_send)(

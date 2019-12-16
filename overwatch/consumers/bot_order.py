@@ -31,14 +31,14 @@ class BotOrderConsumer(SyncConsumer):
             logger.error('No closest BotPrice for calculation')
             return
 
-        bot_price_usd = closest_bot_price.price_usd
+        bot_quote_price = closest_bot_price.quote_price
 
-        if bot_price_usd is None:
+        if bot_quote_price is None:
             logger.error('No USD Price for closest price')
             return
 
         if bot_order.price:
-            bot_order.price_usd = bot_order.price * bot_price_usd
+            bot_order.price_usd = bot_order.price * bot_quote_price
 
         bot_order.updated = True
         bot_order.save()

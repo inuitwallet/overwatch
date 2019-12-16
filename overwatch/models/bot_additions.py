@@ -179,6 +179,8 @@ class BotPrice(models.Model):
     ask_price_usd = models.FloatField(null=True, blank=True)
     market_price = models.FloatField(null=True, blank=True)
     market_price_usd = models.FloatField(null=True, blank=True)
+    base_price = models.FloatField(null=True, blank=True)
+    quote_price = models.FloatField(null=True, blank=True)
     unit = models.CharField(
         max_length=255,
         null=True,

@@ -185,7 +185,9 @@ class Bot(object):
             price=price,
             bid_price=self.buy_price,
             ask_price=self.sell_price,
-            market_price=market_price
+            market_price=market_price,
+            base_price=self.base_price,
+            quote_price=self.quote_price
         )
 
     def get_limits(self):
