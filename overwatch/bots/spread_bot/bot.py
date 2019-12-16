@@ -617,7 +617,7 @@ class Bot(object):
 
         self.logger.info('Got Last trade id : {}'.format(last_trade_id))
 
-        for trade in sorted(b.fetch_my_trades('ARK/BTC'), key=lambda x: x['datetime'], reverse=True):
+        for trade in sorted(self.wrapper.fetch_my_trades('ARK/BTC'), key=lambda x: x['datetime'], reverse=True):
             self.logger.info('Found Trade with ID: {}'.format(trade.get('id')))
 
             if trade.get('id') == last_trade_id:
