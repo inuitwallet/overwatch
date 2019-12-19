@@ -427,8 +427,8 @@ class Bot(object):
         )
 
     def check_total_is_reached(self):
-        self.check_side_total_is_reached('buy', self.total_ask, self.sell_price)
-        self.check_side_total_is_reached('sell', self.total_bid, self.buy_price)
+        self.check_side_total_is_reached('buy', self.total_ask, self.buy_price)
+        self.check_side_total_is_reached('sell', self.total_bid, self.sell_price)
 
     def check_side_total_is_reached(self, side, side_total, price):
         """
