@@ -534,7 +534,7 @@ class Bot(object):
         """
         self.logger.info('Checking Existing {} Order Prices Against {} price {:.8f}'.format(
             side.title(),
-            'sell' if side == 'buy' else 'buy',
+            'Sell' if side == 'sell' else 'Buy',
             price
         ))
 
@@ -549,8 +549,7 @@ class Bot(object):
 
             if cancel:
                 self.logger.info(
-                    'Cancelling {} {} Order {} @ {}'.format(
-                        self.config.get('track'),
+                    'Cancelling {} Order {} @ {}'.format(
                         side.title(),
                         order['id'],
                         order['price']
@@ -591,8 +590,7 @@ class Bot(object):
 
             for order in remove_orders[:num]:
                 self.logger.info(
-                    'Cancelling {} {} Order {}'.format(
-                        self.config.get('track'),
+                    'Cancelling {} Order {}'.format(
                         side.title(),
                         order.get('id')
                     )
