@@ -153,6 +153,7 @@ class Bot(object):
 
                     if self.base_price is not None and self.peg_price is not None:
                         price = self.base_price / self.peg_price
+                        self.quote_price = self.peg_price
 
                 if self.config.get('peg_side', '').lower() == 'base':
                     known_config = True
@@ -160,6 +161,7 @@ class Bot(object):
 
                     if self.quote_price is not None and self.peg_price is not None:
                         price = self.peg_price / self.quote_price
+                        self.base_price = self.peg_price
 
         if not known_config:
             self.logger.warning('Not a known Bot Config!')
