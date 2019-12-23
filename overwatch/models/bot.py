@@ -545,6 +545,8 @@ class Bot(models.Model):
             if balance.time < next_time:
                 continue
 
+            all_attributes = True
+
             for attribute in [
                 balance.bid_available_usd,
                 balance.bid_on_order_usd,
@@ -554,6 +556,10 @@ class Bot(models.Model):
                 if attribute is None:
                     balance.updated = False
                     balance.save()
+                    all_attributes = False
+
+            if not all_attributes:
+                continue
 
             bid_balances.append(balance.bid_available_usd + balance.bid_on_order_usd)
             ask_balances.append(balance.ask_available_usd + balance.ask_on_order_usd)
