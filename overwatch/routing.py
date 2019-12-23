@@ -11,6 +11,7 @@ application = ProtocolTypeRouter({
         URLRouter([
             url(r'^bot/(?P<pk>[^/]+)/$', BotConsumer),
             url(r'^bot_form/(?P<pk>[^/]+)/$', BotFormConsumer),
+            url(r'^bot_form/$', BotFormConsumer),
             url(r'^bot_list/$', BotListConsumer),
         ])
     ),

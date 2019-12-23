@@ -403,7 +403,11 @@
     <script type="text/javascript" src="{% static '/channels/js/websocketbridge.js' %}"></script>
     <script>
         const botFormWebSocketBridge = new channels.WebSocketBridge();
-        botFormWebSocketBridge.connect('/bot_form/{{ object.pk }}/');
+        {% if object %}
+            botFormWebSocketBridge.connect('/bot_form/{{ object.pk }}/');
+        {% else %}
+            botFormWebSocketBridge.connect('/bot_form/');
+        {% endif %}
 
         function get_markets() {
             exchange_account_pk = $("#{{ form.exchange_account.id_for_label }}").val();

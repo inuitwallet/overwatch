@@ -12,36 +12,40 @@ class BotFormConsumer(JsonWebsocketConsumer):
         """
         Add channel to the necessary groups. Initiate data scan
         """
-        # get the bot from the websocket url
-        try:
-            self.bot = Bot.objects.get(
-                pk=self.scope['url_route']['kwargs']['pk']
-            )
-        except Bot.DoesNotExist:
-            self.close()
-            return
+        # get the bot from the websocket url if it exists
+        pk = self.scope.get('url_route', {}).get('kwargs', {}).get('pk')
+
+        if pk:
+            try:
+                self.bot = Bot.objects.get(
+                    pk=pk
+                )
+            except Bot.DoesNotExist:
+                self.close()
+                return
 
         # accept the websocket connection
         self.accept()
-
-        # add the channel to the necessary groups
-        async_to_sync(self.channel_layer.group_add)('bot_form_{}'.format(self.bot.pk), self.channel_name)
 
     def disconnect(self, close_code):
         """
         disconnect from the websocket so remove from groups
         """
-        async_to_sync(self.channel_layer.group_discard)('bot__form_{}'.format(self.bot.pk), self.channel_name)
         self.close()
 
     def receive_json(self, content, **kwargs):
         message_type = content.get('message_type')
 
         if message_type == 'get_markets':
+            exchange_account_pk = content.get('exchange_account_pk')
+
+            if not exchange_account_pk:
+                return
+
             try:
-                exchange_account = Exchange.objects.get(pk=content.get('exchange_account_pk'))
+                exchange_account = Exchange.objects.get(pk=exchange_account_pk)
             except Exchange.DoesNotExist:
-                print('No exchange Account found with pk {}'.format(content.get('exchange_account_pk')))
+                print('No exchange Account found with pk {}'.format(exchange_account_pk))
                 return
 
             try:
@@ -65,13 +69,11 @@ class BotFormConsumer(JsonWebsocketConsumer):
                 )
 
             # finally we send the selected market if there is one
-            if self.bot.market:
-                self.send_json(
-                    {
-                        'message_type': 'selected_market',
-                        'text': self.bot.market
-                    }
-                )
-
-
-
+            if self.bot:
+                if self.bot.market:
+                    self.send_json(
+                        {
+                            'message_type': 'selected_market',
+                            'text': self.bot.market
+                        }
+                    )
