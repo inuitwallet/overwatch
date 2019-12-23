@@ -38,7 +38,7 @@ class UpdateBotView(SuccessMessageMixin, LoginRequiredMixin, UpdateView):
     model = Bot
     fields = ['name', 'exchange_account', 'market', 'use_market_price', 'peg_currency', 'peg_side', 'aws_account',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'base_price_url', 'quote_price_url', 'peg_price_url', 'active', 'vigil_funds_alert_channel_id',
+              'base_price_url', 'quote_price_url', 'peg_price_url', 'vigil_funds_alert_channel_id',
               'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
 
     def get_success_url(self):
@@ -60,7 +60,7 @@ class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
     model = Bot
     fields = ['name', 'exchange_account', 'market', 'use_market_price', 'peg_currency', 'peg_side', 'aws_account',
               'tolerance', 'fee', 'bid_spread', 'ask_spread', 'order_amount', 'total_bid', 'total_ask',
-              'base_price_url', 'quote_price_url', 'peg_price_url', 'active', 'owner', 'vigil_funds_alert_channel_id',
+              'base_price_url', 'quote_price_url', 'peg_price_url', 'owner', 'vigil_funds_alert_channel_id',
               'vigil_wrapper_error_channel_id', 'schedule', 'bot_type']
     success_message = '%(name)s@%(exchange_account__exchange)s has been created. Remember to Deploy the Lambda function'
     success_url = reverse_lazy('index')
