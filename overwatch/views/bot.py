@@ -1,14 +1,14 @@
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
-from django.forms import PasswordInput, Select
-from django.shortcuts import redirect, get_object_or_404
 from math import ceil
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse, HttpResponseRedirect
+from django.forms import Select
+from django.http import JsonResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.template import Template, Context
 from django.urls import reverse_lazy
 from django.views import View
@@ -67,6 +67,7 @@ class CreateBotView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
 
     def get_form(self, **kwargs):
         form = super(CreateBotView, self).get_form(kwargs.get('form_class'))
+        form.fields['market'].widget = Select()
         return form
 
 
