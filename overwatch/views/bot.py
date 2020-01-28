@@ -1,4 +1,6 @@
+from functools import reduce
 from math import ceil
+from operator import itemgetter
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -21,12 +23,36 @@ from overwatch.models import Bot, BotError, BotPlacedOrder, BotTrade, Exchange, 
 class ListBotView(LoginRequiredMixin, ListView):
     model = Bot
 
+    def get_most_profitable_bot(self, results):
+        profits = [r for r in results if r[0] is not None]
+
+        if not profits:
+            return None
+
+        return max(profits, key=itemgetter(1))[0]
+
     def get_context_data(self, *args, object_list=None, **kwargs):
         context = super(ListBotView, self).get_context_data(*args, **kwargs)
         context['exchange_accounts'] = Exchange.objects.filter(owner=self.request.user)
         context['aws_accounts'] = AWS.objects.filter(owner=self.request.user)
         context['exchange_form'] = ExchangeForm()
         context['aws_form'] = AWSForm()
+
+        context['total_profits'] = {
+            1: reduce(lambda a, b: a+b, [e.total_profit(1) for e in context['exchange_accounts']]),
+            7: reduce(lambda a, b: a+b, [e.total_profit(7) for e in context['exchange_accounts']]),
+            14: reduce(lambda a, b: a + b, [e.total_profit(14) for e in context['exchange_accounts']]),
+            30: reduce(lambda a, b: a + b, [e.total_profit(30) for e in context['exchange_accounts']]),
+            365: reduce(lambda a, b: a + b, [e.total_profit(365) for e in context['exchange_accounts']])
+        }
+        context['most_profitable_bots'] = {
+            1: self.get_most_profitable_bot([e.most_profitable_bot(1) for e in context['exchange_accounts']]),
+            7: self.get_most_profitable_bot([e.most_profitable_bot(7) for e in context['exchange_accounts']]),
+            14: self.get_most_profitable_bot([e.most_profitable_bot(14) for e in context['exchange_accounts']]),
+            30: self.get_most_profitable_bot([e.most_profitable_bot(30) for e in context['exchange_accounts']]),
+            365: self.get_most_profitable_bot([e.most_profitable_bot(365) for e in context['exchange_accounts']])
+        }
+        print(context['most_profitable_bots'])
         return context
 
 

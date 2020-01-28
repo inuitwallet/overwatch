@@ -1,0 +1,44 @@
+{% load overwatch_tags %}
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1>Profits</h1>
+        <div class="card-group text-center">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-header">1 day</h5>
+                    <p class="card-title">{{ total_profits.1 | profit_render }}</p>
+                    <p class="card-footer">{% if most_profitable_bots.1 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.1.pk %}" class="card-link">Bot</a>{% endif %}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-header">7 days</h5>
+                    <p class="card-title">{{ total_profits.7 | profit_render }}</p>
+                    <p class="card-footer">{% if most_profitable_bots.7 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.7.pk %}" class="card-link">Bot</a>{% endif %}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-header">14 days</h5>
+                    <p class="card-title">{{ total_profits.14 | profit_render }}</p>
+                    <p class="card-footer">{% if most_profitable_bots.14 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.14.pk %}" class="card-link">Bot</a>{% endif %}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-header">30 days</h5>
+                    <p class="card-title">{{ total_profits.30 | profit_render }}</p>
+                    <p class="card-footer">{% if most_profitable_bots.30 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.30.pk %}" class="card-link">Bot</a>{% endif %}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-header">365 days</h5>
+                    <p class="card-title">{{ total_profits.365 | profit_render }}</p>
+                    <p class="card-footer">{% if most_profitable_bots.365 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.365.pk %}" class="card-link">Bot</a>{% endif %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

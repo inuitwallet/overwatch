@@ -1,0 +1,19 @@
+<table id="configured-bots" class="table table-striped table-hover table-bordered table-dark" style="width: 100%;">
+    <caption>All Configured Bots</caption>
+    <thead class="thead-dark bg-dark">
+        <tr>
+            <td>Name</td>
+            <td>Exchange</td>
+            <td>Market Price</td>
+            <td>Last Activity</td>
+            <td>Last Price</td>
+            <td>Amount on Order</td>
+            <td>24 Hour Profit</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for bot in object_list %}
+            {% include 'overwatch/fragments/bot.html' %}
+        {% endfor %}
+    </tbody>
+</table>
