@@ -110,6 +110,7 @@
             }
             if (message_type === "update_dashboard") {
                 $('#total-profit').html(action['total_profit']);
+                $('#contributing-bots').empty();
                 action['contributing_bots'].forEach(update_contributing_bots);
             }
         });

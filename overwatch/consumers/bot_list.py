@@ -19,7 +19,7 @@ class BotListConsumer(JsonWebsocketConsumer):
         self.user = self.scope["user"]
 
         self.update_days(1)
-        self.send_profits_chart()
+        #self.send_profits_chart()
 
         self.get_bots_data()
 
