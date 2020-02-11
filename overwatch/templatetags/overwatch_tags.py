@@ -14,3 +14,8 @@ def profit_render(value):
         rendered_value = '<span style="color: red">$ {:.2f}</span>'.format(value)
 
     return mark_safe(rendered_value)
+
+
+@register.simple_tag
+def get_profit(bot, days):
+    return bot.profit(days)

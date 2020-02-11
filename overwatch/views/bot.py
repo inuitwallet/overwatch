@@ -38,21 +38,6 @@ class ListBotView(LoginRequiredMixin, ListView):
         context['exchange_form'] = ExchangeForm()
         context['aws_form'] = AWSForm()
 
-        context['total_profits'] = {
-            1: reduce(lambda a, b: a+b, [e.total_profit(1) for e in context['exchange_accounts']]),
-            7: reduce(lambda a, b: a+b, [e.total_profit(7) for e in context['exchange_accounts']]),
-            14: reduce(lambda a, b: a + b, [e.total_profit(14) for e in context['exchange_accounts']]),
-            30: reduce(lambda a, b: a + b, [e.total_profit(30) for e in context['exchange_accounts']]),
-            365: reduce(lambda a, b: a + b, [e.total_profit(365) for e in context['exchange_accounts']])
-        }
-        context['most_profitable_bots'] = {
-            1: self.get_most_profitable_bot([e.most_profitable_bot(1) for e in context['exchange_accounts']]),
-            7: self.get_most_profitable_bot([e.most_profitable_bot(7) for e in context['exchange_accounts']]),
-            14: self.get_most_profitable_bot([e.most_profitable_bot(14) for e in context['exchange_accounts']]),
-            30: self.get_most_profitable_bot([e.most_profitable_bot(30) for e in context['exchange_accounts']]),
-            365: self.get_most_profitable_bot([e.most_profitable_bot(365) for e in context['exchange_accounts']])
-        }
-        print(context['most_profitable_bots'])
         return context
 
 

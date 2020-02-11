@@ -1,11 +1,13 @@
 import datetime
 
 import ccxt
+import pygal
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum
 from django.utils.timezone import now
 from encrypted_model_fields.fields import EncryptedCharField
+from pygal.style import CleanStyle
 
 
 class Exchange(models.Model):
@@ -53,6 +55,23 @@ class Exchange(models.Model):
             total_profit += profit
 
         return total_profit
+
+    def days_profit(self, start_day=0):
+        profit = 0
+
+        for bot in self.bot_set.all():
+            profit = bot.bottrade_set.filter(
+                time__lte=now() - datetime.timedelta(days=start_day),
+                time__gte=now() - datetime.timedelta(days=start_day + 1),
+                profit_usd__isnull=False,
+                bot_trade=True
+            ).aggregate(
+                profit=Sum('profit_usd')
+            )['profit'] or 0
+
+            profit += profit
+
+        return profit
 
     def most_profitable_bot(self, days=1):
         most_profitable_bot = None

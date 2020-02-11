@@ -410,15 +410,17 @@ class Bot(models.Model):
             )
         )
 
-    def rendered_profit(self, days=1):
-        profit = self.bottrade_set.filter(
+    def profit(self, days=1):
+        return float(self.bottrade_set.filter(
             time__gte=now() - datetime.timedelta(days=days),
             profit_usd__isnull=False,
             bot_trade=True
         ).aggregate(
             profit=Sum('profit_usd')
-        )['profit']
-        return render_to_string('overwatch/fragments/bot_list/profit.html', {'profit': profit or 0})
+        )['profit'] or 0.0)
+
+    def rendered_profit(self, days=1):
+        return render_to_string('overwatch/fragments/bot_list/profit.html', {'profit': self.profit(days)})
 
     def get_placed_orders_chart(self, hours=48):
         bid_points = []

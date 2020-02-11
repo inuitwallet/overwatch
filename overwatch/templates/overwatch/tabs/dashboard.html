@@ -2,43 +2,59 @@
 
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1>Profits</h1>
-        <div class="card-group text-center">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-header">1 day</h5>
-                    <p class="card-title">{{ total_profits.1 | profit_render }}</p>
-                    <p class="card-footer">{% if most_profitable_bots.1 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.1.pk %}" class="card-link">Bot</a>{% endif %}</p>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-dark-outline" id="profit-chart-collapse-button" type="button" data-toggle="collapse" data-target="#profit-chart-collapse" aria-expanded="false" aria-controls="profit-chart-collaps">
+                    Profits Chart
+                </button>
+                <div class="collapse" id="profit-chart-collapse">
+                    <div class="card card-body">
+                        <div class="row" id="profits-chart">
+                            <div class="col">
+                                <!-- 30 day Profits Chart -->
+                                <embed />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-header">7 days</h5>
-                    <p class="card-title">{{ total_profits.7 | profit_render }}</p>
-                    <p class="card-footer">{% if most_profitable_bots.7 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.7.pk %}" class="card-link">Bot</a>{% endif %}</p>
+        </div>
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="form-row">
+                    <label id="days-label" for="days" class="col-2 text-right">Number of Days:</label>
+                    <input list="days" value="1" id="days-input" name="days" class="col-1" />
+                    <datalist id="days">
+                        <option value="1">
+                        <option value="2">
+                        <option value="3">
+                        <option value="7">
+                        <option value="14">
+                        <option value="30">
+                        <option value="365">
+                    </datalist>
+                    <button class="btn btn-dark" id="days-update-button">Update</button>
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-header">14 days</h5>
-                    <p class="card-title">{{ total_profits.14 | profit_render }}</p>
-                    <p class="card-footer">{% if most_profitable_bots.14 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.14.pk %}" class="card-link">Bot</a>{% endif %}</p>
+        </div>
+        <div class="row" id="calculated-data">
+            <div class="col">
+                <div class="card card-body" id="total-profit">
                 </div>
             </div>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-header">30 days</h5>
-                    <p class="card-title">{{ total_profits.30 | profit_render }}</p>
-                    <p class="card-footer">{% if most_profitable_bots.30 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.30.pk %}" class="card-link">Bot</a>{% endif %}</p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-header">365 days</h5>
-                    <p class="card-title">{{ total_profits.365 | profit_render }}</p>
-                    <p class="card-footer">{% if most_profitable_bots.365 %}<a href="{% url 'bot_detail' pk=most_profitable_bots.365.pk %}" class="card-link">Bot</a>{% endif %}</p>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        Contributing Bots
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group" id="contributing-bots">
+                            <!-- Bots get populated here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+

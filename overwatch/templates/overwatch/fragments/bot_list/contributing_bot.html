@@ -1,0 +1,11 @@
+{% load overwatch_tags %}
+<a href="{% url 'bot_detail' pk=bot.pk %}" class="list-group-item list-group-item-action">
+    <div class="row">
+        <div class="col">
+            {{ bot.name }}@{{ bot.exchange_account.exchange | title }}
+        </div>
+        <div class="col text-right">
+            {% get_profit bot days as profit %}{{ profit | profit_render }}
+        </div>
+    </div>
+</a>
