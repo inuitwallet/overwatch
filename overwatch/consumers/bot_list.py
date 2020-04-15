@@ -1,6 +1,7 @@
 import itertools
 from functools import reduce
 
+import ccxt
 import pygal
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
@@ -96,22 +97,30 @@ class BotListConsumer(JsonWebsocketConsumer):
 
         for exchange_account in exchange_accounts:
             if exchange_account.exchange not in balances:
-                balances[exchange_account.exchange] = {}
+                balances[exchange_account.identifier] = {}
 
             for bot in exchange_account.bot_set.all():
-                if bot.base not in balances[exchange_account.exchange]:
-                    balances[exchange_account.exchange][bot.base] = {'on_order': 0, 'available': 0}
+                print(exchange_account, bot)
+                balances[exchange_account.identifier][bot.base.upper()] = {'on_order': 0, 'available': 0}
+                balances[exchange_account.identifier][bot.quote.upper()] = {'on_order': 0, 'available': 0}
+                
+            wrapper_class = getattr(ccxt, exchange_account.exchange.lower())
+            wrapper = wrapper_class(
+                {
+                    'apiKey': exchange_account.key,
+                    'secret': exchange_account.secret,
+                    'nonce': ccxt.Exchange.milliseconds
+                }
+            )
 
-                if bot.quote not in balances[exchange_account.exchange]:
-                    balances[exchange_account.exchange][bot.quote] = {'on_order': 0, 'available': 0}
+            exchange_balances = wrapper.fetchBalance()
 
-                latest_balance = bot.botbalance_set.first()
+            for cur in exchange_balances:
+                if cur in set(balances[exchange_account.identifier].keys()):
+                    balances[exchange_account.identifier][cur]['on_order'] += exchange_balances[cur]['used']
+                    balances[exchange_account.identifier][cur]['available'] += exchange_balances[cur]['free']
 
-                balances[exchange_account.exchange][bot.base]['on_order'] += latest_balance.ask_on_order
-                balances[exchange_account.exchange][bot.quote]['on_order'] += latest_balance.bid_on_order
-
-                balances[exchange_account.exchange][bot.base]['available'] = latest_balance.ask_available
-                balances[exchange_account.exchange][bot.quote]['available'] = latest_balance.bid_available
+        print(balances)
 
         self.send_json(
             {
