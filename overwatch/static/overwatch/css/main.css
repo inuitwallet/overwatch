@@ -152,5 +152,11 @@ input[type=checkbox]
 }
 
 #calculated-data {
-    margin-top: 10px;
+    margin-top: 10px
+}
+
+.card-deck {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-gap: .5rem;
 }

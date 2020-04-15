@@ -96,8 +96,6 @@
         botWebSocketBridge.listen(function(action, stream) {
             message_type = action['message_type'];
 
-            console.log(message_type);
-
             if (message_type === 'data_update'){
                 $('#' + action['bot'] + ' .market_price').html(action['market_price']);
                 $('#' + action['bot'] + ' .activity').html(action['activity']);
@@ -112,6 +110,8 @@
                 $('#total-profit').html(action['total_profit']);
                 $('#contributing-bots').empty();
                 action['contributing_bots'].forEach(update_contributing_bots);
+                console.log(action);
+                $('#balances').html(action['balances']);
             }
         });
     </script>

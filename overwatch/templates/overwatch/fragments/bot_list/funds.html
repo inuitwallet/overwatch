@@ -1,0 +1,19 @@
+{% for exchange, currencies in balances.items %}
+    <span class="lead">{{ exchange | title }}</span>
+    <ul class="list-group list-group-flush">
+    {% for currency, cur_bal in currencies.items %}
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col">
+                    {{ currency }}
+                </div>
+                <div class="col">
+                    {{ cur_bal.on_order|floatformat:4 }}
+                </div>
+                <div class="col">
+                    {{ cur_bal.available|floatformat:4 }}
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+{% endfor %}

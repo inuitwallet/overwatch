@@ -1,13 +1,11 @@
 import datetime
 
 import ccxt
-import pygal
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum
 from django.utils.timezone import now
 from encrypted_model_fields.fields import EncryptedCharField
-from pygal.style import CleanStyle
 
 
 class Exchange(models.Model):

@@ -56,7 +56,7 @@ class BotListConsumer(JsonWebsocketConsumer):
 
     def send_profits_chart(self):
         """
-        Calculate total profits over 30 days for all exchange accounts. Push as rendered chart
+        Calculate daily profits over 30 days for all exchange accounts. Push as rendered chart
         """
         profits = {}
 
@@ -92,6 +92,27 @@ class BotListConsumer(JsonWebsocketConsumer):
         exchange_accounts = Exchange.objects.filter(owner=self.user)
         total_profit = reduce(lambda a, b: a + b, [e.total_profit(days) for e in exchange_accounts])
 
+        balances = {}
+
+        for exchange_account in exchange_accounts:
+            if exchange_account.exchange not in balances:
+                balances[exchange_account.exchange] = {}
+
+            for bot in exchange_account.bot_set.all():
+                if bot.base not in balances[exchange_account.exchange]:
+                    balances[exchange_account.exchange][bot.base] = {'on_order': 0, 'available': 0}
+
+                if bot.quote not in balances[exchange_account.exchange]:
+                    balances[exchange_account.exchange][bot.quote] = {'on_order': 0, 'available': 0}
+
+                latest_balance = bot.botbalance_set.first()
+
+                balances[exchange_account.exchange][bot.base]['on_order'] += latest_balance.ask_on_order
+                balances[exchange_account.exchange][bot.quote]['on_order'] += latest_balance.bid_on_order
+
+                balances[exchange_account.exchange][bot.base]['available'] = latest_balance.ask_available
+                balances[exchange_account.exchange][bot.quote]['available'] = latest_balance.bid_available
+
         self.send_json(
             {
                 'message_type': 'update_dashboard',
@@ -105,7 +126,8 @@ class BotListConsumer(JsonWebsocketConsumer):
                     for bot in
                     sorted(list(Bot.objects.filter(owner=self.user)), key=lambda x: x.profit(days), reverse=True)
                     if bot.profit(days) != 0.0
-                ]
+                ],
+                'balances': render_to_string('overwatch/fragments/bot_list/funds.html', {'balances': balances})
             }
         )
 

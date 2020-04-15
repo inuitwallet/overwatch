@@ -23,21 +23,12 @@ from overwatch.models import Bot, BotError, BotPlacedOrder, BotTrade, Exchange, 
 class ListBotView(LoginRequiredMixin, ListView):
     model = Bot
 
-    def get_most_profitable_bot(self, results):
-        profits = [r for r in results if r[0] is not None]
-
-        if not profits:
-            return None
-
-        return max(profits, key=itemgetter(1))[0]
-
     def get_context_data(self, *args, object_list=None, **kwargs):
         context = super(ListBotView, self).get_context_data(*args, **kwargs)
         context['exchange_accounts'] = Exchange.objects.filter(owner=self.request.user)
         context['aws_accounts'] = AWS.objects.filter(owner=self.request.user)
         context['exchange_form'] = ExchangeForm()
         context['aws_form'] = AWSForm()
-
         return context
 
 
