@@ -23,7 +23,7 @@ constantly==15.1.0
 cryptography==2.8
 curtsies==0.3.0
 daphne==2.2.4
-Django==2.1.5
+Django==2.2.13
 django-bootstrap-form==3.4
 django-encrypted-model-fields==0.5.8
 django-etc==0.11.1
