@@ -120,8 +120,6 @@ class BotListConsumer(JsonWebsocketConsumer):
                     balances[exchange_account.identifier][cur]['on_order'] += exchange_balances[cur]['used']
                     balances[exchange_account.identifier][cur]['available'] += exchange_balances[cur]['free']
 
-        print(balances)
-
         self.send_json(
             {
                 'message_type': 'update_dashboard',
