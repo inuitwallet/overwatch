@@ -69,7 +69,7 @@ jobs:
 
           DATABASES = {
             'default': {
-              'ENGINE': 'tenant_schemas.postgresql_backend',
+              'ENGINE': 'django.db.backends.postgresql',
               'NAME': 'github_actions',
               'USER': 'postgres',
               'PASSWORD': 'postgres',
@@ -106,5 +106,5 @@ jobs:
             git pull origin master
             pipenv sync
             echo "DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}" > .env
-            pipenv run python manage.py migrate_schemas
-            sudo supervisorctl restart daio:*
+            pipenv run python manage.py migrate
+            sudo supervisorctl restart overwatch:*
