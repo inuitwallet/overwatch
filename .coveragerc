@@ -1,0 +1,19 @@
+[run]
+branch = True
+command_line = -m pytest
+source =
+    overwatch
+omit =
+    */.local/*
+    */tests/*
+    */migrations/*
+    */wsgi.py
+    */asgi.py
+    */settings.py
+    */local_settings.py
+    */apps.py
+
+
+[report]
+fail_under = 20
+show_missing = True

@@ -1,0 +1,110 @@
+name: test_deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  lint_test_deploy:
+    name: lint then test then deploy
+    runs-on: ubuntu-20.04
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:12.1
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        # Docker Hub image
+        image: redis
+        ports:
+          - 6379:6379
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: install pipenv
+        uses: dschep/install-pipenv-action@v1
+
+      - name: Install dependencies
+        run: |
+          pipenv sync --dev
+
+      - name: Run pre-commit
+        run: |
+          pipenv run pre-commit run -a --verbose
+
+      - name: create local_settings.py
+        run: |
+          echo "
+          from .settings import *
+
+          DATABASES = {
+            'default': {
+              'ENGINE': 'tenant_schemas.postgresql_backend',
+              'NAME': 'github_actions',
+              'USER': 'postgres',
+              'PASSWORD': 'postgres',
+              'HOST': '127.0.0.1',
+              'PORT': '5432',
+            }
+          }
+          " >> daio/local_settings.py
+
+
+      - name: run tests under coverage
+        run: |
+          pipenv run coverage run
+          pipenv run coverage xml
+
+      - name: upload coverage report to codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.xml
+
+      - name: deploy code
+        uses: appleboy/ssh-action@master
+        env:
+          DJANGO_SETTINGS_MODULE: "overwatch.local_settings"
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSHKEY }}
+          port: ${{ secrets.PORT }}
+          envs: DJANGO_SETTINGS_MODULE
+          script_stop: true
+          script: |
+            cd /home/overwatch/overwatch
+            git pull origin master
+            pipenv sync
+            echo "DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}" > .env
+            pipenv run python manage.py migrate_schemas
+            sudo supervisorctl restart daio:*

@@ -18,8 +18,17 @@ django-storages = "*"
 django-widget-tweaks = "*"
 psycopg2-binary = "*"
 pygal = "*"
+black = "==20.8b1"
 
 [dev-packages]
+pytest-django = "*"
+black = "*"
+flake8 = "*"
+isort = "*"
+pre-commit = "*"
+autopep8 = "*"
+coverage = "*"
+django-coverage-plugin = "*"
 
 [requires]
 python_version = "3.8"
