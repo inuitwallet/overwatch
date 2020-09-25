@@ -9,13 +9,13 @@ from .bot_order import BotOrderConsumer
 from .bot_trade import BotTradeConsumer
 
 __all__ = [
-    'CloudWatchLogsConsumer',
-    'BotConsumer',
-    'BotDeployConsumer',
-    'BotFormConsumer',
-    'BotListConsumer',
-    'BotPriceConsumer',
-    'BotBalanceConsumer',
-    'BotOrderConsumer',
-    'BotTradeConsumer'
+    "CloudWatchLogsConsumer",
+    "BotConsumer",
+    "BotDeployConsumer",
+    "BotFormConsumer",
+    "BotListConsumer",
+    "BotPriceConsumer",
+    "BotBalanceConsumer",
+    "BotOrderConsumer",
+    "BotTradeConsumer",
 ]

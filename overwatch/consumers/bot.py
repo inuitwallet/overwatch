@@ -17,9 +17,7 @@ class BotConsumer(JsonWebsocketConsumer):
         """
         # get the bot from the websocket url
         try:
-            self.bot = Bot.objects.get(
-                pk=self.scope['url_route']['kwargs']['pk']
-            )
+            self.bot = Bot.objects.get(pk=self.scope["url_route"]["kwargs"]["pk"])
         except Bot.DoesNotExist:
             self.close()
             return
@@ -28,8 +26,12 @@ class BotConsumer(JsonWebsocketConsumer):
         self.accept()
 
         # add the channel to the necessary groups
-        async_to_sync(self.channel_layer.group_add)('bot_{}'.format(self.bot.pk), self.channel_name)
-        async_to_sync(self.channel_layer.group_add)('cloudwatch_logs_{}'.format(self.bot.pk), self.channel_name)
+        async_to_sync(self.channel_layer.group_add)(
+            "bot_{}".format(self.bot.pk), self.channel_name
+        )
+        async_to_sync(self.channel_layer.group_add)(
+            "cloudwatch_logs_{}".format(self.bot.pk), self.channel_name
+        )
 
         # clear the bot data
         self.clear({})
@@ -45,80 +47,65 @@ class BotConsumer(JsonWebsocketConsumer):
 
         # get the latest cloudwatch logs
         async_to_sync(get_channel_layer().send)(
-            'cloudwatch-logs',
-            {
-                "type": "get.cloudwatch.logs",
-                "bot_pk": self.bot.pk
-            },
+            "cloudwatch-logs", {"type": "get.cloudwatch.logs", "bot_pk": self.bot.pk},
         )
 
     def disconnect(self, close_code):
         """
         disconnect from the websocket so remove from groups
         """
-        async_to_sync(self.channel_layer.group_discard)('bot_{}'.format(self.bot.pk), self.channel_name)
-        async_to_sync(self.channel_layer.group_discard)('cloudwatch_logs_{}'.format(self.bot.pk), self.channel_name)
+        async_to_sync(self.channel_layer.group_discard)(
+            "bot_{}".format(self.bot.pk), self.channel_name
+        )
+        async_to_sync(self.channel_layer.group_discard)(
+            "cloudwatch_logs_{}".format(self.bot.pk), self.channel_name
+        )
         self.close()
 
     def receive_json(self, content, **kwargs):
-        message_type = content.get('message_type')
+        message_type = content.get("message_type")
 
-        if message_type == 'deploy':
+        if message_type == "deploy":
             async_to_sync(get_channel_layer().send)(
-                'bot-deploy',
-                {
-                    "type": "deploy",
-                    "bot_pk": content.get('bot')
-                },
+                "bot-deploy", {"type": "deploy", "bot_pk": content.get("bot")},
             )
 
-        if message_type == 'update':
+        if message_type == "update":
             async_to_sync(get_channel_layer().send)(
-                'bot-deploy',
-                {
-                    "type": "update",
-                    "bot_pk": content.get('bot')
-                },
+                "bot-deploy", {"type": "update", "bot_pk": content.get("bot")},
             )
 
     def clear(self, event):
         """
         Instruct the javascript on the bot_detail page to clear the bot data holders
         """
-        self.send(
-            json.dumps(
-                {
-                    'message_type': 'bot_clear'
-                }
-            )
-        )
+        self.send(json.dumps({"message_type": "bot_clear"}))
 
     def logs_clear(self, event):
         """
         Instruct javascript on bot_detail page to clear the cloudwatch_logs holder
         """
-        self.send(
-            json.dumps(
-                {
-                    'message_type': 'cloudwatch_logs_clear'
-                }
-            )
-        )
+        self.send(json.dumps({"message_type": "cloudwatch_logs_clear"}))
 
     def get_heart_beats(self, event):
         """
         Send the 15 latest heartbeats to the front end
         """
         # clear the heartbeat container
-        self.send(json.dumps({'message_type': 'heartbeat_clear'}))
+        self.send(json.dumps({"message_type": "heartbeat_clear"}))
 
         # get the latest 15 heartbeats and send them to the javascript on the bot_detail page
-        for heartbeat in sorted(self.bot.botheartbeat_set.all()[:15], key=lambda x: x.time):
+        for heartbeat in sorted(
+            self.bot.botheartbeat_set.all()[:15], key=lambda x: x.time
+        ):
             self.send(
                 json.dumps(
                     {
-                        'message_type': 'heartbeat',
-                        'heartbeat': render_to_string('overwatch/fragments/heartbeat.html', {'heartbeat': heartbeat})
+                        "message_type": "heartbeat",
+                        "heartbeat": render_to_string(
+                            "overwatch/fragments/heartbeat.html",
+                            {"heartbeat": heartbeat},
+                        ),
                     }
                 )
             )
@@ -130,14 +117,14 @@ class BotConsumer(JsonWebsocketConsumer):
         self.send(
             json.dumps(
                 {
-                    'message_type': 'price_info',
-                    'price_peg': self.bot.rendered_price(usd=True),
-                    'price': self.bot.rendered_price(usd=False),
-                    'price_sparkline': self.bot.price_sparkline(),
-                    'bid_price_peg': self.bot.rendered_bid_price(usd=True),
-                    'bid_price': self.bot.rendered_bid_price(usd=False),
-                    'ask_price_peg': self.bot.rendered_ask_price(usd=True),
-                    'ask_price': self.bot.rendered_ask_price(usd=False)
+                    "message_type": "price_info",
+                    "price_peg": self.bot.rendered_price(usd=True),
+                    "price": self.bot.rendered_price(usd=False),
+                    "price_sparkline": self.bot.price_sparkline(),
+                    "bid_price_peg": self.bot.rendered_bid_price(usd=True),
+                    "bid_price": self.bot.rendered_bid_price(usd=False),
+                    "ask_price_peg": self.bot.rendered_ask_price(usd=True),
+                    "ask_price": self.bot.rendered_ask_price(usd=False),
                 }
             )
         )
@@ -149,33 +136,33 @@ class BotConsumer(JsonWebsocketConsumer):
         self.send(
             json.dumps(
                 {
-                    'message_type': 'balance_info',
-                    'bid_balance_peg': '{} / {}'.format(
+                    "message_type": "balance_info",
+                    "bid_balance_peg": "{} / {}".format(
                         self.bot.rendered_bid_balance(on_order=True, usd=True),
-                        self.bot.rendered_bid_balance(on_order=False, usd=True)
+                        self.bot.rendered_bid_balance(on_order=False, usd=True),
                     ),
-                    'bid_balance': '({} / {})'.format(
+                    "bid_balance": "({} / {})".format(
                         self.bot.rendered_bid_balance(on_order=True, usd=False),
-                        self.bot.rendered_bid_balance(on_order=False, usd=False)
+                        self.bot.rendered_bid_balance(on_order=False, usd=False),
                     ),
-                    'ask_balance_peg': '{} / {}'.format(
+                    "ask_balance_peg": "{} / {}".format(
                         self.bot.rendered_ask_balance(on_order=True, usd=True),
-                        self.bot.rendered_ask_balance(on_order=False, usd=True)
+                        self.bot.rendered_ask_balance(on_order=False, usd=True),
                     ),
-                    'ask_balance': '({} / {})'.format(
+                    "ask_balance": "({} / {})".format(
                         self.bot.rendered_ask_balance(on_order=True, usd=False),
-                        self.bot.rendered_ask_balance(on_order=False, usd=False)
-                    )
+                        self.bot.rendered_ask_balance(on_order=False, usd=False),
+                    ),
                 }
             )
         )
         self.send(
             json.dumps(
                 {
-                    'message_type': 'balances_chart',
-                    'chart': '<embed type="image/svg+xml" src="{}" />'.format(
+                    "message_type": "balances_chart",
+                    "chart": '<embed type="image/svg+xml" src="{}" />'.format(
                         self.bot.get_balances_chart()
-                    )
+                    ),
                 }
             )
         )
@@ -187,9 +174,9 @@ class BotConsumer(JsonWebsocketConsumer):
         self.send(
             json.dumps(
                 {
-                    'message_type': 'cloudwatch_logs_add_line',
-                    'time': event.get('time'),
-                    'message': event.get('message')
+                    "message_type": "cloudwatch_logs_add_line",
+                    "time": event.get("time"),
+                    "message": event.get("message"),
                 }
             )
         )
@@ -201,9 +188,9 @@ class BotConsumer(JsonWebsocketConsumer):
         self.send(
             json.dumps(
                 {
-                    'message_type': 'toast_notification',
-                    'target': event.get('target'),
-                    'text': event.get('text')
+                    "message_type": "toast_notification",
+                    "target": event.get("target"),
+                    "text": event.get("text"),
                 }
             )
         )
@@ -213,21 +200,15 @@ class BotConsumer(JsonWebsocketConsumer):
         send placed_order table entries or the data url containing the placed_orders_chart to the front end
         """
         # this send just redraws the datatable
-        self.send(
-            json.dumps(
-                {
-                    'message_type': 'placed_order',
-                }
-            )
-        )
+        self.send(json.dumps({"message_type": "placed_order",}))
         # this send pushes the chart data url
         self.send(
             json.dumps(
                 {
-                    'message_type': 'placed_order_chart',
-                    'chart': '<embed type="image/svg+xml" src="{}"/>'.format(
-                        self.bot.get_placed_orders_chart(hours=event.get('hours', 48))
-                    )
+                    "message_type": "placed_order_chart",
+                    "chart": '<embed type="image/svg+xml" src="{}"/>'.format(
+                        self.bot.get_placed_orders_chart(hours=event.get("hours", 48))
+                    ),
                 }
             )
         )
@@ -237,21 +218,15 @@ class BotConsumer(JsonWebsocketConsumer):
         send trade table entries or the data url containing the trades_chart to the front end
         """
         # this send just redraws the datatable
-        self.send(
-            json.dumps(
-                {
-                    'message_type': 'trade',
-                }
-            )
-        )
+        self.send(json.dumps({"message_type": "trade",}))
         # this send pushes the chart data url
         self.send(
             json.dumps(
                 {
-                    'message_type': 'trades_chart',
-                    'chart': '<embed type="image/svg+xml" src="{}" />'.format(
-                        self.bot.get_trades_chart(days=event.get('days'))
-                    )
+                    "message_type": "trades_chart",
+                    "chart": '<embed type="image/svg+xml" src="{}" />'.format(
+                        self.bot.get_trades_chart(days=event.get("days"))
+                    ),
                 }
             )
         )
@@ -260,10 +235,4 @@ class BotConsumer(JsonWebsocketConsumer):
         """
         send the message to redraw the errors table
         """
-        self.send(
-            json.dumps(
-                {
-                    'message_type': 'bot_error'
-                }
-            )
-        )
+        self.send(json.dumps({"message_type": "bot_error"}))

@@ -6,70 +6,89 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0016_botbalance_unit'),
+        ("overwatch", "0016_botbalance_unit"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='ask_spread',
-            field=models.FloatField(default=0, help_text='The spread to add to the fee on the Sell side'),
+            model_name="bot",
+            name="ask_spread",
+            field=models.FloatField(
+                default=0, help_text="The spread to add to the fee on the Sell side"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='bot',
-            name='aws_access_key',
+            model_name="bot",
+            name="aws_access_key",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='aws_secret_key',
+            model_name="bot",
+            name="aws_secret_key",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='bid_spread',
-            field=models.FloatField(default=0, help_text='The spread to add to the fee on the Buy side'),
+            model_name="bot",
+            name="bid_spread",
+            field=models.FloatField(
+                default=0, help_text="The spread to add to the fee on the Buy side"
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='base',
-            field=models.CharField(help_text='The base currency of the pair to operate on', max_length=255),
+            model_name="bot",
+            name="base",
+            field=models.CharField(
+                help_text="The base currency of the pair to operate on", max_length=255
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='fee',
-            field=models.FloatField(help_text='The fee to apply to each side. Shown as a percentage'),
+            model_name="bot",
+            name="fee",
+            field=models.FloatField(
+                help_text="The fee to apply to each side. Shown as a percentage"
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='order_amount',
-            field=models.FloatField(help_text='The amount each order should be'),
+            model_name="bot",
+            name="order_amount",
+            field=models.FloatField(help_text="The amount each order should be"),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='peg',
-            field=models.CharField(help_text='The currency to peg to. The value of this currency will be used to calculate prices', max_length=255),
+            model_name="bot",
+            name="peg",
+            field=models.CharField(
+                help_text="The currency to peg to. The value of this currency will be used to calculate prices",
+                max_length=255,
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='quote',
-            field=models.CharField(help_text='The quote currency of the pair to operate on', max_length=255),
+            model_name="bot",
+            name="quote",
+            field=models.CharField(
+                help_text="The quote currency of the pair to operate on", max_length=255
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='tolerance',
-            field=models.FloatField(help_text='How far from the price an order can be before it is cancelled and replaced at the correct price.Show as a Percentage'),
+            model_name="bot",
+            name="tolerance",
+            field=models.FloatField(
+                help_text="How far from the price an order can be before it is cancelled and replaced at the correct price.Show as a Percentage"
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='total_ask',
-            field=models.FloatField(help_text='The total amount of funds allowed on the Sell side'),
+            model_name="bot",
+            name="total_ask",
+            field=models.FloatField(
+                help_text="The total amount of funds allowed on the Sell side"
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='total_bid',
-            field=models.FloatField(help_text='The total amount of funds allowed on the Buy side'),
+            model_name="bot",
+            name="total_bid",
+            field=models.FloatField(
+                help_text="The total amount of funds allowed on the Buy side"
+            ),
         ),
     ]

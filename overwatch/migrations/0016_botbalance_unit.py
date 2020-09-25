@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0015_botbalance'),
+        ("overwatch", "0015_botbalance"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='botbalance',
-            name='unit',
-            field=models.CharField(default='NBT', max_length=255),
+            model_name="botbalance",
+            name="unit",
+            field=models.CharField(default="NBT", max_length=255),
             preserve_default=False,
         ),
     ]

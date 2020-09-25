@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0029_bot_price_url'),
+        ("overwatch", "0029_bot_price_url"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='bot',
-            old_name='price_url',
-            new_name='base_price_url',
+            model_name="bot", old_name="price_url", new_name="base_price_url",
         ),
         migrations.AddField(
-            model_name='bot',
-            name='market_price',
+            model_name="bot",
+            name="market_price",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='quote_price_url',
-            field=models.URLField(default='https://price-aggregator.crypto-daio.co.uk/price'),
+            model_name="bot",
+            name="quote_price_url",
+            field=models.URLField(
+                default="https://price-aggregator.crypto-daio.co.uk/price"
+            ),
         ),
     ]

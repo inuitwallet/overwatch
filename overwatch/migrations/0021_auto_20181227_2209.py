@@ -6,16 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0020_bottrade'),
+        ("overwatch", "0020_bottrade"),
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='bottrade',
-            options={'ordering': ['-time']},
-        ),
+        migrations.AlterModelOptions(name="bottrade", options={"ordering": ["-time"]},),
         migrations.AlterUniqueTogether(
-            name='bottrade',
-            unique_together={('bot', 'trade_id')},
+            name="bottrade", unique_together={("bot", "trade_id")},
         ),
     ]

@@ -7,21 +7,34 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0010_merge_20180704_2210'),
+        ("overwatch", "0010_merge_20180704_2210"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BotPlacedOrder',
+            name="BotPlacedOrder",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('base', models.CharField(max_length=255)),
-                ('quote', models.CharField(max_length=255)),
-                ('order_type', models.CharField(max_length=255)),
-                ('price', models.FloatField()),
-                ('amount', models.FloatField()),
-                ('bot', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='overwatch.Bot')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("time", models.DateTimeField(auto_now_add=True)),
+                ("base", models.CharField(max_length=255)),
+                ("quote", models.CharField(max_length=255)),
+                ("order_type", models.CharField(max_length=255)),
+                ("price", models.FloatField()),
+                ("amount", models.FloatField()),
+                (
+                    "bot",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="overwatch.Bot"
+                    ),
+                ),
             ],
         ),
     ]

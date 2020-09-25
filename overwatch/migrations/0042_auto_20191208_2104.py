@@ -6,16 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0041_auto_20191208_2035'),
+        ("overwatch", "0041_auto_20191208_2035"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='bot',
-            options={'ordering': ['name', 'exchange_account__identifier', 'active']},
+            name="bot",
+            options={"ordering": ["name", "exchange_account__identifier", "active"]},
         ),
-        migrations.RemoveField(
-            model_name='bot',
-            name='exchange',
-        ),
+        migrations.RemoveField(model_name="bot", name="exchange",),
     ]

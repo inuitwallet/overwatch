@@ -7,17 +7,25 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0007_auto_20180514_2030'),
+        ("overwatch", "0007_auto_20180514_2030"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ApiProfile',
+            name="ApiProfile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('api_user', models.UUIDField(default=uuid.uuid4)),
-                ('api_secret', models.UUIDField(default=uuid.uuid4)),
-                ('last_nonce', models.BigIntegerField(default=0)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("api_user", models.UUIDField(default=uuid.uuid4)),
+                ("api_secret", models.UUIDField(default=uuid.uuid4)),
+                ("last_nonce", models.BigIntegerField(default=0)),
             ],
         ),
     ]

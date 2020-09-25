@@ -7,13 +7,13 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0001_initial'),
+        ("overwatch", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='api_secret',
+            model_name="bot",
+            name="api_secret",
             field=models.UUIDField(default=uuid.uuid4),
         ),
     ]

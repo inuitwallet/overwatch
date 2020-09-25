@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0028_bottrade_bot_trade'),
+        ("overwatch", "0028_bottrade_bot_trade"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='price_url',
-            field=models.URLField(default='https://price-aggregator.crypto-daio.co.uk/price'),
+            model_name="bot",
+            name="price_url",
+            field=models.URLField(
+                default="https://price-aggregator.crypto-daio.co.uk/price"
+            ),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0018_auto_20181006_1920'),
+        ("overwatch", "0018_auto_20181006_1920"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='botprice',
-            name='unit',
+            model_name="botprice",
+            name="unit",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

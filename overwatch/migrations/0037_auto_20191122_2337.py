@@ -7,22 +7,29 @@ import encrypted_model_fields.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0036_bot_bot_type'),
+        ("overwatch", "0036_bot_bot_type"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='bot',
-            options={'ordering': ['name', 'exchange', 'active']},
+            name="bot", options={"ordering": ["name", "exchange", "active"]},
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='vigil_funds_alert_channel_id',
-            field=encrypted_model_fields.fields.EncryptedCharField(blank=True, help_text='Use for reporting fund errors via Vigil.\nDatabase encrypted', null=True),
+            model_name="bot",
+            name="vigil_funds_alert_channel_id",
+            field=encrypted_model_fields.fields.EncryptedCharField(
+                blank=True,
+                help_text="Use for reporting fund errors via Vigil.\nDatabase encrypted",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='vigil_wrapper_error_channel_id',
-            field=encrypted_model_fields.fields.EncryptedCharField(blank=True, help_text='Use for reporting bot errors via Vigil.\nDatabase encrypted', null=True),
+            model_name="bot",
+            name="vigil_wrapper_error_channel_id",
+            field=encrypted_model_fields.fields.EncryptedCharField(
+                blank=True,
+                help_text="Use for reporting bot errors via Vigil.\nDatabase encrypted",
+                null=True,
+            ),
         ),
     ]

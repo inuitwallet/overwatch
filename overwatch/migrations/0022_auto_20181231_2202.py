@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0021_auto_20181227_2209'),
+        ("overwatch", "0021_auto_20181227_2209"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='base_decimal_places',
+            model_name="bot",
+            name="base_decimal_places",
             field=models.IntegerField(default=6),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='peg_decimal_places',
+            model_name="bot",
+            name="peg_decimal_places",
             field=models.IntegerField(default=6),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='quote_decimal_places',
+            model_name="bot",
+            name="quote_decimal_places",
             field=models.IntegerField(default=6),
         ),
     ]

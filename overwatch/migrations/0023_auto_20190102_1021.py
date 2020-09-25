@@ -6,23 +6,17 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0022_auto_20181231_2202'),
+        ("overwatch", "0022_auto_20181231_2202"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='botprice',
-            old_name='ask_price_peg',
-            new_name='ask_price_usd',
+            model_name="botprice", old_name="ask_price_peg", new_name="ask_price_usd",
         ),
         migrations.RenameField(
-            model_name='botprice',
-            old_name='bid_price_peg',
-            new_name='bid_price_usd',
+            model_name="botprice", old_name="bid_price_peg", new_name="bid_price_usd",
         ),
         migrations.RenameField(
-            model_name='botprice',
-            old_name='price_peg',
-            new_name='price_usd',
+            model_name="botprice", old_name="price_peg", new_name="price_usd",
         ),
     ]

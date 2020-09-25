@@ -3,18 +3,13 @@ import requests
 
 class PriceManager(object):
     def __init__(self):
-        self.rates = {'USD': 1}
+        self.rates = {"USD": 1}
 
     def get_aggregator_price(self, currency, url):
         if currency.upper() in self.rates:
             return
 
-        r = requests.get(
-            url='{}/{}'.format(
-                url,
-                currency
-            )
-        )
+        r = requests.get(url="{}/{}".format(url, currency))
 
         if r.status_code != requests.codes.ok:
             self.rates[currency] = None
@@ -26,14 +21,14 @@ class PriceManager(object):
             self.rates[currency] = None
             return
 
-        moving_averages = data.get('moving_averages', {})
-        avg_price = moving_averages.get('30_minute')
+        moving_averages = data.get("moving_averages", {})
+        avg_price = moving_averages.get("30_minute")
 
         if not avg_price:
-            avg_price = data.get('aggregated_usd_price')
+            avg_price = data.get("aggregated_usd_price")
 
         if not avg_price:
-            avg_price = data.get('usd_price')
+            avg_price = data.get("usd_price")
 
         if not avg_price:
             self.rates[currency] = None

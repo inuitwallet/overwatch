@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0047_botbalance_bid_available_as_base'),
+        ("overwatch", "0047_botbalance_bid_available_as_base"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='botprice',
-            name='base_price',
+            model_name="botprice",
+            name="base_price",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='botprice',
-            name='quote_price',
+            model_name="botprice",
+            name="quote_price",
             field=models.FloatField(blank=True, null=True),
         ),
     ]

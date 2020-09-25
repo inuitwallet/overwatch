@@ -13,10 +13,16 @@ def check_currencies(sender, instance, **kwargs):
     exchange = getattr(ccxt, instance.exchange)()
 
     for market in exchange.fetch_markets():
-        if market['base'].upper() == instance.base.upper and market['quote'].upper() == instance.quote.upper():
+        if (
+            market["base"].upper() == instance.base.upper
+            and market["quote"].upper() == instance.quote.upper()
+        ):
             return
 
-        if market['base'].upper() == instance.quote.upper and market['quote'].upper() == instance.base.upper():
+        if (
+            market["base"].upper() == instance.quote.upper
+            and market["quote"].upper() == instance.base.upper()
+        ):
             # raise ValidationError(
             #     'There is a {} pair. You possibly have base and quote reversed'.format(market['symbol'])
             # )
@@ -24,4 +30,8 @@ def check_currencies(sender, instance, **kwargs):
 
     return
 
-    raise ValidationError('No {} market matching {}/{} found'.format(instance.exchange, instance.base, instance.quote))
+    raise ValidationError(
+        "No {} market matching {}/{} found".format(
+            instance.exchange, instance.base, instance.quote
+        )
+    )

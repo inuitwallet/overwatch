@@ -6,14 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0035_auto_20191112_2217'),
+        ("overwatch", "0035_auto_20191112_2217"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='bot_type',
-            field=models.CharField(choices=[('spread_bot', 'Spread_Bot')], default='spread_bot', max_length=255),
+            model_name="bot",
+            name="bot_type",
+            field=models.CharField(
+                choices=[("spread_bot", "Spread_Bot")],
+                default="spread_bot",
+                max_length=255,
+            ),
             preserve_default=False,
         ),
     ]

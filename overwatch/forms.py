@@ -7,18 +7,15 @@ from overwatch.models import Exchange, AWS
 class AWSForm(forms.ModelForm):
     class Meta:
         model = AWS
-        fields = ['identifier', 'region', 'access_key', 'secret_key']
-        widgets = {
-            'access_key': PasswordInput(),
-            'secret_key': PasswordInput()
-        }
+        fields = ["identifier", "region", "access_key", "secret_key"]
+        widgets = {"access_key": PasswordInput(), "secret_key": PasswordInput()}
 
 
 class ExchangeForm(forms.ModelForm):
     class Meta:
         model = Exchange
-        fields = ['identifier', 'exchange', 'key', 'secret']
+        fields = ["identifier", "exchange", "key", "secret"]
         widgets = {
-            'key': PasswordInput(),
-            'secret': PasswordInput(),
+            "key": PasswordInput(),
+            "secret": PasswordInput(),
         }

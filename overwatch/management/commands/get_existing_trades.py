@@ -12,79 +12,79 @@ from overwatch.models import BotTrade, Bot
 class Command(BaseCommand):
     @staticmethod
     def get_price(cur, dt):
-        r = requests.get('https://price-aggregator.crypto-daio.co.uk/price/{}/{}'.format(cur, dt))
+        r = requests.get(
+            "https://price-aggregator.crypto-daio.co.uk/price/{}/{}".format(cur, dt)
+        )
 
         if r.status_code != requests.codes.ok:
-            print('Bad response from aggregator: {} {}'.format(r.status_code, r.reason))
+            print("Bad response from aggregator: {} {}".format(r.status_code, r.reason))
             return None
 
         try:
             response = r.json()
         except ValueError:
-            print('No Json: {}'.format(r.text))
+            print("No Json: {}".format(r.text))
             return None
 
-        agg_price = response.get('moving_averages', {}).get('30_minute')
+        agg_price = response.get("moving_averages", {}).get("30_minute")
 
         if agg_price is None:
-            print('No agg_price?: {}'.format(response))
+            print("No agg_price?: {}".format(response))
             return None
 
         return agg_price
 
     def handle(self, *args, **options):
         conn = psycopg2.connect(
-            dbname='completed_trades',
-            user='liquidity_operations',
+            dbname="completed_trades",
+            user="liquidity_operations",
             password=settings.BITTREX_TRADES_PASSWORD,
             host=settings.BITTREX_TRADES_HOST,
-            port=5432
+            port=5432,
         )
 
         curr = conn.cursor()
 
-        prices = {'btc': {}, 'usnbt': {}}
+        prices = {"btc": {}, "usnbt": {}}
 
-        curr.execute(
-            "select * from completed_trades order by datetime desc;"
-        )
+        curr.execute("select * from completed_trades order by datetime desc;")
         rows = curr.fetchall()
 
         for row in rows:
             try:
                 BotTrade.objects.get(trade_id=row[4])
-                print('Trade already exists')
+                print("Trade already exists")
             except BotTrade.DoesNotExist:
                 print(row)
-                dt = row[0].strftime('%Y-%m-%dT%H:%M:%S')
+                dt = row[0].strftime("%Y-%m-%dT%H:%M:%S")
 
-                btc_price = prices['btc'].get(dt, self.get_price('btc', dt))
+                btc_price = prices["btc"].get(dt, self.get_price("btc", dt))
 
                 if btc_price is None:
                     continue
 
-                prices['btc'][dt] = btc_price
+                prices["btc"][dt] = btc_price
 
-                usnbt_price = prices['usnbt'].get(dt, self.get_price('usnbt', dt))
+                usnbt_price = prices["usnbt"].get(dt, self.get_price("usnbt", dt))
 
                 if usnbt_price is None:
                     continue
 
-                prices['usnbt'][dt] = usnbt_price
+                prices["usnbt"][dt] = usnbt_price
 
-                print('price = {}'.format(row[6]))
-                print('btc price = {}'.format(btc_price))
+                print("price = {}".format(row[6]))
+                print("btc price = {}".format(btc_price))
 
                 trade_price_usd = row[6] * btc_price
 
-                print('trade_price = {}'.format(trade_price_usd))
+                print("trade_price = {}".format(trade_price_usd))
 
-                if row[5] == 'buy':
+                if row[5] == "buy":
                     trade_diff_usd = usnbt_price - trade_price_usd
                 else:
                     trade_diff_usd = trade_price_usd - usnbt_price
                 # let's make a new trade
-                name = '{}-{}'.format(row[2], row[3])
+                name = "{}-{}".format(row[2], row[3])
                 bot = Bot.objects.get(name__iexact=name, exchange__iexact=row[1])
 
                 trade = BotTrade.objects.create(
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                     target_price_usd=usnbt_price,
                     trade_price_usd=trade_price_usd,
                     difference_usd=trade_diff_usd,
-                    profit_usd=trade_diff_usd * row[7]
+                    profit_usd=trade_diff_usd * row[7],
                 )
 
                 print(trade)

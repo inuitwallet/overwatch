@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0044_auto_20191209_2014'),
+        ("overwatch", "0044_auto_20191209_2014"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='peg_price_url',
-            field=models.URLField(default='https://price-aggregator.crypto-daio.co.uk/price'),
+            model_name="bot",
+            name="peg_price_url",
+            field=models.URLField(
+                default="https://price-aggregator.crypto-daio.co.uk/price"
+            ),
         ),
     ]

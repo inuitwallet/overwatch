@@ -6,17 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0004_botheartbeat'),
+        ("overwatch", "0004_botheartbeat"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='botheartbeat',
-            options={'ordering': ['-time']},
+            name="botheartbeat", options={"ordering": ["-time"]},
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='last_nonce',
+            model_name="bot",
+            name="last_nonce",
             field=models.BigIntegerField(default=0),
         ),
     ]

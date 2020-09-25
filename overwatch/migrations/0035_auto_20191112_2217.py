@@ -7,68 +7,91 @@ import encrypted_model_fields.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0034_auto_20191110_1953'),
+        ("overwatch", "0034_auto_20191110_1953"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='base_url',
-            field=models.URLField(blank=True, help_text='The base url of the exchange api', max_length=255, null=True),
+            model_name="bot",
+            name="base_url",
+            field=models.URLField(
+                blank=True,
+                help_text="The base url of the exchange api",
+                max_length=255,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='exchange_api_key',
-            field=encrypted_model_fields.fields.EncryptedCharField(blank=True, help_text='database encrypted and hidden from display', null=True),
+            model_name="bot",
+            name="exchange_api_key",
+            field=encrypted_model_fields.fields.EncryptedCharField(
+                blank=True,
+                help_text="database encrypted and hidden from display",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='exchange_api_secret',
-            field=encrypted_model_fields.fields.EncryptedCharField(blank=True, help_text='database encrypted and hidden from display', null=True),
+            model_name="bot",
+            name="exchange_api_secret",
+            field=encrypted_model_fields.fields.EncryptedCharField(
+                blank=True,
+                help_text="database encrypted and hidden from display",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='schedule',
-            field=models.IntegerField(default=2, help_text='How often the bot should run (Minutes)'),
+            model_name="bot",
+            name="schedule",
+            field=models.IntegerField(
+                default=2, help_text="How often the bot should run (Minutes)"
+            ),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='sleep_long',
-            field=models.IntegerField(default=5),
+            model_name="bot", name="sleep_long", field=models.IntegerField(default=5),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='sleep_medium',
-            field=models.IntegerField(default=3),
+            model_name="bot", name="sleep_medium", field=models.IntegerField(default=3),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='sleep_short',
-            field=models.IntegerField(default=2),
+            model_name="bot", name="sleep_short", field=models.IntegerField(default=2),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='timeout',
-            field=models.IntegerField(default=300),
+            model_name="bot", name="timeout", field=models.IntegerField(default=300),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='vigil_funds_alert_channel_id',
-            field=encrypted_model_fields.fields.EncryptedCharField(blank=True, default='ef77dfd5-4a38-43e4-9538-8490a6ef965a', help_text='Use for reporting fund errors via Vigil.\nDatabase encrypted', null=True),
+            model_name="bot",
+            name="vigil_funds_alert_channel_id",
+            field=encrypted_model_fields.fields.EncryptedCharField(
+                blank=True,
+                default="ef77dfd5-4a38-43e4-9538-8490a6ef965a",
+                help_text="Use for reporting fund errors via Vigil.\nDatabase encrypted",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='vigil_wrapper_error_channel_id',
-            field=encrypted_model_fields.fields.EncryptedCharField(blank=True, default='4762f58a-fbc8-43d1-8b40-d4378e7d7275', help_text='Use for reporting bot errors via Vigil.\nDatabase encrypted', null=True),
+            model_name="bot",
+            name="vigil_wrapper_error_channel_id",
+            field=encrypted_model_fields.fields.EncryptedCharField(
+                blank=True,
+                default="4762f58a-fbc8-43d1-8b40-d4378e7d7275",
+                help_text="Use for reporting bot errors via Vigil.\nDatabase encrypted",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='peg',
-            field=models.CharField(help_text='The currency to peg to. The value of this currency will be used to calculate the prices the bot uses', max_length=255),
+            model_name="bot",
+            name="peg",
+            field=models.CharField(
+                help_text="The currency to peg to. The value of this currency will be used to calculate the prices the bot uses",
+                max_length=255,
+            ),
         ),
         migrations.AlterField(
-            model_name='bot',
-            name='track',
-            field=models.CharField(help_text='The currency to track. If this is the same as Quote Currency, the bot is "reversed"', max_length=255),
+            model_name="bot",
+            name="track",
+            field=models.CharField(
+                help_text='The currency to track. If this is the same as Quote Currency, the bot is "reversed"',
+                max_length=255,
+            ),
         ),
     ]

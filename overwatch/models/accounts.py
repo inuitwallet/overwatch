@@ -9,46 +9,41 @@ from encrypted_model_fields.fields import EncryptedCharField
 
 
 class Exchange(models.Model):
-    identifier = models.CharField(
-        max_length=255,
-        unique=True
-    )
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
+    identifier = models.CharField(max_length=255, unique=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     exchange = models.CharField(
         max_length=255,
-        help_text='The exchange name. This matches ',
-        choices=[(exchange, exchange.title()) for exchange in ccxt.exchanges]
+        help_text="The exchange name. This matches ",
+        choices=[(exchange, exchange.title()) for exchange in ccxt.exchanges],
     )
     key = EncryptedCharField(
         max_length=255,
-        help_text='database encrypted and hidden from display',
+        help_text="database encrypted and hidden from display",
         blank=True,
-        null=True
+        null=True,
     )
     secret = EncryptedCharField(
         max_length=255,
-        help_text='database encrypted and hidden from display',
+        help_text="database encrypted and hidden from display",
         blank=True,
-        null=True
+        null=True,
     )
 
     def __str__(self):
-        return '{} @ {}'.format(self.identifier, self.exchange.title())
+        return "{} @ {}".format(self.identifier, self.exchange.title())
 
     def total_profit(self, days=1):
         total_profit = 0
 
         for bot in self.bot_set.all():
-            profit = bot.bottrade_set.filter(
-                time__gte=now() - datetime.timedelta(days=days),
-                profit_usd__isnull=False,
-                bot_trade=True
-            ).aggregate(
-                profit=Sum('profit_usd')
-            )['profit'] or 0
+            profit = (
+                bot.bottrade_set.filter(
+                    time__gte=now() - datetime.timedelta(days=days),
+                    profit_usd__isnull=False,
+                    bot_trade=True,
+                ).aggregate(profit=Sum("profit_usd"))["profit"]
+                or 0
+            )
 
             total_profit += profit
 
@@ -58,14 +53,15 @@ class Exchange(models.Model):
         profit = 0
 
         for bot in self.bot_set.all():
-            profit = bot.bottrade_set.filter(
-                time__lte=now() - datetime.timedelta(days=start_day),
-                time__gte=now() - datetime.timedelta(days=start_day + 1),
-                profit_usd__isnull=False,
-                bot_trade=True
-            ).aggregate(
-                profit=Sum('profit_usd')
-            )['profit'] or 0
+            profit = (
+                bot.bottrade_set.filter(
+                    time__lte=now() - datetime.timedelta(days=start_day),
+                    time__gte=now() - datetime.timedelta(days=start_day + 1),
+                    profit_usd__isnull=False,
+                    bot_trade=True,
+                ).aggregate(profit=Sum("profit_usd"))["profit"]
+                or 0
+            )
 
             profit += profit
 
@@ -76,13 +72,14 @@ class Exchange(models.Model):
         max_profit = 0
 
         for bot in self.bot_set.all():
-            profit = bot.bottrade_set.filter(
-                time__gte=now() - datetime.timedelta(days=days),
-                profit_usd__isnull=False,
-                bot_trade=True
-            ).aggregate(
-                profit=Sum('profit_usd')
-            )['profit'] or 0
+            profit = (
+                bot.bottrade_set.filter(
+                    time__gte=now() - datetime.timedelta(days=days),
+                    profit_usd__isnull=False,
+                    bot_trade=True,
+                ).aggregate(profit=Sum("profit_usd"))["profit"]
+                or 0
+            )
 
             if profit > max_profit:
                 max_profit = profit
@@ -92,29 +89,17 @@ class Exchange(models.Model):
 
 
 class AWS(models.Model):
-    identifier = models.CharField(
-        max_length=255,
-        unique=True
-    )
-    owner = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
-    region = models.CharField(
-        max_length=255,
-        default='eu-west-1'
-    )
+    identifier = models.CharField(max_length=255, unique=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    region = models.CharField(max_length=255, default="eu-west-1")
     access_key = EncryptedCharField(
-        max_length=255,
-        help_text='database encrypted',
-        blank=True,
-        null=True
+        max_length=255, help_text="database encrypted", blank=True, null=True
     )
     secret_key = EncryptedCharField(
         max_length=255,
-        help_text='database encrypted and hidden from display',
+        help_text="database encrypted and hidden from display",
         blank=True,
-        null=True
+        null=True,
     )
 
     def __str__(self):

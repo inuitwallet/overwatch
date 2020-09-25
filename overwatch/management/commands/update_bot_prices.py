@@ -16,7 +16,9 @@ class Command(BaseCommand):
 
     def make_price_request(self, currency):
         # we've not see this unit yet so get the usd price
-        r = requests.get('https://price-aggregator.crypto-daio.co.uk/price/{}'.format(currency))
+        r = requests.get(
+            "https://price-aggregator.crypto-daio.co.uk/price/{}".format(currency)
+        )
 
         if r.status_code == requests.codes.not_found:
             # we got a 404 so no data for this unit
@@ -35,14 +37,14 @@ class Command(BaseCommand):
             return False
 
         # we got a response so set the value!
-        self.usd_prices[currency] = response.get('moving_averages', {}).get('30_minute')
+        self.usd_prices[currency] = response.get("moving_averages", {}).get("30_minute")
         return True
 
     def handle(self, *args, **options):
         # get all BotPrices that don't have a price_usd
         bot_prices = BotPrice.objects.filter(price_peg__isnull=True)
 
-        print('getting PEG values for {} bot prices'.format(bot_prices.count()))
+        print("getting PEG values for {} bot prices".format(bot_prices.count()))
 
         for bot_price in bot_prices:
             track = bot_price.bot.track.upper()
@@ -58,15 +60,21 @@ class Command(BaseCommand):
                 continue
 
             # If the peg currency is USD, we're golden as the price is already in USD
-            if peg == 'USD' or peg == 'USNBT':
+            if peg == "USD" or peg == "USNBT":
                 if bot_price.price:
-                    bot_price.price_peg = self.apply_price(bot_price.price, self.usd_prices[track], reverse)
+                    bot_price.price_peg = self.apply_price(
+                        bot_price.price, self.usd_prices[track], reverse
+                    )
 
                 if bot_price.bid_price:
-                    bot_price.bid_price_peg = self.apply_price(bot_price.bid_price, self.usd_prices[track], reverse)
+                    bot_price.bid_price_peg = self.apply_price(
+                        bot_price.bid_price, self.usd_prices[track], reverse
+                    )
 
                 if bot_price.ask_price:
-                    bot_price.ask_price_peg = self.apply_price(bot_price.ask_price, self.usd_prices[track], reverse)
+                    bot_price.ask_price_peg = self.apply_price(
+                        bot_price.ask_price, self.usd_prices[track], reverse
+                    )
 
             else:
                 # we do the same as above but multiply in the USD price of the peg currency
@@ -84,12 +92,18 @@ class Command(BaseCommand):
                     peg_price = self.usd_prices[track] * self.usd_prices[peg]
 
                 if bot_price.price:
-                    bot_price.price_peg = self.apply_price(bot_price.price, peg_price, reverse)
+                    bot_price.price_peg = self.apply_price(
+                        bot_price.price, peg_price, reverse
+                    )
 
                 if bot_price.bid_price:
-                    bot_price.bid_price_peg = self.apply_price(bot_price.bid_price, peg_price, reverse)
+                    bot_price.bid_price_peg = self.apply_price(
+                        bot_price.bid_price, peg_price, reverse
+                    )
 
                 if bot_price.ask_price:
-                    bot_price.ask_price_peg = self.apply_price(bot_price.ask_price, peg_price, reverse)
+                    bot_price.ask_price_peg = self.apply_price(
+                        bot_price.ask_price, peg_price, reverse
+                    )
 
             bot_price.save()

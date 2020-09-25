@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0027_bot_aws_region'),
+        ("overwatch", "0027_bot_aws_region"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bottrade',
-            name='bot_trade',
+            model_name="bottrade",
+            name="bot_trade",
             field=models.BooleanField(default=True),
         ),
     ]

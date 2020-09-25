@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0046_auto_20191211_2320'),
+        ("overwatch", "0046_auto_20191211_2320"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='botbalance',
-            name='bid_available_as_base',
+            model_name="botbalance",
+            name="bid_available_as_base",
             field=models.FloatField(blank=True, null=True),
         ),
     ]

@@ -6,32 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0013_auto_20180917_1936'),
+        ("overwatch", "0013_auto_20180917_1936"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='botprice',
-            name='side',
-        ),
+        migrations.RemoveField(model_name="botprice", name="side",),
         migrations.AddField(
-            model_name='botprice',
-            name='ask_price',
+            model_name="botprice",
+            name="ask_price",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='botprice',
-            name='ask_price_usd',
+            model_name="botprice",
+            name="ask_price_usd",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='botprice',
-            name='bid_price',
+            model_name="botprice",
+            name="bid_price",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='botprice',
-            name='bid_price_usd',
+            model_name="botprice",
+            name="bid_price_usd",
             field=models.FloatField(blank=True, null=True),
         ),
     ]

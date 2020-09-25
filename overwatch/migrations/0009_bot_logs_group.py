@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0008_apiprofile'),
+        ("overwatch", "0008_apiprofile"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='logs_group',
-            field=models.CharField(blank=True, help_text='AWS Cloudwatch logs group name', max_length=255, null=True),
+            model_name="bot",
+            name="logs_group",
+            field=models.CharField(
+                blank=True,
+                help_text="AWS Cloudwatch logs group name",
+                max_length=255,
+                null=True,
+            ),
         ),
     ]

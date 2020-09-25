@@ -9,19 +9,21 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('overwatch', '0030_auto_20190505_1916'),
+        ("overwatch", "0030_auto_20190505_1916"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='active',
-            field=models.BooleanField(default=True),
+            model_name="bot", name="active", field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='bot',
-            name='owner',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="bot",
+            name="owner",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
             preserve_default=False,
         ),
     ]

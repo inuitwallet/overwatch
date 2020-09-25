@@ -6,13 +6,11 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0002_bot_api_secret'),
+        ("overwatch", "0002_bot_api_secret"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='last_nonce',
-            field=models.IntegerField(default=0),
+            model_name="bot", name="last_nonce", field=models.IntegerField(default=0),
         ),
     ]

@@ -7,26 +7,36 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0011_botplacedorder'),
+        ("overwatch", "0011_botplacedorder"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BotPrice',
+            name="BotPrice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('price', models.FloatField()),
-                ('unit', models.CharField(max_length=255)),
-                ('side', models.CharField(max_length=255)),
-                ('bot', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='overwatch.Bot')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("time", models.DateTimeField(auto_now_add=True)),
+                ("price", models.FloatField()),
+                ("unit", models.CharField(max_length=255)),
+                ("side", models.CharField(max_length=255)),
+                (
+                    "bot",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="overwatch.Bot"
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['-time'],
-            },
+            options={"ordering": ["-time"],},
         ),
         migrations.AlterModelOptions(
-            name='botplacedorder',
-            options={'ordering': ['-time']},
+            name="botplacedorder", options={"ordering": ["-time"]},
         ),
     ]

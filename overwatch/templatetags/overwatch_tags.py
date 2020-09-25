@@ -9,7 +9,7 @@ def profit_render(value):
     if value > 0:
         rendered_value = '<span style="color: green">$ {:.2f}</span>'.format(value)
     elif value == 0:
-        rendered_value = '<span>$ {:.2f}</span>'.format(value)
+        rendered_value = "<span>$ {:.2f}</span>".format(value)
     else:
         rendered_value = '<span style="color: red">$ {:.2f}</span>'.format(value)
 

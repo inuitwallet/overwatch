@@ -10,42 +10,35 @@ from .bot import (
     ActivateBotView,
     BotErrorsDataTablesView,
     BotPlacedOrdersDataTablesView,
-    BotTradesDataTablesView
+    BotTradesDataTablesView,
 )
 from .bot_api import (
     BotApiConfigView,
     BotApiPlacedOrderView,
     BotApiPricesView,
     BotApiBalancesView,
-    BotApiTradeView
+    BotApiTradeView,
 )
-from .bot_user_api import (
-    BotUserApiErrorsView
-)
+from .bot_user_api import BotUserApiErrorsView
 
 __all__ = [
-    'AWSAccount',
-    'ExchangeAccount',
-    'ListBotView',
-    'DetailBotView',
-    'UpdateBotView',
-    'CreateBotView',
-    'DeleteBotView',
-    'DeployBotView',
-    'DeactivateBotView',
-    'ActivateBotView',
-    'BotErrorsDataTablesView',
-    'BotPlacedOrdersDataTablesView',
-    'BotTradesDataTablesView',
-    'BotApiConfigView',
-    'BotApiPlacedOrderView',
-    'BotApiPricesView',
-    'BotApiBalancesView',
-    'BotApiTradeView',
-    'BotUserApiErrorsView',
+    "AWSAccount",
+    "ExchangeAccount",
+    "ListBotView",
+    "DetailBotView",
+    "UpdateBotView",
+    "CreateBotView",
+    "DeleteBotView",
+    "DeployBotView",
+    "DeactivateBotView",
+    "ActivateBotView",
+    "BotErrorsDataTablesView",
+    "BotPlacedOrdersDataTablesView",
+    "BotTradesDataTablesView",
+    "BotApiConfigView",
+    "BotApiPlacedOrderView",
+    "BotApiPricesView",
+    "BotApiBalancesView",
+    "BotApiTradeView",
+    "BotUserApiErrorsView",
 ]
-
-
-
-
-

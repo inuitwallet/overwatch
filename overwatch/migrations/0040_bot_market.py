@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0039_auto_20191206_2048'),
+        ("overwatch", "0039_auto_20191206_2048"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='market',
-            field=models.CharField(default='', help_text='The Market to operate on', max_length=255),
+            model_name="bot",
+            name="market",
+            field=models.CharField(
+                default="", help_text="The Market to operate on", max_length=255
+            ),
             preserve_default=False,
         ),
     ]

@@ -12,42 +12,38 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-t',
-            '--tim',
-            help='The time to calculate the profit over',
-            dest='time',
-            default=None
+            "-t",
+            "--tim",
+            help="The time to calculate the profit over",
+            dest="time",
+            default=None,
         )
         parser.add_argument(
-            '-b',
-            '--bot',
-            help='pk of bot to limit to',
-            dest='bot',
-            default=None
+            "-b", "--bot", help="pk of bot to limit to", dest="bot", default=None
         )
 
     def handle(self, *args, **options):
         bot = None
 
-        if options['bot']:
+        if options["bot"]:
             try:
-                bot = Bot.objects.get(pk=options['bot'])
-                self.log.info('Using bot {}'.format(bot))
+                bot = Bot.objects.get(pk=options["bot"])
+                self.log.info("Using bot {}".format(bot))
             except Bot.DoesNotExist:
                 bot = None
 
         total_profit = 0
 
-        trades = BotTrade.objects.filter(
-            profit_usd__isnull=False
-        ).filter(
-            bot__market_price=False
-        ).exclude(
-            bot_trade=False
+        trades = (
+            BotTrade.objects.filter(profit_usd__isnull=False)
+            .filter(bot__market_price=False)
+            .exclude(bot_trade=False)
         )
 
-        if options['time']:
-            trades = trades.filter(time__gte=now() - timedelta(days=int(options['time'])))
+        if options["time"]:
+            trades = trades.filter(
+                time__gte=now() - timedelta(days=int(options["time"]))
+            )
 
         earliest_trade = now()
 
@@ -57,6 +53,4 @@ class Command(BaseCommand):
             if t.time < earliest_trade:
                 earliest_trade = t.time
 
-        self.log.info('Profit since {} = ${}'.format(earliest_trade, total_profit))
-
-
+        self.log.info("Profit since {} = ${}".format(earliest_trade, total_profit))

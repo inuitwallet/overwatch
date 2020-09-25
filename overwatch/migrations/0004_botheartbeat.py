@@ -7,16 +7,29 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0003_bot_last_nonce'),
+        ("overwatch", "0003_bot_last_nonce"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BotHeartBeat',
+            name="BotHeartBeat",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('bot', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='overwatch.Bot')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("time", models.DateTimeField(auto_now_add=True)),
+                (
+                    "bot",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="overwatch.Bot"
+                    ),
+                ),
             ],
         ),
     ]

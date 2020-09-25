@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0005_auto_20180510_1429'),
-        ('overwatch', '0005_auto_20180510_2112'),
+        ("overwatch", "0005_auto_20180510_1429"),
+        ("overwatch", "0005_auto_20180510_2112"),
     ]
 
-    operations = [
-    ]
+    operations = []

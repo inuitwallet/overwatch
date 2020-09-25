@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('overwatch', '0026_bottrade_updated'),
+        ("overwatch", "0026_bottrade_updated"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='bot',
-            name='aws_region',
-            field=models.CharField(default='eu-west-1', max_length=255),
+            model_name="bot",
+            name="aws_region",
+            field=models.CharField(default="eu-west-1", max_length=255),
         ),
     ]
