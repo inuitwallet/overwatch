@@ -78,7 +78,7 @@ jobs:
             }
           }
 
-          FIELD_ENCRYPTION_KEY = 'supersecretencryptionkey'
+          FIELD_ENCRYPTION_KEY = 'AaciltiIP5L6syKvLpz2lJ4nVhwcBZQ5abGgjorVbNs='
           " >> overwatch/local_settings.py
 
 
