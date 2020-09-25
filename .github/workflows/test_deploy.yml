@@ -77,7 +77,7 @@ jobs:
               'PORT': '5432',
             }
           }
-          " >> daio/local_settings.py
+          " >> overwatch/local_settings.py
 
 
       - name: run tests under coverage
